@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/cameraFragment">
+
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.pdfscanner.app.ui.CameraFragment"
+        android:label="Camera"
+        tools:layout="@layout/fragment_camera">
+        
+        <action
+            android:id="@+id/action_camera_to_preview"
+            app:destination="@id/previewFragment" />
+        
+        <action
+            android:id="@+id/action_camera_to_pages"
+            app:destination="@id/pagesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/previewFragment"
+        android:name="com.pdfscanner.app.ui.PreviewFragment"
+        android:label="Preview"
+        tools:layout="@layout/fragment_preview">
+        
+        <argument
+            android:name="imageUri"
+            app:argType="string" />
+        
+        <action
+            android:id="@+id/action_preview_to_camera"
+            app:destination="@id/cameraFragment"
+            app:popUpTo="@id/cameraFragment"
+            app:popUpToInclusive="true" />
+        
+        <action
+            android:id="@+id/action_preview_to_pages"
+            app:destination="@id/pagesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pagesFragment"
+        android:name="com.pdfscanner.app.ui.PagesFragment"
+        android:label="Pages"
+        tools:layout="@layout/fragment_pages">
+        
+        <action
+            android:id="@+id/action_pages_to_camera"
+            app:destination="@id/cameraFragment" />
+    </fragment>
+
+</navigation>

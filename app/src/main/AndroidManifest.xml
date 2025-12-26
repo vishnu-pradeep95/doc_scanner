@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AndroidManifest.xml - The App's "ID Card"
+    
+    PURPOSE:
+    Every Android app MUST have this file. It declares:
+    1. App's package name (unique identifier)
+    2. Components (Activities, Services, Receivers, Providers)
+    3. Required permissions
+    4. Hardware/software requirements
+    5. App metadata (icon, theme, etc.)
+    
+    The system reads this at install time to know what the app needs.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        HARDWARE FEATURE DECLARATION
+        
+        uses-feature declares hardware requirements
+        android:required="true" = app won't install on devices without this
+        
+        This helps Play Store filter compatible devices
+    -->
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    
+    <!--
+        PERMISSION DECLARATION
+        
+        uses-permission declares what sensitive features the app needs
+        CAMERA is a "dangerous" permission = requires runtime request
+        
+        Just declaring here isn't enough - code must request at runtime
+        (done in CameraFragment.kt)
+    -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!--
+        APPLICATION BLOCK
+        
+        Configures the app as a whole and declares its components
+        
+        Attributes:
+        - allowBackup: Allow Android backup service to backup app data
+        - icon/roundIcon: App icons (mipmap resources for different densities)
+        - label: App name (from strings.xml)
+        - supportsRtl: Support right-to-left languages (Arabic, Hebrew)
+        - theme: Default theme for all activities
+    -->
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PDFScanner"
+        tools:targetApi="34">
+
+        <!--
+            ACTIVITY DECLARATION
+            
+            Every Activity must be declared here
+            
+            android:name - class name (. prefix = relative to package)
+            android:exported - can other apps launch this?
+                true = yes (required for launcher activity)
+                false = no (private to this app)
+            android:windowSoftInputMode - how keyboard affects layout
+            
+            INTENT-FILTER:
+            Declares what this activity responds to
+            
+            ACTION_MAIN = this is an entry point
+            CATEGORY_LAUNCHER = show in app launcher
+            
+            Together they make this the app's main entry point
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            CROP IMAGE ACTIVITY
+            
+            CanHub Android-Image-Cropper library's activity
+            This is required for the cropping UI to work properly
+            The theme must have an ActionBar for the toolbar to appear
+        -->
+        <activity
+            android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Theme.PDFScanner.Crop" />
+
+        <!--
+            FILEPROVIDER DECLARATION
+            
+            FileProvider enables secure file sharing between apps
+            
+            WHY NEEDED:
+            - App-private files (in filesDir) can't be accessed by other apps
+            - FileProvider creates content:// URIs with temporary permissions
+            - Other apps can read the file via the URI
+            
+            ATTRIBUTES:
+            - authorities: Unique identifier (app.package.fileprovider)
+            - exported="false": Provider is private to this app
+            - grantUriPermissions="true": Can grant temp access via URIs
+            
+            META-DATA:
+            - Points to file_paths.xml which defines shareable directories
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+</manifest>

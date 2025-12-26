@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Document icon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,24h28l16,16v44c0,2.2 -1.8,4 -4,4H34c-2.2,0 -4,-1.8 -4,-4V28c0,-2.2 1.8,-4 4,-4z"/>
+    
+    <!-- Folded corner -->
+    <path
+        android:fillColor="#BBDEFB"
+        android:pathData="M62,24v16h16z"/>
+    
+    <!-- Scan lines -->
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M38,50h32v3H38zM38,58h32v3H38zM38,66h24v3H38z"/>
+    
+    <!-- Camera lens - outer circle (r=10) -->
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M72,66a10,10 0,1 1,0 20a10,10 0,1 1,0 -20z"/>
+    <!-- Camera lens - middle circle (r=6) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M72,70a6,6 0,1 1,0 12a6,6 0,1 1,0 -12z"/>
+    <!-- Camera lens - inner circle (r=3) -->
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M72,73a3,3 0,1 1,0 6a3,3 0,1 1,0 -6z"/>
+</vector>

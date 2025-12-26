@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDF Scanner</string>
+    
+    <!-- Camera Fragment -->
+    <string name="capture_photo">Capture</string>
+    <string name="view_pages">View Pages (%d)</string>
+    <string name="camera_permission_required">Camera permission is required to scan documents</string>
+    <string name="permission_denied">Permission denied. Please enable camera permission in settings.</string>
+    <string name="grant_permission">Grant Permission</string>
+    
+    <!-- Preview Fragment -->
+    <string name="retake">Retake</string>
+    <string name="crop_rotate">Edit</string>
+    <string name="add_page">Add Page</string>
+    <string name="done">Done</string>
+    
+    <!-- Pages Fragment -->
+    <string name="scanned_pages">Scanned Pages</string>
+    <string name="add_more">Add More</string>
+    <string name="create_pdf">Create PDF</string>
+    <string name="share_pdf">Share PDF</string>
+    <string name="no_pages">No pages scanned yet</string>
+    <string name="creating_pdf">Creating PDF…</string>
+    <string name="pdf_created">PDF created successfully!</string>
+    <string name="pdf_error">Error creating PDF</string>
+    <string name="page_number">Page %d</string>
+    <string name="delete_page">Delete</string>
+    <string name="confirm_delete">Delete this page?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    
+    <!-- General -->
+    <string name="error">Error</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    file_paths.xml - FileProvider Path Configuration
+    
+    PURPOSE:
+    Defines which directories FileProvider can share.
+    This is a security measure - you explicitly list allowed paths.
+    
+    PATH TYPES:
+    - files-path: Internal storage (context.filesDir)
+    - cache-path: Internal cache (context.cacheDir)
+    - external-path: External storage (Environment.getExternalStorageDirectory())
+    - external-files-path: External files (context.getExternalFilesDir())
+    - external-cache-path: External cache (context.getExternalCacheDir())
+    
+    ATTRIBUTES:
+    - name: Alias used in content:// URI (hides real path)
+    - path: Subdirectory within the root (. or empty = entire root)
+    
+    EXAMPLE:
+    For file at: /data/data/com.pdfscanner.app/files/pdfs/Scan.pdf
+    URI becomes: content://com.pdfscanner.app.fileprovider/pdfs/Scan.pdf
+-->
+<paths>
+    <!-- 
+        Scanned images directory
+        Maps: context.filesDir/scans/ → content://...fileprovider/scans/
+    -->
+    <files-path name="scans" path="scans/" />
+    
+    <!-- 
+        Generated PDFs directory
+        Maps: context.filesDir/pdfs/ → content://...fileprovider/pdfs/
+    -->
+    <files-path name="pdfs" path="pdfs/" />
+    
+    <!-- 
+        Cache directory for temporary files (crop results, etc.)
+        Maps: context.cacheDir/ → content://...fileprovider/cache/
+    -->
+    <cache-path name="cache" path="/" />
+</paths>
