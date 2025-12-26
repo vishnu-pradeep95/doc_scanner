@@ -29,6 +29,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 
 // AlertDialog for confirmation prompts
@@ -41,6 +42,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope  // Coroutine scope tied to lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager  // Grid layout for RecyclerView
+
+// Material design components
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 // Project imports
 import com.pdfscanner.app.R
@@ -123,6 +130,31 @@ class PagesFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+        
+        // Handle menu item clicks (OCR placeholder)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_ocr -> {
+                    showOcrComingSoonMessage()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    /**
+     * Show OCR coming soon snackbar
+     * 
+     * OCR (Optical Character Recognition) will be implemented in a future phase.
+     * This placeholder informs users the feature is planned.
+     */
+    private fun showOcrComingSoonMessage() {
+        Snackbar.make(
+            binding.root,
+            R.string.ocr_coming_soon,
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
     /**
@@ -172,15 +204,50 @@ class PagesFragment : Fragment() {
             findNavController().navigate(R.id.action_pages_to_camera)
         }
 
-        // Create PDF from all pages
+        // Create PDF from all pages - show rename dialog first
         binding.btnCreatePdf.setOnClickListener {
-            createPdf()
+            showPdfNameDialog()
         }
 
         // Share the generated PDF
         binding.fabShare.setOnClickListener {
             sharePdf()
         }
+    }
+
+    /**
+     * Show dialog to let user name the PDF before creation
+     * 
+     * UX IMPROVEMENT:
+     * Instead of auto-generating a name, let users provide a meaningful name.
+     * Example: "Meeting Notes" → "Meeting Notes_20251226_123456.pdf"
+     * 
+     * If left empty, defaults to "Scan".
+     */
+    private fun showPdfNameDialog() {
+        // Create the input layout programmatically for Material Design styling
+        val inputLayout = TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.pdf_name_hint)
+            boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
+            setPadding(48, 16, 48, 0)
+        }
+        
+        val editText = TextInputEditText(inputLayout.context).apply {
+            // Pre-fill with existing name if set
+            setText(viewModel.pdfBaseName.value ?: "")
+        }
+        inputLayout.addView(editText)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.name_your_pdf)
+            .setView(inputLayout)
+            .setPositiveButton(R.string.create_pdf) { _, _ ->
+                val pdfName = editText.text?.toString()?.trim()
+                viewModel.setPdfBaseName(pdfName)
+                createPdf()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     /**
@@ -431,7 +498,10 @@ class PagesFragment : Fragment() {
         val pdfsDir = File(requireContext().filesDir, "pdfs").apply { mkdirs() }
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
             .format(System.currentTimeMillis())
-        val pdfFile = File(pdfsDir, "Scan_$timestamp.pdf")
+        
+        // Use custom name from ViewModel if set, otherwise default to "Scan"
+        val pdfFileName = viewModel.getPdfFileName(timestamp)
+        val pdfFile = File(pdfsDir, pdfFileName)
 
         /**
          * Write PDF to file

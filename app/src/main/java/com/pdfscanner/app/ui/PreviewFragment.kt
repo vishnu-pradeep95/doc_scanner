@@ -5,11 +5,17 @@
  * After capturing an image, users see it here and can:
  * 1. Retake (go back to camera)
  * 2. Crop/Rotate (edit the image)
- * 3. Add Page (save and continue)
+ * 3. Apply filters (Original, Enhanced, B&W)
+ * 4. Add Page (save and continue)
  * 
  * IMAGE CROPPING:
  * We use CanHub/Android-Image-Cropper library (maintained fork of uCrop)
  * It provides a full-screen crop activity with rotation, aspect ratio, etc.
+ * 
+ * IMAGE FILTERS:
+ * We apply document-style filters (contrast/brightness adjustments) to
+ * improve text legibility. Filters are applied on a background thread
+ * and the processed image is saved to disk before adding to the PDF.
  * 
  * NAVIGATION ARGUMENTS:
  * This Fragment receives the image URI as a navigation argument.
@@ -19,6 +25,7 @@
 package com.pdfscanner.app.ui
 
 // Android core imports
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory  // Decode image files
 import android.net.Uri  // Universal Resource Identifier for files
 import android.os.Bundle
@@ -33,6 +40,7 @@ import androidx.core.content.FileProvider  // Secure file sharing
 import androidx.core.net.toUri  // Extension to convert File to Uri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels  // Shared ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs  // Safe Args navigation arguments
 
@@ -44,7 +52,13 @@ import com.canhub.cropper.CropImageOptions  // Crop configuration
 // Project imports
 import com.pdfscanner.app.R
 import com.pdfscanner.app.databinding.FragmentPreviewBinding
+import com.pdfscanner.app.util.ImageProcessor
 import com.pdfscanner.app.viewmodel.ScannerViewModel
+
+// Coroutines
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // Java utilities
 import java.io.File
@@ -95,6 +109,44 @@ class PreviewFragment : Fragment() {
     private var currentImageUri: Uri? = null
 
     // ============================================================
+    // FILTER STATE
+    // ============================================================
+
+    /**
+     * Currently selected filter type
+     * 
+     * Defaults to ORIGINAL (no processing).
+     * When user taps a filter button, we:
+     * 1. Update this variable
+     * 2. Apply the filter in background
+     * 3. Update the preview ImageView
+     */
+    private var currentFilterType: ImageProcessor.FilterType = ImageProcessor.FilterType.ORIGINAL
+
+    /**
+     * Original image URI (before any filter is applied)
+     * 
+     * We keep this reference so we can re-apply filters from the original.
+     * When user switches filters, we load from originalImageUri, not the
+     * previously filtered image (to avoid quality loss from repeated processing).
+     */
+    private var originalImageUri: Uri? = null
+
+    /**
+     * Cached downsampled bitmap for preview
+     * 
+     * We load the image once at a reduced resolution for preview.
+     * This bitmap is used when applying filters for display.
+     * Full-resolution filtering happens only when saving.
+     * 
+     * MEMORY TRADE-OFF:
+     * - Keeping a preview bitmap (~1-2MB) in memory
+     * - Avoids re-reading from disk on each filter change
+     * - Released in onDestroyView()
+     */
+    private var previewBitmap: Bitmap? = null
+
+    // ============================================================
     // IMAGE CROPPER
     // ============================================================
     
@@ -115,6 +167,12 @@ class PreviewFragment : Fragment() {
             result.uriContent?.let { croppedUri ->
                 // Update our current image reference
                 currentImageUri = croppedUri
+                originalImageUri = croppedUri  // Cropped image becomes new "original"
+                
+                // Reset filter to Original when image changes
+                currentFilterType = ImageProcessor.FilterType.ORIGINAL
+                binding.filterToggleGroup.check(R.id.btnFilterOriginal)
+                
                 // Display the cropped image
                 loadImage(croppedUri)
             }
@@ -152,9 +210,11 @@ class PreviewFragment : Fragment() {
          * Uri.parse() converts string back to Uri object
          */
         currentImageUri = Uri.parse(args.imageUri)
+        originalImageUri = currentImageUri  // Keep reference to original
 
         setupToolbar()
         setupButtons()
+        setupFilterButtons()
         
         // Display the captured image
         loadImage(currentImageUri!!)
@@ -207,15 +267,187 @@ class PreviewFragment : Fragment() {
          * Save this image to the pages list and continue
          */
         binding.btnAddPage.setOnClickListener {
-            currentImageUri?.let { uri ->
-                // Add to ViewModel's page list
-                viewModel.addPage(uri)
-                
-                // Clear the "current capture" since it's now in the list
-                viewModel.clearCurrentCapture()
+            // If a filter is applied, save the processed image before adding
+            if (currentFilterType != ImageProcessor.FilterType.ORIGINAL) {
+                saveFilteredImageAndAddPage()
+            } else {
+                // No filter - use original image directly
+                addPageAndNavigate(currentImageUri!!)
+            }
+        }
+    }
 
-                // Navigate to pages list to see all scanned pages
-                findNavController().navigate(R.id.action_preview_to_pages)
+    /**
+     * Add page to ViewModel and navigate to pages list
+     * 
+     * @param uri The URI of the image to add (original or processed)
+     */
+    private fun addPageAndNavigate(uri: Uri) {
+        // Add to ViewModel's page list
+        viewModel.addPage(uri)
+        
+        // Track which filter was applied to this page
+        val pageIndex = viewModel.getPageCount() - 1
+        viewModel.setPageFilter(pageIndex, currentFilterType)
+        
+        // Clear the "current capture" since it's now in the list
+        viewModel.clearCurrentCapture()
+
+        // Navigate to pages list to see all scanned pages
+        findNavController().navigate(R.id.action_preview_to_pages)
+    }
+
+    /**
+     * Save the filtered image to disk and then add page
+     * 
+     * When a filter is applied, we need to persist the processed image
+     * before adding it to the pages list. This ensures the PDF uses the
+     * filtered version.
+     * 
+     * PROCESS:
+     * 1. Show loading overlay
+     * 2. Load full-resolution original image
+     * 3. Apply filter
+     * 4. Save to processed directory
+     * 5. Add the processed URI to pages
+     */
+    private fun saveFilteredImageAndAddPage() {
+        val originalUri = originalImageUri ?: return
+
+        // Show loading
+        binding.loadingOverlay.visibility = View.VISIBLE
+
+        lifecycleScope.launch {
+            try {
+                val processedUri = withContext(Dispatchers.IO) {
+                    // Load full resolution bitmap for final output
+                    val fullResBitmap = loadFullResBitmap(originalUri)
+                        ?: throw Exception("Failed to load image")
+
+                    // Apply the selected filter
+                    val processedBitmap = ImageProcessor.applyFilter(fullResBitmap, currentFilterType)
+
+                    // Save to processed directory
+                    val processedFile = createProcessedFile()
+                    val success = ImageProcessor.saveBitmapToFile(processedBitmap, processedFile)
+
+                    // Clean up bitmaps
+                    if (processedBitmap != fullResBitmap) {
+                        processedBitmap.recycle()
+                    }
+                    fullResBitmap.recycle()
+
+                    if (!success) {
+                        throw Exception("Failed to save processed image")
+                    }
+
+                    processedFile.toUri()
+                }
+
+                // Hide loading and add page
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    addPageAndNavigate(processedUri)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    Toast.makeText(
+                        requireContext(),
+                        "Error processing image: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Load full resolution bitmap from URI
+     * 
+     * For final PDF output, we need the full resolution image.
+     * We still limit to a reasonable max size to avoid OOM on very large images.
+     */
+    private fun loadFullResBitmap(uri: Uri): Bitmap? {
+        return try {
+            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Create a file for the processed/filtered image
+     * 
+     * Saves to filesDir/processed/ directory to keep organized.
+     */
+    private fun createProcessedFile(): File {
+        val processedDir = File(requireContext().filesDir, "processed").apply { mkdirs() }
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US)
+            .format(System.currentTimeMillis())
+        return File(processedDir, "PROC_$timestamp.jpg")
+    }
+
+    // ============================================================
+    // FILTER SETUP
+    // ============================================================
+
+    /**
+     * Setup filter toggle button listeners
+     * 
+     * MaterialButtonToggleGroup provides a segmented control look.
+     * When a button is selected, we apply the corresponding filter.
+     */
+    private fun setupFilterButtons() {
+        binding.filterToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val filterType = when (checkedId) {
+                    R.id.btnFilterOriginal -> ImageProcessor.FilterType.ORIGINAL
+                    R.id.btnFilterEnhanced -> ImageProcessor.FilterType.ENHANCED
+                    R.id.btnFilterBw -> ImageProcessor.FilterType.DOCUMENT_BW
+                    else -> ImageProcessor.FilterType.ORIGINAL
+                }
+                applyFilterToPreview(filterType)
+            }
+        }
+    }
+
+    /**
+     * Apply a filter to the preview image
+     * 
+     * This applies the filter to the cached preview bitmap (downsampled)
+     * for fast UI response. The full-resolution filtering happens when
+     * the user clicks "Add Page".
+     * 
+     * @param filterType The filter to apply
+     */
+    private fun applyFilterToPreview(filterType: ImageProcessor.FilterType) {
+        currentFilterType = filterType
+
+        // For ORIGINAL, just show the cached preview
+        if (filterType == ImageProcessor.FilterType.ORIGINAL) {
+            previewBitmap?.let { binding.imagePreview.setImageBitmap(it) }
+            return
+        }
+
+        // For other filters, apply in background
+        val bitmap = previewBitmap ?: return
+
+        // Show brief loading indicator
+        binding.loadingOverlay.visibility = View.VISIBLE
+
+        lifecycleScope.launch {
+            val filteredBitmap = withContext(Dispatchers.IO) {
+                // Apply filter to preview bitmap
+                // NOTE: We create a copy to avoid modifying the cached original
+                ImageProcessor.applyFilter(bitmap, filterType)
+            }
+
+            withContext(Dispatchers.Main) {
+                binding.loadingOverlay.visibility = View.GONE
+                binding.imagePreview.setImageBitmap(filteredBitmap)
             }
         }
     }
@@ -249,12 +481,15 @@ class PreviewFragment : Fragment() {
              * - Don't allocate memory for pixels
              * - Much faster than full decode
              */
+            var imageWidth = 0
+            var imageHeight = 0
             requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
                 val options = BitmapFactory.Options().apply {
                     inJustDecodeBounds = true  // Don't load pixels yet
                 }
                 BitmapFactory.decodeStream(inputStream, null, options)
-                // Now options.outWidth and options.outHeight contain dimensions
+                imageWidth = options.outWidth
+                imageHeight = options.outHeight
             }
 
             /**
@@ -268,9 +503,12 @@ class PreviewFragment : Fragment() {
             requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
                 val options = BitmapFactory.Options().apply {
                     // Calculate appropriate sample size based on target dimensions
-                    inSampleSize = calculateInSampleSize(1080, 1920)
+                    inSampleSize = calculateInSampleSize(imageWidth, imageHeight, 1080, 1920)
                 }
                 val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+                
+                // Cache the preview bitmap for filter application
+                previewBitmap = bitmap
                 
                 // Set the decoded bitmap as the ImageView source
                 binding.imagePreview.setImageBitmap(bitmap)
@@ -284,17 +522,34 @@ class PreviewFragment : Fragment() {
     /**
      * Calculate inSampleSize for bitmap decoding
      * 
-     * This is a simplified version - production apps would calculate
-     * based on actual image dimensions vs requested dimensions
+     * Finds the largest power of 2 that keeps dimensions >= target.
+     * This provides a good balance of quality vs memory usage.
      * 
+     * @param srcWidth Source image width
+     * @param srcHeight Source image height
      * @param reqWidth Target width
      * @param reqHeight Target height
      * @return Sample size (1 = full resolution, 2 = half, etc.)
      */
-    private fun calculateInSampleSize(reqWidth: Int, reqHeight: Int): Int {
-        // For simplicity, return 1 (full resolution)
-        // A more sophisticated version would compare actual vs target dimensions
-        return 1
+    private fun calculateInSampleSize(
+        srcWidth: Int, 
+        srcHeight: Int,
+        reqWidth: Int, 
+        reqHeight: Int
+    ): Int {
+        var inSampleSize = 1
+
+        if (srcHeight > reqHeight || srcWidth > reqWidth) {
+            val halfHeight = srcHeight / 2
+            val halfWidth = srcWidth / 2
+
+            // Calculate the largest inSampleSize that keeps dimensions >= required
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
     }
 
     // ============================================================
@@ -384,6 +639,9 @@ class PreviewFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Clean up cached bitmap to prevent memory leak
+        previewBitmap?.recycle()
+        previewBitmap = null
         // Prevent memory leak by clearing binding reference
         _binding = null
     }

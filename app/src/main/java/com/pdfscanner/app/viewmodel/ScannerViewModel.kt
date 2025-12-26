@@ -38,6 +38,7 @@ import android.net.Uri  // URI = Uniform Resource Identifier, points to files/re
 import androidx.lifecycle.LiveData  // Read-only observable data
 import androidx.lifecycle.MutableLiveData  // Read-write observable data
 import androidx.lifecycle.ViewModel  // Base class for ViewModels
+import com.pdfscanner.app.util.ImageProcessor  // Filter utilities
 
 /**
  * ScannerViewModel - Manages scanned pages across all Fragments
@@ -123,6 +124,32 @@ class ScannerViewModel : ViewModel() {
      */
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
+
+    // ============================================================
+    // FILTER STATE
+    // ============================================================
+
+    /**
+     * Maps page index to its applied filter type
+     * 
+     * When a filter is applied in PreviewFragment, we track it here.
+     * This allows PagesFragment to know which filter was applied when
+     * generating the PDF (it will re-apply the filter to full-res image).
+     * 
+     * Key = page index in pages list
+     * Value = filter type applied
+     */
+    private val _pageFilters = MutableLiveData<MutableMap<Int, ImageProcessor.FilterType>>(mutableMapOf())
+    val pageFilters: LiveData<MutableMap<Int, ImageProcessor.FilterType>> = _pageFilters
+
+    /**
+     * Custom PDF base name (entered by user)
+     * 
+     * If null or empty, a default timestamp-based name will be used.
+     * Example: "Meeting Notes" → "Meeting Notes_20251226_123456.pdf"
+     */
+    private val _pdfBaseName = MutableLiveData<String?>()
+    val pdfBaseName: LiveData<String?> = _pdfBaseName
 
     // ============================================================
     // PUBLIC METHODS (how Fragments modify data)
@@ -239,5 +266,56 @@ class ScannerViewModel : ViewModel() {
     fun clearAllPages() {
         _pages.value = mutableListOf()
         _pdfUri.value = null
+        _pageFilters.value = mutableMapOf()
+        _pdfBaseName.value = null
+    }
+
+    // ============================================================
+    // FILTER METHODS
+    // ============================================================
+
+    /**
+     * Set the filter type for a specific page
+     * 
+     * Called when user selects a filter in PreviewFragment.
+     * The actual processed image URI is stored in the pages list.
+     * 
+     * @param pageIndex Index of the page (0-based)
+     * @param filterType The filter that was applied
+     */
+    fun setPageFilter(pageIndex: Int, filterType: ImageProcessor.FilterType) {
+        val currentFilters = _pageFilters.value ?: mutableMapOf()
+        currentFilters[pageIndex] = filterType
+        _pageFilters.value = currentFilters
+    }
+
+    /**
+     * Get the filter type for a specific page
+     * 
+     * @param pageIndex Index of the page
+     * @return FilterType, defaults to ORIGINAL if not set
+     */
+    fun getPageFilter(pageIndex: Int): ImageProcessor.FilterType {
+        return _pageFilters.value?.get(pageIndex) ?: ImageProcessor.FilterType.ORIGINAL
+    }
+
+    /**
+     * Set custom PDF base name
+     * 
+     * @param name The base name for the PDF (without extension)
+     */
+    fun setPdfBaseName(name: String?) {
+        _pdfBaseName.value = name?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    /**
+     * Get the PDF file name to use
+     * 
+     * @param timestamp Timestamp string to append
+     * @return Complete filename (with .pdf extension)
+     */
+    fun getPdfFileName(timestamp: String): String {
+        val baseName = _pdfBaseName.value?.takeIf { it.isNotEmpty() } ?: "Scan"
+        return "${baseName}_$timestamp.pdf"
     }
 }

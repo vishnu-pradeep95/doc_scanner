@@ -21,6 +21,11 @@
  * - Automatically animates insertions/deletions
  * - Handles the "notify" calls for you
  * 
+ * THUMBNAIL OPTIMIZATION:
+ * - Use inSampleSize to load downsampled images (1/16 pixels)
+ * - Cache bitmaps in a LruCache keyed by URI
+ * - Load thumbnails asynchronously to avoid blocking UI
+ * 
  * ANALOGY:
  * Think of it like a printing press:
  * - The press (RecyclerView) holds paper
@@ -31,13 +36,20 @@
 
 package com.pdfscanner.app.adapter
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil  // Computes list differences
 import androidx.recyclerview.widget.ListAdapter  // Adapter with DiffUtil built-in
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // View Binding for the item layout
 import com.pdfscanner.app.databinding.ItemPageBinding
@@ -56,6 +68,45 @@ import com.pdfscanner.app.databinding.ItemPageBinding
 class PagesAdapter(
     private val onDeleteClick: (Int) -> Unit
 ) : ListAdapter<Uri, PagesAdapter.PageViewHolder>(PageDiffCallback()) {
+
+    // ============================================================
+    // THUMBNAIL CACHE
+    // ============================================================
+
+    /**
+     * LruCache for thumbnail bitmaps
+     * 
+     * LRU = Least Recently Used
+     * When cache is full, oldest (least recently accessed) items are removed.
+     * 
+     * MEMORY SIZING:
+     * We allocate 1/8 of available memory for thumbnail cache.
+     * Each thumbnail is ~200KB (assuming 200x280 @ 4 bytes/pixel = 224KB)
+     * So with 32MB cache, we can hold ~140 thumbnails.
+     * 
+     * KEY: URI string
+     * VALUE: Bitmap
+     */
+    private val thumbnailCache: LruCache<String, Bitmap> = run {
+        // Get max available memory (in KB)
+        val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
+        // Use 1/8th of available memory for cache
+        val cacheSize = maxMemory / 8
+        
+        object : LruCache<String, Bitmap>(cacheSize) {
+            override fun sizeOf(key: String, bitmap: Bitmap): Int {
+                // Return size in KB
+                return bitmap.byteCount / 1024
+            }
+        }
+    }
+
+    /**
+     * Coroutine scope for async thumbnail loading
+     * 
+     * SupervisorJob ensures one failed load doesn't cancel others
+     */
+    private val adapterScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     // ============================================================
     // ADAPTER METHODS
@@ -137,38 +188,45 @@ class PagesAdapter(
             binding.textPageNumber.text = (position + 1).toString()
 
             // ============================================
-            // THUMBNAIL IMAGE
+            // THUMBNAIL IMAGE (with caching)
             // ============================================
             
             /**
-             * Load thumbnail image
+             * Load thumbnail image with LRU caching
              * 
-             * We use inSampleSize = 4 to load 1/16 of the pixels
-             * This is much faster and uses less memory for thumbnails
+             * PROCESS:
+             * 1. Check cache for existing thumbnail
+             * 2. If cached, use immediately
+             * 3. If not cached, load asynchronously and cache result
+             * 
+             * This avoids re-decoding images on every bind (scroll)
              */
-            try {
-                val context = binding.root.context
-                
-                // First pass: get dimensions (not loading pixels)
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val options = BitmapFactory.Options().apply {
-                        inJustDecodeBounds = true
-                    }
-                    BitmapFactory.decodeStream(inputStream, null, options)
-                }
-
-                // Second pass: load downsampled image
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val options = BitmapFactory.Options().apply {
-                        inSampleSize = 4  // Load 1/4 width, 1/4 height = 1/16 pixels
-                    }
-                    val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
-                    binding.imageThumbnail.setImageBitmap(bitmap)
-                }
-            } catch (e: Exception) {
-                // If loading fails, clear the image
-                // This handles deleted files, permission issues, etc.
+            val cacheKey = uri.toString()
+            val cachedBitmap = thumbnailCache.get(cacheKey)
+            
+            if (cachedBitmap != null) {
+                // Cache hit - use immediately
+                binding.imageThumbnail.setImageBitmap(cachedBitmap)
+            } else {
+                // Cache miss - load asynchronously
+                // Clear previous image while loading
                 binding.imageThumbnail.setImageDrawable(null)
+                
+                // Store the URI we're loading for - to handle recycled views
+                binding.imageThumbnail.tag = cacheKey
+                
+                adapterScope.launch {
+                    val bitmap = withContext(Dispatchers.IO) {
+                        loadThumbnail(uri, binding.root.context)
+                    }
+                    
+                    // Only set if this view is still showing the same URI
+                    // (handles recycled views during scroll)
+                    if (binding.imageThumbnail.tag == cacheKey && bitmap != null) {
+                        thumbnailCache.put(cacheKey, bitmap)
+                        binding.imageThumbnail.setImageBitmap(bitmap)
+                    }
+                }
             }
 
             // ============================================
@@ -192,6 +250,70 @@ class PagesAdapter(
                     onDeleteClick(currentPosition)
                 }
             }
+        }
+        
+        /**
+         * Load a thumbnail bitmap from URI
+         * 
+         * Uses inSampleSize = 4 for efficient memory usage.
+         * Thumbnails are 1/16 the pixels of the original.
+         * 
+         * @param uri Image file URI
+         * @param context Context for ContentResolver
+         * @return Decoded bitmap, or null on error
+         */
+        private fun loadThumbnail(uri: Uri, context: android.content.Context): Bitmap? {
+            return try {
+                // First pass: get dimensions
+                var width = 0
+                var height = 0
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val options = BitmapFactory.Options().apply {
+                        inJustDecodeBounds = true
+                    }
+                    BitmapFactory.decodeStream(inputStream, null, options)
+                    width = options.outWidth
+                    height = options.outHeight
+                }
+
+                // Calculate appropriate sample size for ~200px thumbnail
+                val targetSize = 200
+                val inSampleSize = calculateInSampleSize(width, height, targetSize, targetSize)
+
+                // Second pass: load downsampled image
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val options = BitmapFactory.Options().apply {
+                        this.inSampleSize = inSampleSize
+                    }
+                    BitmapFactory.decodeStream(inputStream, null, options)
+                }
+            } catch (e: Exception) {
+                null
+            }
+        }
+        
+        /**
+         * Calculate optimal inSampleSize for thumbnails
+         */
+        private fun calculateInSampleSize(
+            srcWidth: Int,
+            srcHeight: Int,
+            reqWidth: Int,
+            reqHeight: Int
+        ): Int {
+            var inSampleSize = 1
+            
+            if (srcHeight > reqHeight || srcWidth > reqWidth) {
+                val halfHeight = srcHeight / 2
+                val halfWidth = srcWidth / 2
+                
+                while (halfHeight / inSampleSize >= reqHeight && 
+                       halfWidth / inSampleSize >= reqWidth) {
+                    inSampleSize *= 2
+                }
+            }
+            
+            return inSampleSize
         }
     }
 

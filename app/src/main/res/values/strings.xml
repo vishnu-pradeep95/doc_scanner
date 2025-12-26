@@ -15,6 +15,13 @@
     <string name="add_page">Add Page</string>
     <string name="done">Done</string>
     
+    <!-- Preview Fragment - Filters -->
+    <string name="filter_label">Filter:</string>
+    <string name="filter_original">Original</string>
+    <string name="filter_enhanced">Enhanced</string>
+    <string name="filter_bw">B&amp;W</string>
+    <string name="applying_filter">Applying filter…</string>
+    
     <!-- Pages Fragment -->
     <string name="scanned_pages">Scanned Pages</string>
     <string name="add_more">Add More</string>
@@ -30,8 +37,20 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     
+    <!-- PDF Naming -->
+    <string name="name_your_pdf">Name Your PDF</string>
+    <string name="pdf_name_hint">Enter PDF name (optional)</string>
+    
+    <!-- OCR (Text Recognition) -->
+    <string name="recognize_text">Recognize Text</string>
+    <string name="ocr_coming_soon">Text recognition coming soon! This feature will let you copy and search text from scanned documents.</string>
+    <string name="ocr_processing">Recognizing text…</string>
+    <string name="ocr_no_text">No text recognized in this image</string>
+    <string name="ocr_error">Error recognizing text</string>
+    
     <!-- General -->
     <string name="error">Error</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="loading">Loading…</string>
 </resources>

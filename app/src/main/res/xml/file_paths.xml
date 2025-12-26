@@ -29,6 +29,13 @@
     <files-path name="scans" path="scans/" />
     
     <!-- 
+        Processed/filtered images directory
+        Maps: context.filesDir/processed/ → content://...fileprovider/processed/
+        Stores images after filter application (Enhanced, B&W)
+    -->
+    <files-path name="processed" path="processed/" />
+    
+    <!-- 
         Generated PDFs directory
         Maps: context.filesDir/pdfs/ → content://...fileprovider/pdfs/
     -->

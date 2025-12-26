@@ -17,6 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/menu_pages"
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@color/white"
         app:title="@string/scanned_pages"

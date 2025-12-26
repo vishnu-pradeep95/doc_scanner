@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- OCR placeholder menu item (coming soon) -->
+    <item
+        android:id="@+id/action_ocr"
+        android:icon="@drawable/ic_ocr"
+        android:title="@string/recognize_text"
+        app:showAsAction="ifRoom" />
+
+</menu>

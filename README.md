@@ -1,6 +1,6 @@
 # PDF Scanner App
 
-A simple Android app to scan documents using CameraX, edit them with crop/rotate via CanHub Image Cropper, and generate multi-page PDFs.
+A simple Android app to scan documents using CameraX, edit them with crop/rotate via CanHub Image Cropper, apply document-style filters, and generate multi-page PDFs.
 
 ## 🚀 Quick Start (For Beginners)
 
@@ -15,9 +15,18 @@ A simple Android app to scan documents using CameraX, edit them with crop/rotate
 
 - 📷 **Camera Capture** - Use CameraX to capture document images
 - ✂️ **Crop & Rotate** - Edit scanned images with CanHub Image Cropper
+- 🎨 **Document Filters** - Enhance text with Original, Enhanced, and B&W modes
+- 📝 **Custom PDF Names** - Name your PDFs before saving
 - 📄 **Multi-page PDF** - Combine multiple scans into a single PDF
 - 📤 **Secure Sharing** - Share PDFs via FileProvider with proper permissions
 - 🔒 **Privacy First** - All files stored in app-private storage
+- 🔮 **OCR Ready** - Text recognition framework in place (coming soon)
+
+## Screenshots
+
+| Camera | Preview + Filters | Pages |
+|--------|-------------------|-------|
+| Capture documents | Apply filters & crop | Manage & create PDF |
 
 ## Requirements
 
@@ -54,20 +63,37 @@ app/src/main/
 ├── java/com/pdfscanner/app/
 │   ├── MainActivity.kt          # App entry point
 │   ├── adapter/
-│   │   └── PagesAdapter.kt      # RecyclerView adapter
+│   │   └── PagesAdapter.kt      # RecyclerView adapter (with LRU cache)
+│   ├── ocr/
+│   │   └── OcrProcessor.kt      # OCR design stub (ML Kit ready)
 │   ├── ui/
 │   │   ├── CameraFragment.kt    # Camera screen
-│   │   ├── PreviewFragment.kt   # Image preview/edit
-│   │   └── PagesFragment.kt     # Page list & PDF
+│   │   ├── PreviewFragment.kt   # Image preview/edit + filters
+│   │   └── PagesFragment.kt     # Page list & PDF generation
+│   ├── util/
+│   │   └── ImageProcessor.kt    # Document filters (Enhanced, B&W)
 │   └── viewmodel/
 │       └── ScannerViewModel.kt  # Shared data holder
 └── res/
     ├── layout/                  # XML UI layouts
+    ├── menu/                    # Toolbar menus
     ├── navigation/              # Navigation graph
     ├── drawable/                # Vector icons & shapes
     ├── values/                  # Strings, colors, themes
     └── xml/                     # FileProvider config
 ```
+
+## Document Filters
+
+The app includes document-style filters to improve text legibility:
+
+| Filter | Description |
+|--------|-------------|
+| **Original** | No processing - use captured image as-is |
+| **Enhanced** | 30% contrast boost + brightness adjustment |
+| **B&W** | Grayscale + high contrast for clean document look |
+
+Filters use Android's `ColorMatrix` for hardware-accelerated processing.
 
 ## Code Documentation
 
@@ -76,6 +102,13 @@ All Kotlin source files contain extensive comments explaining:
 - Why certain patterns are used
 - Android concepts (lifecycle, binding, etc.)
 - Analogies to C++/Python where applicable
+
+## Roadmap
+
+- [x] Phase 1: Basic scanning (capture, crop, PDF)
+- [x] Phase 2: Document filters & UX improvements
+- [ ] Phase 3: OCR with ML Kit Text Recognition
+- [ ] Phase 4: Auto-edge detection, folders, search
 
 ## License
 
