@@ -21,6 +21,10 @@
  * - Automatically animates insertions/deletions
  * - Handles the "notify" calls for you
  * 
+ * DRAG & DROP:
+ * ItemTouchHelper is used to enable drag-to-reorder functionality.
+ * When user long-presses and drags, we swap items in the list.
+ * 
  * THUMBNAIL OPTIMIZATION:
  * - Use inSampleSize to load downsampled images (1/16 pixels)
  * - Cache bitmaps in a LruCache keyed by URI
@@ -41,8 +45,10 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.LruCache
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil  // Computes list differences
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter  // Adapter with DiffUtil built-in
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
@@ -55,7 +61,7 @@ import kotlinx.coroutines.withContext
 import com.pdfscanner.app.databinding.ItemPageBinding
 
 /**
- * PagesAdapter - Displays page thumbnails in a grid
+ * PagesAdapter - Displays page thumbnails in a grid with drag-to-reorder
  * 
  * GENERICS:
  * ListAdapter<Uri, PagesAdapter.PageViewHolder>
@@ -63,10 +69,13 @@ import com.pdfscanner.app.databinding.ItemPageBinding
  * - PageViewHolder = type of ViewHolder
  * 
  * @param onDeleteClick Callback when delete button is clicked
- *                     Lambda receives the position of the item
+ * @param onItemMoved Callback when items are reordered via drag
+ * @param onDragStarted Callback to start drag (passes ViewHolder)
  */
 class PagesAdapter(
-    private val onDeleteClick: (Int) -> Unit
+    private val onDeleteClick: (Int) -> Unit,
+    private val onItemMoved: (fromPosition: Int, toPosition: Int) -> Unit = { _, _ -> },
+    private val onDragStarted: ((RecyclerView.ViewHolder) -> Unit)? = null
 ) : ListAdapter<Uri, PagesAdapter.PageViewHolder>(PageDiffCallback()) {
 
     // ============================================================
@@ -250,6 +259,23 @@ class PagesAdapter(
                     onDeleteClick(currentPosition)
                 }
             }
+
+            // ============================================
+            // DRAG HANDLE
+            // ============================================
+            
+            /**
+             * Setup drag handle for reordering
+             * 
+             * When user touches the drag handle, we start the drag operation.
+             * This provides better UX than long-press on entire item.
+             */
+            binding.dragHandle.setOnTouchListener { _, event ->
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                    onDragStarted?.invoke(this)
+                }
+                false
+            }
         }
         
         /**
@@ -361,6 +387,100 @@ class PagesAdapter(
             // For file URIs, if the path is the same, content is the same
             // (we're not tracking if the file contents changed)
             return oldItem == newItem
+        }
+    }
+
+    // ============================================================
+    // DRAG & DROP SUPPORT
+    // ============================================================
+
+    /**
+     * Move an item from one position to another
+     * 
+     * Called by ItemTouchHelper during drag operation.
+     * Updates internal list and notifies RecyclerView of the move.
+     * 
+     * @param fromPosition Original position
+     * @param toPosition New position
+     */
+    fun moveItem(fromPosition: Int, toPosition: Int) {
+        val currentList = currentList.toMutableList()
+        val item = currentList.removeAt(fromPosition)
+        currentList.add(toPosition, item)
+        submitList(currentList)
+        
+        // Notify the callback so ViewModel can be updated
+        onItemMoved(fromPosition, toPosition)
+    }
+
+    /**
+     * ItemTouchHelper.Callback for drag & drop reordering
+     * 
+     * ITEMTOUCHHELPER:
+     * Android's built-in helper for swipe and drag gestures on RecyclerView.
+     * 
+     * @param adapter The PagesAdapter instance
+     */
+    class DragCallback(
+        private val adapter: PagesAdapter
+    ) : ItemTouchHelper.Callback() {
+
+        /**
+         * Define which movement directions are allowed
+         * 
+         * UP/DOWN/LEFT/RIGHT for grid layout reordering
+         */
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or 
+                           ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            return makeMovementFlags(dragFlags, 0)  // 0 = no swipe
+        }
+
+        /**
+         * Called when item is moved during drag
+         * 
+         * @return true if items were swapped
+         */
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            adapter.moveItem(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+            return true
+        }
+
+        /**
+         * Called when item is swiped (not used here)
+         */
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            // Not used - we only support drag, not swipe
+        }
+
+        /**
+         * Enable long press to start drag (as fallback)
+         */
+        override fun isLongPressDragEnabled(): Boolean = true
+
+        /**
+         * Visual feedback when dragging
+         */
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            super.onSelectedChanged(viewHolder, actionState)
+            if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                viewHolder?.itemView?.alpha = 0.7f
+            }
+        }
+
+        /**
+         * Reset visual state when drag ends
+         */
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            super.clearView(recyclerView, viewHolder)
+            viewHolder.itemView.alpha = 1.0f
         }
     }
 }

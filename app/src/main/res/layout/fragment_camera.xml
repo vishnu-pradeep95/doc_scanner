@@ -63,6 +63,41 @@
 
     </LinearLayout>
 
+    <!-- Batch mode indicator - shown when batch scanning is active -->
+    <LinearLayout
+        android:id="@+id/batchModeIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/badge_bg"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_batch_mode"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/textBatchCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="Batch: 5" />
+
+    </LinearLayout>
+
     <!-- Bottom controls -->
     <LinearLayout
         android:id="@+id/controlsLayout"
@@ -76,11 +111,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Spacer -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
+        <!-- Batch mode toggle -->
+        <ImageButton
+            android:id="@+id/btnBatchMode"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/batch_mode"
+            android:padding="8dp"
+            android:src="@drawable/ic_batch_mode"
+            app:tint="@color/white" />
 
         <!-- Capture button -->
         <ImageButton

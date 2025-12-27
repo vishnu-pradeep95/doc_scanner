@@ -50,6 +50,16 @@
         <action
             android:id="@+id/action_pages_to_camera"
             app:destination="@id/cameraFragment" />
+        
+        <action
+            android:id="@+id/action_pages_to_history"
+            app:destination="@id/historyFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.pdfscanner.app.ui.HistoryFragment"
+        android:label="History"
+        tools:layout="@layout/fragment_history" />
 
 </navigation>

@@ -73,7 +73,7 @@ import java.util.concurrent.Executors
  * 2. Display live camera preview
  * 3. Capture image when button pressed
  * 4. Save image to app storage
- * 5. Navigate to preview screen
+ * 5. Navigate to preview screen (normal mode) or continue capturing (batch mode)
  */
 class CameraFragment : Fragment() {
 
@@ -135,6 +135,27 @@ class CameraFragment : Fragment() {
      * This executor provides a background thread pool
      */
     private lateinit var cameraExecutor: ExecutorService
+
+    // ============================================================
+    // BATCH MODE STATE
+    // ============================================================
+    
+    /**
+     * Whether batch scanning mode is active
+     * 
+     * In batch mode:
+     * - Captured images are added directly to pages list
+     * - No navigation to preview after each capture
+     * - Shows counter of captured pages
+     * - User can tap "Done" when finished
+     */
+    private var isBatchMode = false
+    
+    /**
+     * Counter for pages captured in current batch session
+     * Resets when batch mode is disabled
+     */
+    private var batchCaptureCount = 0
 
     // ============================================================
     // PERMISSION HANDLING
@@ -226,7 +247,7 @@ class CameraFragment : Fragment() {
 
     /**
      * Setup button click listeners
-     */
+    */
     private fun setupUI() {
         // Capture button - takes a photo
         binding.btnCapture.setOnClickListener {
@@ -235,6 +256,10 @@ class CameraFragment : Fragment() {
 
         // View pages button - navigate to pages list
         binding.btnViewPages.setOnClickListener {
+            // Exit batch mode when navigating to pages
+            if (isBatchMode) {
+                exitBatchMode()
+            }
             // findNavController() gets the NavController from the NavHostFragment
             // navigate() changes to another Fragment using the action ID from nav_graph.xml
             findNavController().navigate(R.id.action_camera_to_pages)
@@ -245,6 +270,52 @@ class CameraFragment : Fragment() {
             // Re-request the camera permission
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
+        
+        // Batch mode toggle button - initially dimmed to indicate inactive
+        binding.btnBatchMode.alpha = 0.6f
+        binding.btnBatchMode.setOnClickListener {
+            toggleBatchMode()
+        }
+    }
+    
+    /**
+     * Toggle batch scanning mode on/off
+     * 
+     * Batch mode allows capturing multiple pages quickly without
+     * navigating to preview screen after each capture.
+     */
+    private fun toggleBatchMode() {
+        isBatchMode = !isBatchMode
+        
+        if (isBatchMode) {
+            // Entering batch mode
+            batchCaptureCount = 0
+            updateBatchUI()
+            binding.batchModeIndicator.visibility = View.VISIBLE
+            // Tint the button to indicate active state
+            binding.btnBatchMode.alpha = 1.0f
+            Toast.makeText(requireContext(), R.string.batch_mode_on, Toast.LENGTH_SHORT).show()
+        } else {
+            exitBatchMode()
+        }
+    }
+    
+    /**
+     * Exit batch mode and reset UI
+     */
+    private fun exitBatchMode() {
+        isBatchMode = false
+        batchCaptureCount = 0
+        binding.batchModeIndicator.visibility = View.GONE
+        binding.btnBatchMode.alpha = 0.6f
+        Toast.makeText(requireContext(), R.string.batch_mode_off, Toast.LENGTH_SHORT).show()
+    }
+    
+    /**
+     * Update the batch mode indicator with current count
+     */
+    private fun updateBatchUI() {
+        binding.textBatchCount.text = getString(R.string.batch_count, batchCaptureCount)
     }
 
     /**
@@ -479,20 +550,31 @@ class CameraFragment : Fragment() {
                     // Uri is Android's standard way to reference files/resources
                     val savedUri = photoFile.toUri()
                     
-                    // Store in ViewModel for PreviewFragment to access
-                    viewModel.setCurrentCapture(savedUri)
+                    if (isBatchMode) {
+                        // BATCH MODE: Add directly to pages, stay on camera
+                        viewModel.addPage(savedUri)
+                        batchCaptureCount++
+                        updateBatchUI()
+                        
+                        // Brief visual feedback - flash effect would go here
+                        // For now, we just update the counter
+                    } else {
+                        // NORMAL MODE: Navigate to preview for crop/edit
+                        // Store in ViewModel for PreviewFragment to access
+                        viewModel.setCurrentCapture(savedUri)
 
-                    /**
-                     * Navigate to preview screen
-                     * 
-                     * CameraFragmentDirections is auto-generated from nav_graph.xml
-                     * actionCameraToPreview() creates an action with the required argument
-                     * 
-                     * Safe Args plugin ensures type-safe navigation arguments
-                     */
-                    val action = CameraFragmentDirections
-                        .actionCameraToPreview(savedUri.toString())
-                    findNavController().navigate(action)
+                        /**
+                         * Navigate to preview screen
+                         * 
+                         * CameraFragmentDirections is auto-generated from nav_graph.xml
+                         * actionCameraToPreview() creates an action with the required argument
+                         * 
+                         * Safe Args plugin ensures type-safe navigation arguments
+                         */
+                        val action = CameraFragmentDirections
+                            .actionCameraToPreview(savedUri.toString())
+                        findNavController().navigate(action)
+                    }
                 }
 
                 /**

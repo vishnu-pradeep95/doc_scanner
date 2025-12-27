@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Batch mode icon - multiple stacked documents/pages
+    Used in CameraFragment for batch scanning toggle
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Back page (offset) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4,6H18V20H4V6Z"
+        android:fillAlpha="0.5" />
+    
+    <!-- Middle page (offset) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,4H20V18H6V4Z"
+        android:fillAlpha="0.7" />
+    
+    <!-- Front page -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,2H22V16H8V2Z" />
+    
+    <!-- Plus symbol on front page -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M14,6V12M11,9H17"
+        android:strokeWidth="1.5"
+        android:strokeColor="#000000" />
+    
+</vector>

@@ -14,11 +14,14 @@ A simple Android app to scan documents using CameraX, edit them with crop/rotate
 ## Features
 
 - 📷 **Camera Capture** - Use CameraX to capture document images
+- ⚡ **Batch Scanning** - Capture multiple pages quickly without preview interruption
 - ✂️ **Crop & Rotate** - Edit scanned images with CanHub Image Cropper
 - 🎨 **Document Filters** - Enhance text with Original, Enhanced, and B&W modes
+- 🔀 **Page Reordering** - Drag & drop to rearrange pages before PDF creation
 - 📝 **Custom PDF Names** - Name your PDFs before saving
 - 📄 **Multi-page PDF** - Combine multiple scans into a single PDF
 - 📤 **Secure Sharing** - Share PDFs via FileProvider with proper permissions
+- 📚 **Document History** - Access and manage all previously created PDFs
 - 🔒 **Privacy First** - All files stored in app-private storage
 - 🔮 **OCR Ready** - Text recognition framework in place (coming soon)
 
@@ -63,13 +66,17 @@ app/src/main/
 ├── java/com/pdfscanner/app/
 │   ├── MainActivity.kt          # App entry point
 │   ├── adapter/
-│   │   └── PagesAdapter.kt      # RecyclerView adapter (with LRU cache)
+│   │   ├── PagesAdapter.kt      # Page thumbnails (with drag & drop)
+│   │   └── HistoryAdapter.kt    # Document history list
+│   ├── data/
+│   │   └── DocumentHistory.kt   # PDF history storage (SharedPrefs + JSON)
 │   ├── ocr/
 │   │   └── OcrProcessor.kt      # OCR design stub (ML Kit ready)
 │   ├── ui/
-│   │   ├── CameraFragment.kt    # Camera screen
+│   │   ├── CameraFragment.kt    # Camera screen + batch mode
 │   │   ├── PreviewFragment.kt   # Image preview/edit + filters
-│   │   └── PagesFragment.kt     # Page list & PDF generation
+│   │   ├── PagesFragment.kt     # Page list & PDF generation
+│   │   └── HistoryFragment.kt   # Document history screen
 │   ├── util/
 │   │   └── ImageProcessor.kt    # Document filters (Enhanced, B&W)
 │   └── viewmodel/
@@ -107,8 +114,9 @@ All Kotlin source files contain extensive comments explaining:
 
 - [x] Phase 1: Basic scanning (capture, crop, PDF)
 - [x] Phase 2: Document filters & UX improvements
-- [ ] Phase 3: OCR with ML Kit Text Recognition
-- [ ] Phase 4: Auto-edge detection, folders, search
+- [x] Phase 3: Page reordering, batch scanning, document history
+- [ ] Phase 4: OCR with ML Kit Text Recognition
+- [ ] Phase 5: Auto-edge detection, folders, search
 
 ## License
 

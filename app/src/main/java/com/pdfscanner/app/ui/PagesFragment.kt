@@ -42,6 +42,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope  // Coroutine scope tied to lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager  // Grid layout for RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper  // Drag & drop support
 
 // Material design components
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -52,6 +53,7 @@ import com.google.android.material.textfield.TextInputLayout
 // Project imports
 import com.pdfscanner.app.R
 import com.pdfscanner.app.adapter.PagesAdapter
+import com.pdfscanner.app.data.DocumentHistoryRepository
 import com.pdfscanner.app.databinding.FragmentPagesBinding
 import com.pdfscanner.app.viewmodel.ScannerViewModel
 
@@ -87,6 +89,11 @@ class PagesFragment : Fragment() {
      * It creates views for each item and binds data to them
      */
     private lateinit var pagesAdapter: PagesAdapter
+
+    /**
+     * ItemTouchHelper for drag & drop reordering
+     */
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     // ============================================================
     // STATE
@@ -131,9 +138,14 @@ class PagesFragment : Fragment() {
             findNavController().navigateUp()
         }
         
-        // Handle menu item clicks (OCR placeholder)
+        // Handle menu item clicks
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.action_history -> {
+                    // Navigate to document history
+                    findNavController().navigate(R.id.action_pages_to_history)
+                    true
+                }
                 R.id.action_ocr -> {
                     showOcrComingSoonMessage()
                     true
@@ -168,20 +180,36 @@ class PagesFragment : Fragment() {
      * RecyclerView "recycles" views - instead of creating a new view
      * for each item, it reuses views that scroll off screen.
      * This is crucial for performance with long lists.
+     * 
+     * DRAG & DROP:
+     * ItemTouchHelper enables drag-to-reorder functionality.
+     * Users can long-press or use the drag handle to reorder pages.
      */
     private fun setupRecyclerView() {
         /**
-         * Create adapter with delete callback
+         * Create adapter with callbacks
          * 
-         * We pass a lambda that will be called when user clicks delete
+         * We pass lambdas for delete, move, and drag start events
          * This is the "callback pattern" - adapter notifies us of events
          */
         pagesAdapter = PagesAdapter(
             onDeleteClick = { position ->
                 // Show confirmation dialog before deleting
                 showDeleteConfirmation(position)
+            },
+            onItemMoved = { fromPosition, toPosition ->
+                // Update ViewModel when pages are reordered
+                viewModel.movePage(fromPosition, toPosition)
+            },
+            onDragStarted = { viewHolder ->
+                // Start drag when user touches the drag handle
+                itemTouchHelper.startDrag(viewHolder)
             }
         )
+
+        // Setup ItemTouchHelper for drag & drop
+        val callback = PagesAdapter.DragCallback(pagesAdapter)
+        itemTouchHelper = ItemTouchHelper(callback)
 
         /**
          * Configure RecyclerView
@@ -192,6 +220,7 @@ class PagesFragment : Fragment() {
         binding.recyclerPages.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = pagesAdapter
+            itemTouchHelper.attachToRecyclerView(this)
         }
     }
 
@@ -365,6 +394,9 @@ class PagesFragment : Fragment() {
                     binding.loadingOverlay.visibility = View.GONE
                     binding.fabShare.visibility = View.VISIBLE
                     Toast.makeText(requireContext(), R.string.pdf_created, Toast.LENGTH_SHORT).show()
+                    
+                    // Save to document history
+                    saveToHistory(pdfFile, pages.size)
                 }
             } catch (e: Exception) {
                 // Handle errors (file I/O, out of memory, etc.)
@@ -664,6 +696,29 @@ class PagesFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    // ============================================================
+    // DOCUMENT HISTORY
+    // ============================================================
+
+    /**
+     * Save newly created PDF to document history
+     * 
+     * @param pdfFile The generated PDF file
+     * @param pageCount Number of pages in the PDF
+     */
+    private fun saveToHistory(pdfFile: File, pageCount: Int) {
+        val repository = DocumentHistoryRepository.getInstance(requireContext())
+        
+        // Get the display name (without extension and timestamp)
+        val baseName = viewModel.pdfBaseName.value ?: "Scan"
+        
+        repository.addDocument(
+            name = baseName,
+            filePath = pdfFile.absolutePath,
+            pageCount = pageCount
+        )
     }
 
     // ============================================================

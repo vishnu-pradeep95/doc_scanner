@@ -224,6 +224,26 @@ class ScannerViewModel : ViewModel() {
     }
 
     /**
+     * Move a page from one position to another (for drag & drop reordering)
+     * 
+     * Uses Collections.swap() for simple adjacent moves, which is what
+     * ItemTouchHelper typically does (one position at a time during drag)
+     * 
+     * @param fromPosition Original position of the page
+     * @param toPosition Target position to move to
+     */
+    fun movePage(fromPosition: Int, toPosition: Int) {
+        val currentList = _pages.value ?: return
+        
+        // Validate both positions are within bounds
+        if (fromPosition in currentList.indices && toPosition in currentList.indices) {
+            // Swap the elements - works for adjacent moves during drag
+            java.util.Collections.swap(currentList, fromPosition, toPosition)
+            _pages.value = currentList  // Trigger observers
+        }
+    }
+
+    /**
      * Clear the current capture reference
      * 
      * Called after the capture is added to pages list

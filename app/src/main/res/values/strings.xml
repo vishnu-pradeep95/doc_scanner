@@ -9,6 +9,13 @@
     <string name="permission_denied">Permission denied. Please enable camera permission in settings.</string>
     <string name="grant_permission">Grant Permission</string>
     
+    <!-- Batch Mode -->
+    <string name="batch_mode">Batch Mode</string>
+    <string name="batch_mode_on">Batch mode ON - tap to capture multiple pages</string>
+    <string name="batch_mode_off">Batch mode OFF</string>
+    <string name="batch_count">Batch: %d</string>
+    <string name="batch_done">Done</string>
+    
     <!-- Preview Fragment -->
     <string name="retake">Retake</string>
     <string name="crop_rotate">Edit</string>
@@ -36,6 +43,7 @@
     <string name="confirm_delete">Delete this page?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="drag_to_reorder">Drag to reorder</string>
     
     <!-- PDF Naming -->
     <string name="name_your_pdf">Name Your PDF</string>
@@ -52,5 +60,19 @@
     <string name="error">Error</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
     <string name="loading">Loading…</string>
+    
+    <!-- Document History -->
+    <string name="document_history">Document History</string>
+    <string name="no_documents_yet">No documents yet</string>
+    <string name="create_first_pdf_hint">Create your first PDF to see it here</string>
+    <string name="delete_document">Delete Document</string>
+    <string name="confirm_delete_document">Delete "%1$s"? This cannot be undone.</string>
+    <string name="document_deleted">Document deleted</string>
+    <string name="file_not_found">File not found</string>
+    <string name="no_pdf_viewer">No PDF viewer app installed</string>
+    <string name="error_opening_pdf">Error opening PDF</string>
+    <string name="error_sharing_pdf">Error sharing PDF</string>
+    <string name="view_history">History</string>
 </resources>
