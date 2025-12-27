@@ -39,13 +39,15 @@ import com.pdfscanner.app.databinding.ItemPageBinding
  * @param onItemMoved Callback when items are reordered via drag
  * @param onDragStarted Callback to start drag (passes ViewHolder)
  * @param onSelectionChanged Callback when selection changes (count, isInSelectionMode)
+ * @param onRotateClick Callback when rotate button is clicked
  */
 class PagesAdapter(
     private val onDeleteClick: (Int) -> Unit,
     private val onItemClick: ((Int) -> Unit)? = null,
     private val onItemMoved: (fromPosition: Int, toPosition: Int) -> Unit = { _, _ -> },
     private val onDragStarted: ((RecyclerView.ViewHolder) -> Unit)? = null,
-    private val onSelectionChanged: ((selectedCount: Int, isSelectionMode: Boolean) -> Unit)? = null
+    private val onSelectionChanged: ((selectedCount: Int, isSelectionMode: Boolean) -> Unit)? = null,
+    private val onRotateClick: ((Int) -> Unit)? = null
 ) : ListAdapter<Uri, PagesAdapter.PageViewHolder>(PageDiffCallback()) {
 
     // ============================================================
@@ -239,12 +241,14 @@ class PagesAdapter(
                 
                 // Hide normal buttons in selection mode
                 binding.btnDelete.visibility = View.GONE
+                binding.btnRotate.visibility = View.GONE
                 binding.dragHandle.visibility = View.GONE
             } else {
                 binding.selectionOverlay.visibility = View.GONE
                 binding.textSelectionOrder.visibility = View.GONE
                 binding.checkboxSelect.visibility = View.GONE
                 binding.btnDelete.visibility = View.VISIBLE
+                binding.btnRotate.visibility = View.VISIBLE
                 binding.dragHandle.visibility = View.VISIBLE
             }
 
@@ -295,6 +299,14 @@ class PagesAdapter(
                 val currentPosition = bindingAdapterPosition
                 if (currentPosition != RecyclerView.NO_POSITION) {
                     onDeleteClick(currentPosition)
+                }
+            }
+
+            // Rotate button (only in normal mode)
+            binding.btnRotate.setOnClickListener {
+                val currentPosition = bindingAdapterPosition
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    onRotateClick?.invoke(currentPosition)
                 }
             }
 

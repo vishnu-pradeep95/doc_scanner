@@ -22,11 +22,13 @@ package com.pdfscanner.app
 // Android core imports
 import android.os.Bundle  // Bundle is like a dictionary/map for passing data
 import androidx.appcompat.app.AppCompatActivity  // Base class for Activities
+import androidx.appcompat.app.AppCompatDelegate  // For theme switching
 import androidx.navigation.fragment.NavHostFragment  // Handles Fragment navigation
 
 // View Binding - auto-generated class from activity_main.xml
 // Naming convention: ActivityMainBinding comes from activity_main.xml
 import com.pdfscanner.app.databinding.ActivityMainBinding
+import com.pdfscanner.app.util.AppPreferences
 
 /**
  * MainActivity extends AppCompatActivity
@@ -57,6 +59,10 @@ class MainActivity : AppCompatActivity() {
      * @param savedInstanceState Previously saved state, or null if fresh start
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme BEFORE super.onCreate() for smooth theme transition
+        val prefs = AppPreferences(this)
+        AppCompatDelegate.setDefaultNightMode(prefs.getThemeMode())
+        
         // ALWAYS call super first - this runs the parent class's onCreate
         // Failing to do this will crash your app!
         super.onCreate(savedInstanceState)

@@ -5,31 +5,56 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     
-    <!-- Document icon -->
+    <!-- Modern gradient-like document background -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M34,24h28l16,16v44c0,2.2 -1.8,4 -4,4H34c-2.2,0 -4,-1.8 -4,-4V28c0,-2.2 1.8,-4 4,-4z"/>
+        android:pathData="M30,26h36l12,12v44c0,3.3 -2.7,6 -6,6H30c-3.3,0 -6,-2.7 -6,-6V32c0,-3.3 2.7,-6 6,-6z"/>
     
-    <!-- Folded corner -->
+    <!-- Document shadow/depth -->
     <path
-        android:fillColor="#BBDEFB"
-        android:pathData="M62,24v16h16z"/>
+        android:fillColor="#E3F2FD"
+        android:pathData="M26,32v50c0,3.3 2.7,6 6,6h44c3.3,0 6,-2.7 6,-6V38L70,26H32c-3.3,0 -6,2.7 -6,6z"
+        android:strokeWidth="0"/>
     
-    <!-- Scan lines -->
+    <!-- Folded corner with gradient effect -->
     <path
-        android:fillColor="#1976D2"
-        android:pathData="M38,50h32v3H38zM38,58h32v3H38zM38,66h24v3H38z"/>
+        android:fillColor="#90CAF9"
+        android:pathData="M66,26v12h12z"/>
     
-    <!-- Camera lens - outer circle (r=10) -->
+    <!-- Inner document stroke -->
     <path
-        android:fillColor="#1976D2"
-        android:pathData="M72,66a10,10 0,1 1,0 20a10,10 0,1 1,0 -20z"/>
-    <!-- Camera lens - middle circle (r=6) -->
+        android:fillColor="#64B5F6"
+        android:pathData="M30,26h36l12,12v44c0,3.3 -2.7,6 -6,6H30c-3.3,0 -6,-2.7 -6,-6V32c0,-3.3 2.7,-6 6,-6z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2196F3"
+        android:fillType="evenOdd"
+        android:fillAlpha="0"/>
+    
+    <!-- Scan lines - representing text -->
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M34,46h40v2.5H34zM34,54h40v2.5H34zM34,62h28v2.5H34z"/>
+    
+    <!-- Modern scanner element - viewfinder corners -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M34,38h8v2h-6v6h-2zM74,38v8h-2v-6h-6v-2zM34,76v-8h2v6h6v2zM74,76h-8v-2h6v-6h2z"
+        android:strokeWidth="0"/>
+    
+    <!-- Camera lens - modern circular design -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M78,72a8,8 0,1 1,-16 0a8,8 0,1 1,16 0z"/>
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M72,70a6,6 0,1 1,0 12a6,6 0,1 1,0 -12z"/>
-    <!-- Camera lens - inner circle (r=3) -->
+        android:pathData="M75,72a5,5 0,1 1,-10 0a5,5 0,1 1,10 0z"/>
     <path
-        android:fillColor="#1976D2"
-        android:pathData="M72,73a3,3 0,1 1,0 6a3,3 0,1 1,0 -6z"/>
+        android:fillColor="#1565C0"
+        android:pathData="M72.5,72a2.5,2.5 0,1 1,-5 0a2.5,2.5 0,1 1,5 0z"/>
+    
+    <!-- Lens highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.6"
+        android:pathData="M67,68a1.5,1.5 0,1 1,-3 0a1.5,1.5 0,1 1,3 0z"/>
 </vector>

@@ -439,7 +439,9 @@ class PreviewFragment : Fragment() {
             if (isChecked) {
                 val filterType = when (checkedId) {
                     R.id.btnFilterOriginal -> ImageProcessor.FilterType.ORIGINAL
+                    R.id.btnFilterMagic -> ImageProcessor.FilterType.MAGIC
                     R.id.btnFilterEnhanced -> ImageProcessor.FilterType.ENHANCED
+                    R.id.btnFilterSharpen -> ImageProcessor.FilterType.SHARPEN
                     R.id.btnFilterBw -> ImageProcessor.FilterType.DOCUMENT_BW
                     else -> ImageProcessor.FilterType.ORIGINAL
                 }

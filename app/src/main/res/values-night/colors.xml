@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 
+    DARK MODE COLORS
+    
+    These override the light mode colors when the system is in dark mode
+    or user selects dark theme in settings.
+    -->
+
+    <!-- Primary brand colors - Slightly desaturated for dark mode -->
+    <color name="primary">#64B5F6</color>
+    <color name="primary_dark">#42A5F5</color>
+    <color name="primary_light">#1E3A5F</color>
+    <color name="primary_variant">#90CAF9</color>
+    
+    <!-- Accent/Secondary colors -->
+    <color name="accent">#FF8A65</color>
+    <color name="accent_dark">#FF7043</color>
+    <color name="secondary">#4DD0E1</color>
+    <color name="secondary_light">#1E4D40</color>
+    
+    <!-- Surface colors - Dark surfaces -->
+    <color name="surface">#1E1E1E</color>
+    <color name="surface_variant">#2D2D2D</color>
+    <color name="background">#121212</color>
+    
+    <!-- Neutral colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray_light">#2D2D2D</color>
+    <color name="gray_medium">#757575</color>
+    <color name="gray">#9E9E9E</color>
+    <color name="gray_dark">#BDBDBD</color>
+    
+    <!-- Transparency -->
+    <color name="transparent">#00000000</color>
+    <color name="overlay">#B3000000</color>
+    <color name="overlay_light">#66000000</color>
+    
+    <!-- Selection colors -->
+    <color name="selection_overlay">#4D64B5F6</color>
+    <color name="selection_border">#64B5F6</color>
+    
+    <!-- Capture button -->
+    <color name="capture_button">#FFFFFF</color>
+    <color name="capture_button_border">#64B5F6</color>
+    
+    <!-- Status colors - Slightly adjusted for dark mode -->
+    <color name="success">#81C784</color>
+    <color name="error">#EF5350</color>
+    <color name="warning">#FFD54F</color>
+    
+    <!-- Text colors - Light text on dark -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_hint">#757575</color>
+    
+    <!-- Card colors for dark mode -->
+    <color name="card_background">#1E1E1E</color>
+    <color name="card_elevated">#2D2D2D</color>
+    
+    <!-- Divider color -->
+    <color name="divider">#3D3D3D</color>
+</resources>

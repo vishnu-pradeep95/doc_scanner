@@ -160,6 +160,34 @@ class PagesFragment : Fragment() {
         binding.selectionToolbar.setNavigationOnClickListener {
             pagesAdapter.exitSelectionMode()
         }
+        
+        // Selection toolbar menu items
+        binding.selectionToolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_select_all -> {
+                    pagesAdapter.selectAll()
+                    true
+                }
+                R.id.action_ocr_selected -> {
+                    performOcrOnSelectedPages()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    /**
+     * Perform OCR on selected pages only (in selection order)
+     */
+    private fun performOcrOnSelectedPages() {
+        val selectedUris = pagesAdapter.getSelectedUrisInOrder()
+        if (selectedUris.isEmpty()) {
+            Toast.makeText(requireContext(), R.string.no_pages_selected, Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        performOcrOnPages(selectedUris, isSelectedMode = true)
     }
 
     /**
@@ -175,6 +203,16 @@ class PagesFragment : Fragment() {
             return
         }
         
+        performOcrOnPages(pages, isSelectedMode = false)
+    }
+    
+    /**
+     * Perform OCR on a list of page URIs
+     * 
+     * @param uris List of page URIs to process
+     * @param isSelectedMode Whether this is from selection mode (affects exit behavior)
+     */
+    private fun performOcrOnPages(uris: List<Uri>, isSelectedMode: Boolean) {
         // Show loading with OCR-specific message
         binding.loadingText.text = getString(R.string.ocr_processing)
         binding.loadingOverlay.visibility = View.VISIBLE
@@ -184,12 +222,12 @@ class PagesFragment : Fragment() {
                 val allText = StringBuilder()
                 
                 // Process each page
-                pages.forEachIndexed { index, uri ->
+                uris.forEachIndexed { index, uri ->
                     val result = OcrProcessor.recognizeText(requireContext(), uri)
                     if (result.success && result.fullText.isNotEmpty()) {
                         if (allText.isNotEmpty()) {
                             allText.append("\n\n--- Page ${index + 2} ---\n\n")
-                        } else if (pages.size > 1) {
+                        } else if (uris.size > 1) {
                             allText.append("--- Page 1 ---\n\n")
                         }
                         allText.append(result.fullText)
@@ -198,6 +236,11 @@ class PagesFragment : Fragment() {
                 
                 withContext(Dispatchers.Main) {
                     binding.loadingOverlay.visibility = View.GONE
+                    
+                    // Exit selection mode after OCR if in selection mode
+                    if (isSelectedMode) {
+                        pagesAdapter.exitSelectionMode()
+                    }
                     
                     if (allText.isEmpty()) {
                         Toast.makeText(requireContext(), R.string.ocr_no_text, Toast.LENGTH_SHORT).show()
@@ -208,6 +251,11 @@ class PagesFragment : Fragment() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     binding.loadingOverlay.visibility = View.GONE
+                    
+                    if (isSelectedMode) {
+                        pagesAdapter.exitSelectionMode()
+                    }
+                    
                     Toast.makeText(
                         requireContext(),
                         "${getString(R.string.ocr_error)}: ${e.message}",
@@ -299,6 +347,10 @@ class PagesFragment : Fragment() {
             onSelectionChanged = { selectedCount, isSelectionMode ->
                 // Update UI based on selection mode
                 updateSelectionModeUI(selectedCount, isSelectionMode)
+            },
+            onRotateClick = { position ->
+                // Rotate the page 90 degrees clockwise
+                rotatePage(position)
             }
         )
 
@@ -579,6 +631,96 @@ class PagesFragment : Fragment() {
             }
             .setNegativeButton(R.string.no, null)  // null = just dismiss
             .show()
+    }
+
+    /**
+     * Rotate a page 90 degrees clockwise
+     * 
+     * This rotates the image file and updates the URI in the ViewModel.
+     * The rotation is done in the background to avoid blocking the UI.
+     * 
+     * @param position Index of page to rotate
+     */
+    private fun rotatePage(position: Int) {
+        val pages = viewModel.pages.value ?: return
+        if (position !in pages.indices) return
+        
+        val uri = pages[position]
+        
+        // Show loading
+        binding.loadingText.text = getString(R.string.rotating_page)
+        binding.loadingOverlay.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            try {
+                val rotatedUri = withContext(Dispatchers.IO) {
+                    rotateImage(uri)
+                }
+                
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    
+                    if (rotatedUri != null) {
+                        // Update the page with the rotated image
+                        viewModel.updatePage(position, rotatedUri)
+                        pagesAdapter.notifyItemChanged(position)
+                    } else {
+                        Toast.makeText(requireContext(), R.string.rotate_error, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    Toast.makeText(requireContext(), R.string.rotate_error, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Rotate an image 90 degrees clockwise and save to a new file
+     * 
+     * @param uri Original image URI
+     * @return New URI of rotated image, or null on error
+     */
+    private fun rotateImage(uri: Uri): Uri? {
+        return try {
+            // Load the bitmap
+            val inputStream = requireContext().contentResolver.openInputStream(uri) ?: return null
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream.close()
+            
+            // Create rotation matrix (90 degrees clockwise)
+            val matrix = android.graphics.Matrix()
+            matrix.postRotate(90f)
+            
+            // Create rotated bitmap
+            val rotatedBitmap = Bitmap.createBitmap(
+                bitmap, 0, 0, 
+                bitmap.width, bitmap.height, 
+                matrix, true
+            )
+            
+            // Save to a new file
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(java.util.Date())
+            val rotatedFile = File(
+                requireContext().filesDir,
+                "scans/ROT_${timestamp}.jpg"
+            )
+            rotatedFile.parentFile?.mkdirs()
+            
+            FileOutputStream(rotatedFile).use { outputStream ->
+                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+            }
+            
+            // Clean up
+            bitmap.recycle()
+            rotatedBitmap.recycle()
+            
+            Uri.fromFile(rotatedFile)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     // ============================================================
