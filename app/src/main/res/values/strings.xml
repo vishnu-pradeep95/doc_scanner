@@ -51,10 +51,14 @@
     
     <!-- OCR (Text Recognition) -->
     <string name="recognize_text">Recognize Text</string>
-    <string name="ocr_coming_soon">Text recognition coming soon! This feature will let you copy and search text from scanned documents.</string>
     <string name="ocr_processing">Recognizing text…</string>
-    <string name="ocr_no_text">No text recognized in this image</string>
+    <string name="ocr_no_text">No text found in scanned pages</string>
     <string name="ocr_error">Error recognizing text</string>
+    <string name="recognized_text">Recognized Text</string>
+    <string name="copy_text">Copy</string>
+    <string name="text_copied">Text copied to clipboard</string>
+    <string name="share">Share</string>
+    <string name="close">Close</string>
     
     <!-- General -->
     <string name="error">Error</string>

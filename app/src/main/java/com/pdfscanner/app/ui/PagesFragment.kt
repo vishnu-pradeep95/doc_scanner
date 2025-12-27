@@ -20,6 +20,7 @@
 package com.pdfscanner.app.ui
 
 // Android core imports
+import android.content.Context
 import android.content.Intent  // For launching other apps/activities
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -46,7 +47,6 @@ import androidx.recyclerview.widget.ItemTouchHelper  // Drag & drop support
 
 // Material design components
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -55,6 +55,7 @@ import com.pdfscanner.app.R
 import com.pdfscanner.app.adapter.PagesAdapter
 import com.pdfscanner.app.data.DocumentHistoryRepository
 import com.pdfscanner.app.databinding.FragmentPagesBinding
+import com.pdfscanner.app.ocr.OcrProcessor
 import com.pdfscanner.app.viewmodel.ScannerViewModel
 
 // Coroutine imports
@@ -147,7 +148,7 @@ class PagesFragment : Fragment() {
                     true
                 }
                 R.id.action_ocr -> {
-                    showOcrComingSoonMessage()
+                    performOcrOnAllPages()
                     true
                 }
                 else -> false
@@ -156,17 +157,96 @@ class PagesFragment : Fragment() {
     }
 
     /**
-     * Show OCR coming soon snackbar
+     * Perform OCR on all scanned pages and show results
      * 
-     * OCR (Optical Character Recognition) will be implemented in a future phase.
-     * This placeholder informs users the feature is planned.
+     * Processes each page through ML Kit Text Recognition and
+     * combines results into a single text output.
      */
-    private fun showOcrComingSoonMessage() {
-        Snackbar.make(
-            binding.root,
-            R.string.ocr_coming_soon,
-            Snackbar.LENGTH_LONG
-        ).show()
+    private fun performOcrOnAllPages() {
+        val pages = viewModel.pages.value
+        if (pages.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), R.string.no_pages, Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Show loading
+        binding.loadingOverlay.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            try {
+                val allText = StringBuilder()
+                
+                // Process each page
+                pages.forEachIndexed { index, uri ->
+                    val result = OcrProcessor.recognizeText(requireContext(), uri)
+                    if (result.success && result.fullText.isNotEmpty()) {
+                        if (allText.isNotEmpty()) {
+                            allText.append("\n\n--- Page ${index + 2} ---\n\n")
+                        } else if (pages.size > 1) {
+                            allText.append("--- Page 1 ---\n\n")
+                        }
+                        allText.append(result.fullText)
+                    }
+                }
+                
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    
+                    if (allText.isEmpty()) {
+                        Toast.makeText(requireContext(), R.string.ocr_no_text, Toast.LENGTH_SHORT).show()
+                    } else {
+                        showOcrResultDialog(allText.toString())
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    Toast.makeText(
+                        requireContext(),
+                        "${getString(R.string.ocr_error)}: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Show dialog with OCR results and copy/share options
+     */
+    private fun showOcrResultDialog(text: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.recognized_text)
+            .setMessage(text)
+            .setPositiveButton(R.string.copy_text) { _, _ ->
+                copyToClipboard(text)
+            }
+            .setNeutralButton(R.string.share) { _, _ ->
+                shareText(text)
+            }
+            .setNegativeButton(R.string.close, null)
+            .show()
+    }
+    
+    /**
+     * Copy text to clipboard
+     */
+    private fun copyToClipboard(text: String) {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clip = android.content.ClipData.newPlainText("OCR Text", text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(requireContext(), R.string.text_copied, Toast.LENGTH_SHORT).show()
+    }
+    
+    /**
+     * Share text via Android share sheet
+     */
+    private fun shareText(text: String) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
     }
 
     /**

@@ -23,7 +23,7 @@ A simple Android app to scan documents using CameraX, edit them with crop/rotate
 - 📤 **Secure Sharing** - Share PDFs via FileProvider with proper permissions
 - 📚 **Document History** - Access and manage all previously created PDFs
 - 🔒 **Privacy First** - All files stored in app-private storage
-- 🔮 **OCR Ready** - Text recognition framework in place (coming soon)
+- � **OCR Text Recognition** - Extract and copy text from scanned documents using ML Kit
 
 ## Screenshots
 
@@ -56,6 +56,7 @@ A simple Android app to scan documents using CameraX, edit them with crop/rotate
 |---------|---------|
 | CameraX 1.3.x | Camera capture |
 | CanHub Image Cropper 4.5.0 | Crop/rotate functionality |
+| ML Kit Text Recognition 16.0 | On-device OCR |
 | Navigation Component | Fragment navigation |
 | Material Design 3 | UI components |
 
@@ -115,7 +116,7 @@ All Kotlin source files contain extensive comments explaining:
 - [x] Phase 1: Basic scanning (capture, crop, PDF)
 - [x] Phase 2: Document filters & UX improvements
 - [x] Phase 3: Page reordering, batch scanning, document history
-- [ ] Phase 4: OCR with ML Kit Text Recognition
+- [x] Phase 4: OCR with ML Kit Text Recognition
 - [ ] Phase 5: Auto-edge detection, folders, search
 
 ## License

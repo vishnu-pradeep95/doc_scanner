@@ -193,11 +193,23 @@ dependencies {
     implementation("com.github.CanHub:Android-Image-Cropper:4.4.0")
     
     // ===========================================
+    // ML KIT - Text Recognition (OCR)
+    // ===========================================
+    
+    // ML Kit Text Recognition - on-device OCR
+    // Recognizes text in Latin-based languages (English, Spanish, etc.)
+    // Model is bundled with app (~3.5MB increase)
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+    
+    // ===========================================
     // KOTLIN COROUTINES
     // ===========================================
     
     // Coroutines Android - async programming with Android dispatchers
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    
+    // Coroutines Play Services - await() for Google Play Tasks
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     
     // ===========================================
     // UI COMPONENTS
