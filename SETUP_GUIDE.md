@@ -348,6 +348,13 @@ findNavController().navigate(action)
 
 ### Key Features Guide
 
+#### Home Screen
+The new home screen provides quick access to:
+- **New Scan** - Jump directly to camera
+- **Document History** - View all saved PDFs
+- **Recent Documents** - Quick access to last 3 PDFs
+- **Settings** - Theme and app preferences
+
 #### Auto-Scan (ML Kit Document Scanner)
 Tap the magic wand icon in the camera screen to launch ML Kit's built-in document scanner:
 - Automatic edge detection
@@ -361,18 +368,39 @@ Long-press any page thumbnail to enter selection mode:
 - Numbers indicate the order you selected them
 - "Create PDF" uses this selection order
 - "Delete" removes all selected pages
+- "OCR" extracts text from selected pages only
 - Tap X in toolbar to exit selection mode
+
+#### Page Rotation
+Tap the rotate button below any page thumbnail to rotate it 90° clockwise.
 
 #### OCR (Text Recognition)
 Tap the "Aa" icon in pages screen:
-- Text is extracted from all pages
+- Text is extracted from all pages (or just selected pages in selection mode)
 - View results in a dialog
 - Copy text to clipboard with one tap
 - Works offline using on-device ML
 
 #### Document Filters
-In preview screen, choose from:
+In preview screen, choose from 7 filters:
 - **Original**: No processing
 - **Enhanced**: Better contrast for text
 - **B&W**: High contrast grayscale
+- **Sepia**: Warm vintage tone
+- **High Contrast**: Maximum text legibility
+- **Magic Color**: Enhanced vibrancy
+- **Auto**: Smart processing based on content
+
+#### Dark Mode
+Go to Settings to choose your theme:
+- **System Default** - Follows your phone's theme
+- **Light** - Always light
+- **Dark** - Always dark with Studio Ghibli-inspired night colors
+
+#### Studio Ghibli Design
+The app uses a warm, nature-inspired color palette:
+- Soft sky blues and forest greens
+- Warm sunset accents
+- Cream-colored surfaces
+- Gentle gradients instead of harsh solid colors
 

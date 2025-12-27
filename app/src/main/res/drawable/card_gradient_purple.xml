@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ghibli Sunset Card - Warm evening tones -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="16dp" />
     <gradient
         android:type="linear"
         android:angle="135"
-        android:startColor="#7C4DFF"
-        android:endColor="#651FFF" />
+        android:startColor="#F2C078"
+        android:endColor="#E8A87C" />
 </shape>

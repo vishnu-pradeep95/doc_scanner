@@ -2,6 +2,8 @@
 
 A modern Android document scanner app built with CameraX, ML Kit, and Material Design 3. Capture documents, apply filters, extract text with OCR, and generate multi-page PDFs.
 
+**🎨 Now featuring a Studio Ghibli-inspired design** with warm, natural colors and a gentle aesthetic.
+
 ## 🚀 Quick Start (For Beginners)
 
 **See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed instructions including:**
@@ -21,7 +23,8 @@ A modern Android document scanner app built with CameraX, ML Kit, and Material D
 
 ### ✂️ Edit & Enhance
 - **Crop & Rotate** - Precise editing with CanHub Image Cropper
-- **Document Filters** - Enhance text with Original, Enhanced, and B&W modes
+- **Page Rotation** - Rotate pages 90° at a time from page view
+- **Document Filters** - 7 professional filters including Enhanced, B&W, Sepia, and more
 - **Re-edit Pages** - Tap any page to crop/rotate again
 
 ### 📄 Organize & Export
@@ -33,13 +36,20 @@ A modern Android document scanner app built with CameraX, ML Kit, and Material D
 
 ### 🔍 Text Recognition
 - **OCR** - Extract text from scanned documents using ML Kit
+- **Selected Pages OCR** - Run OCR on just selected pages
 - **Copy Text** - Copy extracted text to clipboard
 - **Clear Icon** - Distinctive "Aa" icon for text recognition
 
 ### 📚 Document Management
+- **Home Screen** - Quick access to scan, history, and recent documents
 - **Document History** - Access all previously created PDFs
 - **Secure Sharing** - Share PDFs via FileProvider
 - **Privacy First** - All files stored in app-private storage
+
+### 🌙 Appearance
+- **Dark Mode** - System-synced, light, or dark themes
+- **Studio Ghibli Design** - Warm, nature-inspired color palette
+- **Smooth Transitions** - Polished UI with Material 3
 
 ## Screenshots
 
@@ -91,13 +101,16 @@ app/src/main/
 │   ├── ocr/
 │   │   └── OcrProcessor.kt      # ML Kit Text Recognition
 │   ├── ui/
+│   │   ├── HomeFragment.kt      # Home screen with quick actions
 │   │   ├── CameraFragment.kt    # Camera + batch mode + auto-scan
 │   │   ├── PreviewFragment.kt   # Image preview/edit + filters
 │   │   ├── PagesFragment.kt     # Page list, selection mode, PDF generation
-│   │   └── HistoryFragment.kt   # Document history screen
+│   │   ├── HistoryFragment.kt   # Document history screen
+│   │   └── SettingsFragment.kt  # Theme and app settings
 │   ├── util/
-│   │   ├── ImageProcessor.kt    # Document filters (Enhanced, B&W)
-│   │   └── DocumentScanner.kt   # ML Kit Document Scanner integration
+│   │   ├── ImageProcessor.kt    # Document filters (7 modes)
+│   │   ├── DocumentScanner.kt   # ML Kit Document Scanner integration
+│   │   └── ThemeManager.kt      # Dark mode handling
 │   └── viewmodel/
 │       └── ScannerViewModel.kt  # Shared data holder
 └── res/
@@ -111,15 +124,19 @@ app/src/main/
 
 ## Document Filters
 
-The app includes document-style filters to improve text legibility:
+The app includes 7 professional document filters:
 
 | Filter | Description |
 |--------|-------------|
 | **Original** | No processing - use captured image as-is |
-| **Enhanced** | 30% contrast boost + brightness adjustment |
-| **B&W** | Grayscale + high contrast for clean document look |
+| **Enhanced** | Contrast boost + brightness adjustment for better text |
+| **B&W** | High contrast grayscale for clean document look |
+| **Sepia** | Warm vintage tone for documents |
+| **High Contrast** | Maximum text legibility |
+| **Magic Color** | Enhanced vibrancy for colored documents |
+| **Auto** | Smart processing based on document content |
 
-Filters use Android's `ColorMatrix` for hardware-accelerated processing.
+Filters use Android's `ColorMatrix` and `RenderScript` for hardware-accelerated processing.
 
 ## Multi-Selection Mode
 
@@ -144,9 +161,20 @@ All Kotlin source files contain extensive comments explaining:
 - [x] Phase 3: Page reordering, batch scanning, document history
 - [x] Phase 4: OCR with ML Kit Text Recognition
 - [x] Phase 5: Auto-edge detection, multi-selection, modern UI
-- [ ] Phase 6: Dark mode, annotations, cloud backup
+- [x] Phase 6: Home screen, dark mode, advanced filters, Studio Ghibli design
+- [ ] Phase 7: Cloud backup, annotations, folder organization
 
 ## Changelog
+
+### v1.6.0 (Phase 6) - January 2025
+- ✨ **Home Screen** - New landing page with quick actions and recent documents
+- ✨ **Dark Mode** - Full dark theme support (system, light, dark)
+- ✨ **Studio Ghibli Design** - Warm, nature-inspired color palette with soft gradients
+- ✨ **7 Document Filters** - Added Sepia, High Contrast, Magic Color, Auto modes
+- ✨ **Page Rotation** - Rotate individual pages from page view
+- ✨ **Selected Pages OCR** - Run OCR on just the selected pages
+- 🎨 **Modernized UI** - Replaced harsh blue with soft cream/forest gradients
+- 🎨 **Improved Cards** - Nature-inspired gradient cards on home screen
 
 ### v1.5.0 (Phase 5) - December 2024
 - ✨ **Auto Edge Detection** - ML Kit Document Scanner integration

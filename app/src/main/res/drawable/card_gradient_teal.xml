@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ghibli Meadow Card - Forest greens -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="16dp" />
     <gradient
         android:type="linear"
         android:angle="135"
-        android:startColor="#00BFA5"
-        android:endColor="#00897B" />
+        android:startColor="#A8C69F"
+        android:endColor="#7BA38E" />
 </shape>

@@ -5,30 +5,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_variant"
+    android:background="@color/background"
     tools:context=".ui.PagesFragment">
 
-    <!-- Normal Toolbar -->
+    <!-- Normal Toolbar - Ghibli styled -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
+        android:background="@color/surface"
+        android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/menu_pages"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/white"
+        app:navigationIconTint="@color/text_primary"
         app:title="@string/scanned_pages"
-        app:titleTextColor="@color/white" />
+        app:titleTextColor="@color/text_primary" />
     
-    <!-- Selection Mode Toolbar (hidden by default) -->
+    <!-- Selection Mode Toolbar - Accent colored -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/selectionToolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary_dark"
+        android:background="@color/ghibli_water"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

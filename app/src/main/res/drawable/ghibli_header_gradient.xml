@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+Studio Ghibli-inspired header gradient
+Soft sky gradient reminiscent of Ghibli film backgrounds
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="135"
+        android:startColor="@color/header_start"
+        android:centerColor="@color/ghibli_cloud"
+        android:endColor="@color/header_end" />
+</shape>
