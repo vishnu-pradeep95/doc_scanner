@@ -7,8 +7,16 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".ui.PagesFragment">
+    
+    <!-- Decorative background elements -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_decorative_elements"
+        android:scaleType="fitEnd"
+        android:contentDescription="@null" />
 
-    <!-- Normal Toolbar - Cartoon themed -->
+    <!-- Normal Toolbar - Playful mascot style -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -21,7 +29,7 @@
         app:menu="@menu/menu_pages"
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="?attr/colorOnSurface"
-        app:title="@string/scanned_pages"
+        app:title="📄 My Pages"
         app:titleTextColor="?attr/colorOnSurface" />
     
     <!-- Selection Mode Toolbar - Cartoon primary color -->
@@ -128,7 +136,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="@string/add_more" />
+            android:text="@string/add_more"
+            app:icon="@drawable/ic_add_page_mascot"
+            app:iconSize="24dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreatePdf"
@@ -136,7 +146,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/create_pdf" />
+            android:text="@string/create_pdf"
+            app:icon="@drawable/ic_pdf_mascot"
+            app:iconSize="24dp" />
 
     </LinearLayout>
     
@@ -166,8 +178,8 @@
             android:layout_weight="1"
             android:text="@string/delete_selected"
             android:textColor="@color/error"
-            app:icon="@drawable/ic_delete"
-            app:iconTint="@color/error"
+            app:icon="@drawable/ic_delete_mascot"
+            app:iconSize="24dp"
             app:strokeColor="@color/error" />
 
         <com.google.android.material.button.MaterialButton
@@ -177,7 +189,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/create_pdf_selected"
-            app:icon="@drawable/ic_pdf" />
+            app:icon="@drawable/ic_pdf_mascot"
+            app:iconSize="24dp" />
 
     </LinearLayout>
 
@@ -188,12 +201,11 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:contentDescription="@string/share_pdf"
-        android:src="@drawable/ic_share"
+        android:src="@drawable/ic_share_mascot"
         android:visibility="gone"
         app:backgroundTint="@color/accent"
         app:layout_constraintBottom_toTopOf="@id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/white"
         tools:visibility="visible" />
 
     <!-- Loading overlay -->

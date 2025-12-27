@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Crop icon - Scissors with happy face cutting paper -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Crop frame corners -->
+    <path
+        android:pathData="M4,4 L8,4 M4,4 L4,8"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M16,4 L20,4 M20,4 L20,8"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M4,16 L4,20 M4,20 L8,20"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M20,16 L20,20 M20,20 L16,20"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <!-- Scissors in center -->
+    <group
+        android:translateX="12"
+        android:translateY="12">
+        
+        <!-- Left handle -->
+        <path
+            android:pathData="M -4,-2 A 1.5,1.5 0 1,1 -4,-1.999 Z"
+            android:fillColor="#FFE66D"
+            android:strokeWidth="1.5"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Right handle -->
+        <path
+            android:pathData="M -4,2 A 1.5,1.5 0 1,1 -4,1.999 Z"
+            android:fillColor="#FFE66D"
+            android:strokeWidth="1.5"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Blades -->
+        <path
+            android:pathData="M-4,-2 L3,-1 M-4,2 L3,1"
+            android:strokeWidth="2"
+            android:strokeColor="#2C3E50"
+            android:strokeLineCap="round"/>
+        
+        <!-- Happy eyes on scissors -->
+        <path
+            android:pathData="M -4,-2.3 A 0.4,0.4 0 1,1 -4,-2.299 Z"
+            android:fillColor="#2C3E50"/>
+        
+        <path
+            android:pathData="M -4,1.7 A 0.4,0.4 0 1,1 -4,1.699 Z"
+            android:fillColor="#2C3E50"/>
+    </group>
+    
+    <!-- Sparkles around crop area -->
+    <path
+        android:pathData="M10,6 L10.3,6.5 L10.8,6.8 L10.3,7.1 L10,7.6 L9.7,7.1 L9.2,6.8 L9.7,6.5 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <path
+        android:pathData="M14,18 L14.3,18.5 L14.8,18.8 L14.3,19.1 L14,19.6 L13.7,19.1 L13.2,18.8 L13.7,18.5 Z"
+        android:fillColor="#FF6B6B"/>
+    
+</vector>

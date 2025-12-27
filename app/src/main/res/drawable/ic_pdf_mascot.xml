@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PDF icon - Excited PDF document with star eyes ready to be created -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- PDF document body -->
+    <path
+        android:pathData="M6,2 L14,2 L18,6 L18,22 L6,22 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Folded corner -->
+    <path
+        android:pathData="M14,2 L14,6 L18,6 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.3"/>
+    
+    <!-- PDF text badge -->
+    <path
+        android:pathData="M7,10 L17,10 L17,14 L7,14 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- PDF letters -->
+    <path
+        android:pathData="M8.5,11 L8.5,13 M8.5,11 L9.5,11 Q10,11 10,11.7 Q10,12.3 9.5,12.3 L8.5,12.3"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    
+    <path
+        android:pathData="M11,11 L11,13 M11,11 Q12.5,11 12.5,12 Q12.5,13 11,13"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    
+    <path
+        android:pathData="M13.5,11 L13.5,13 M13.5,11 L15,11 M13.5,12 L14.5,12"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Star eyes (excited!) -->
+    <path
+        android:pathData="M9,16.5 L9.3,17.3 L10.1,17.6 L9.3,17.9 L9,18.7 L8.7,17.9 L7.9,17.6 L8.7,17.3 Z"
+        android:fillColor="#4ECDC4"/>
+    
+    <path
+        android:pathData="M15,16.5 L15.3,17.3 L16.1,17.6 L15.3,17.9 L15,18.7 L14.7,17.9 L13.9,17.6 L14.7,17.3 Z"
+        android:fillColor="#4ECDC4"/>
+    
+    <!-- Big excited smile -->
+    <path
+        android:pathData="M8,19.5 Q12,21.5 16,19.5"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

@@ -7,48 +7,68 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".ui.PreviewFragment">
+    
+    <!-- Decorative background elements -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_decorative_elements"
+        android:scaleType="fitEnd"
+        android:contentDescription="@null" />
 
-    <!-- Toolbar - Ghibli styled -->
+    <!-- Toolbar - Playful Mascot Style -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/surface"
-        android:elevation="2dp"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/menu_preview"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_primary"
-        app:title="Preview"
-        app:titleTextColor="@color/text_primary" />
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:title="✨ Edit Magic"
+        app:titleTextAppearance="@style/TextAppearance.Material3.TitleMedium"
+        app:titleTextColor="?attr/colorOnSurface" />
 
-    <!-- Image preview card -->
+    <!-- Artistic photo frame with shadow -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/previewCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="12dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:strokeWidth="3dp"
+        app:strokeColor="?attr/colorPrimary"
         app:layout_constraintBottom_toTopOf="@id/filterLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
-
-        <ImageView
-            android:id="@+id/imagePreview"
+        
+        <!-- Inner padding frame -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
-            android:contentDescription="Scanned page preview"
-            android:scaleType="fitCenter"
-            tools:src="@tools:sample/backgrounds/scenic" />
+            android:padding="8dp"
+            android:background="@color/white">
+
+            <ImageView
+                android:id="@+id/imagePreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:contentDescription="Scanned page preview"
+                android:scaleType="fitCenter"
+                tools:src="@tools:sample/backgrounds/scenic" />
+                
+        </FrameLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Filter selection buttons - Cartoon theme -->
+    <!-- Playful filter selection with icons -->
     <LinearLayout
         android:id="@+id/filterLayout"
         android:layout_width="0dp"
@@ -66,8 +86,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:text="@string/filter_label"
+            android:text="🎨 Style"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:fontFamily="@font/nunito_bold"
             android:textColor="?attr/colorOnSurface" />
 
         <HorizontalScrollView
@@ -86,48 +107,58 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterOriginal"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="80dp"
+                    android:minWidth="95dp"
                     android:text="@string/filter_original"
-                    android:textSize="12sp" />
+                    android:textSize="11sp"
+                    app:icon="@drawable/ic_filter_original_mascot"
+                    app:iconSize="22dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterMagic"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="80dp"
+                    android:minWidth="95dp"
                     android:text="@string/filter_magic"
-                    android:textSize="12sp" />
+                    android:textSize="11sp"
+                    app:icon="@drawable/ic_filter_magic_mascot"
+                    app:iconSize="22dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterEnhanced"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="80dp"
+                    android:minWidth="95dp"
                     android:text="@string/filter_enhanced"
-                    android:textSize="12sp" />
+                    android:textSize="11sp"
+                    app:icon="@drawable/ic_filter_enhanced_mascot"
+                    app:iconSize="22dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterSharpen"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="80dp"
+                    android:minWidth="95dp"
                     android:text="@string/filter_sharpen"
-                    android:textSize="12sp" />
+                    android:textSize="11sp"
+                    app:icon="@drawable/ic_filter_sharpen_mascot"
+                    app:iconSize="22dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterBw"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="80dp"
+                    android:minWidth="95dp"
                     android:text="@string/filter_bw"
-                    android:textSize="12sp" />
+                    android:textSize="11sp"
+                    app:icon="@drawable/ic_filter_bw_mascot"
+                    app:iconSize="22dp" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
             
@@ -135,7 +166,7 @@
 
     </LinearLayout>
 
-    <!-- Action buttons -->
+    <!-- Playful action buttons - text only for clean layout -->
     <LinearLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="0dp"
@@ -144,7 +175,7 @@
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="12dp"
         android:paddingVertical="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -155,18 +186,20 @@
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
-            android:text="@string/retake" />
+            android:text="Retake"
+            android:textSize="13sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCrop"
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
-            android:text="@string/crop_rotate" />
+            android:text="Edit"
+            android:textSize="13sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddPage"
@@ -174,7 +207,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/add_page" />
+            android:text="Add Page"
+            android:textSize="13sp" />
 
     </LinearLayout>
 

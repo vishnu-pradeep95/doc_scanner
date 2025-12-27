@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Seamless home banner - blends with dark background -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="200dp"
+    android:viewportWidth="360"
+    android:viewportHeight="200">
+    
+    <!-- Subtle wave at bottom to blend with content below -->
+    <path
+        android:pathData="M0,180 Q90,160 180,175 T360,165 L360,200 L0,200 Z"
+        android:fillColor="#1A1F24"
+        android:fillAlpha="0.3"/>
+    
+    <!-- Very subtle decorative gradient blobs - almost invisible -->
+    <path
+        android:pathData="M-20,40 Q60,20 120,50 T200,30 L200,100 Q120,120 40,90 Z"
+        android:fillColor="#4ECDC4"
+        android:fillAlpha="0.06"/>
+    
+    <path
+        android:pathData="M200,20 Q280,10 360,40 L360,90 Q300,110 240,80 Z"
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.05"/>
+    
+    <!-- Floating document 1 (left) - with happy face -->
+    <group
+        android:pivotX="70"
+        android:pivotY="80"
+        android:rotation="-12">
+        
+        <!-- Document body -->
+        <path
+            android:pathData="M55,55 L85,55 L85,105 L55,105 Z"
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="2.5"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Fold corner -->
+        <path
+            android:pathData="M85,55 L85,68 L72,68 Z"
+            android:fillColor="#E8F4F8"/>
+        
+        <!-- Lines on document -->
+        <path
+            android:pathData="M60,72 L80,72"
+            android:strokeWidth="1.5"
+            android:strokeColor="#4ECDC4"/>
+        <path
+            android:pathData="M60,78 L80,78"
+            android:strokeWidth="1.5"
+            android:strokeColor="#4ECDC4"/>
+        <path
+            android:pathData="M60,84 L74,84"
+            android:strokeWidth="1.5"
+            android:strokeColor="#4ECDC4"/>
+        
+        <!-- Happy eyes -->
+        <path
+            android:pathData="M 67,75 A 2,2 0 1,1 63,75 A 2,2 0 1,1 67,75"
+            android:fillColor="#2C3E50"/>
+        <path
+            android:pathData="M 79,75 A 2,2 0 1,1 75,75 A 2,2 0 1,1 79,75"
+            android:fillColor="#2C3E50"/>
+        
+        <!-- Smile -->
+        <path
+            android:pathData="M64,88 Q70,93 76,88"
+            android:strokeWidth="2"
+            android:strokeColor="#FF6B6B"
+            android:strokeLineCap="round"
+            android:fillColor="@android:color/transparent"/>
+    </group>
+    
+    <!-- Floating document 2 (center-right) - PDF style -->
+    <group
+        android:pivotX="220"
+        android:pivotY="90"
+        android:rotation="8">
+        
+        <!-- Document body -->
+        <path
+            android:pathData="M195,65 L245,65 L245,125 L195,125 Z"
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="2.5"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Fold corner -->
+        <path
+            android:pathData="M245,65 L245,80 L230,80 Z"
+            android:fillColor="#FFE66D"
+            android:fillAlpha="0.4"/>
+        
+        <!-- PDF badge -->
+        <path
+            android:pathData="M202,82 L238,82 L238,92 L202,92 Z"
+            android:fillColor="#FF6B6B"/>
+        
+        <!-- PDF text hint -->
+        <path
+            android:pathData="M208,86 L212,86 M216,86 L220,86 M224,86 L228,86"
+            android:strokeWidth="2"
+            android:strokeColor="#FFFFFF"
+            android:strokeLineCap="round"/>
+        
+        <!-- Cute checkmark -->
+        <path
+            android:pathData="M210,105 L216,111 L230,97"
+            android:strokeWidth="3"
+            android:strokeColor="#4ECDC4"
+            android:strokeLineCap="round"
+            android:fillColor="@android:color/transparent"/>
+    </group>
+    
+    <!-- Floating document 3 (far right) - camera icon -->
+    <group
+        android:pivotX="310"
+        android:pivotY="70"
+        android:rotation="-5">
+        
+        <!-- Document body -->
+        <path
+            android:pathData="M285,45 L335,45 L335,105 L285,105 Z"
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="2.5"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Camera icon inside -->
+        <path
+            android:pathData="M298,62 L322,62 L322,82 L298,82 Z"
+            android:fillColor="#4ECDC4"
+            android:strokeWidth="2"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Lens -->
+        <path
+            android:pathData="M 310,72 A 5,5 0 1,1 310,71.999 Z"
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="1.5"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Flash -->
+        <path
+            android:pathData="M 320,66 A 2,2 0 1,1 320,65.999 Z"
+            android:fillColor="#FFE66D"/>
+        
+        <!-- Lines below camera -->
+        <path
+            android:pathData="M292,90 L328,90"
+            android:strokeWidth="1.5"
+            android:strokeColor="#E0E0E0"/>
+        <path
+            android:pathData="M292,96 L315,96"
+            android:strokeWidth="1.5"
+            android:strokeColor="#E0E0E0"/>
+    </group>
+    
+    <!-- Sparkles scattered around -->
+    <path
+        android:pathData="M130,50 L131.5,54 L135.5,55.5 L131.5,57 L130,61 L128.5,57 L124.5,55.5 L128.5,54 Z"
+        android:fillColor="#FFE66D"/>
+    
+    <path
+        android:pathData="M170,110 L171.5,114 L175.5,115.5 L171.5,117 L170,121 L168.5,117 L164.5,115.5 L168.5,114 Z"
+        android:fillColor="#4ECDC4"/>
+    
+    <path
+        android:pathData="M270,40 L271.5,44 L275.5,45.5 L271.5,47 L270,51 L268.5,47 L264.5,45.5 L268.5,44 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <path
+        android:pathData="M340,130 L341,133 L344,134 L341,135 L340,138 L339,135 L336,134 L339,133 Z"
+        android:fillColor="#FFE66D"/>
+    
+    <!-- Small decorative dots -->
+    <path
+        android:pathData="M 105,120 A 3,3 0 1,1 105,119.999 Z"
+        android:fillColor="#4ECDC4"
+        android:fillAlpha="0.5"/>
+    
+    <path
+        android:pathData="M 155,75 A 3,3 0 1,1 155,74.999 Z"
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.5"/>
+    
+    <path
+        android:pathData="M 250,140 A 3,3 0 1,1 250,139.999 Z"
+        android:fillColor="#FFE66D"
+        android:fillAlpha="0.5"/>
+    
+    <!-- Happy scanner mascot at bottom left -->
+    <group
+        android:translateX="20"
+        android:translateY="145">
+        
+        <!-- Scanner body -->
+        <path
+            android:pathData="M0,0 L50,0 L50,28 L0,28 Z"
+            android:fillColor="#FF6B6B"
+            android:strokeWidth="2.5"
+            android:strokeColor="#2C3E50"/>
+        
+        <!-- Scan light effect -->
+        <path
+            android:pathData="M6,12 L44,12"
+            android:strokeWidth="4"
+            android:strokeColor="#4ECDC4"
+            android:strokeLineCap="round"/>
+        
+        <!-- Googly eyes -->
+        <path
+            android:pathData="M 18,8 A 4,4 0 1,1 18,7.999 Z"
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="1.5"
+            android:strokeColor="#2C3E50"/>
+        <path
+            android:pathData="M 19.5,8 A 2,2 0 1,1 19.5,7.999 Z"
+            android:fillColor="#2C3E50"/>
+        
+        <path
+            android:pathData="M 32,8 A 4,4 0 1,1 32,7.999 Z"
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="1.5"
+            android:strokeColor="#2C3E50"/>
+        <path
+            android:pathData="M 33.5,8 A 2,2 0 1,1 33.5,7.999 Z"
+            android:fillColor="#2C3E50"/>
+        
+        <!-- Happy smile -->
+        <path
+            android:pathData="M15,20 Q25,25 35,20"
+            android:strokeWidth="2.5"
+            android:strokeColor="#2C3E50"
+            android:strokeLineCap="round"
+            android:fillColor="@android:color/transparent"/>
+        
+        <!-- Little buttons -->
+        <path
+            android:pathData="M 10,22 A 1.5,1.5 0 1,1 10,21.999 Z"
+            android:fillColor="#FFE66D"/>
+        <path
+            android:pathData="M 40,22 A 1.5,1.5 0 1,1 40,21.999 Z"
+            android:fillColor="#4ECDC4"/>
+    </group>
+    
+</vector>

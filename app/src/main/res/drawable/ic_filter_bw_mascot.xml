@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Document body - split half white/half dark -->
+    <path
+        android:pathData="M5,3 L19,3 L19,21 L5,21 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50" />
+    
+    <!-- Dark half -->
+    <path
+        android:pathData="M12,3 L19,3 L19,21 L12,21 Z"
+        android:fillColor="#2C3E50" />
+    
+    <!-- Lines on light side -->
+    <path
+        android:pathData="M7,8 L11,8"
+        android:strokeWidth="1.5"
+        android:strokeColor="#95A5A6" />
+    <path
+        android:pathData="M7,12 L11,12"
+        android:strokeWidth="1.5"
+        android:strokeColor="#95A5A6" />
+    <path
+        android:pathData="M7,16 L11,16"
+        android:strokeWidth="1.5"
+        android:strokeColor="#95A5A6" />
+    
+    <!-- Lines on dark side -->
+    <path
+        android:pathData="M13,8 L17,8"
+        android:strokeWidth="1.5"
+        android:strokeColor="#95A5A6" />
+    <path
+        android:pathData="M13,12 L17,12"
+        android:strokeWidth="1.5"
+        android:strokeColor="#95A5A6" />
+    <path
+        android:pathData="M13,16 L17,16"
+        android:strokeWidth="1.5"
+        android:strokeColor="#95A5A6" />
+    
+</vector>

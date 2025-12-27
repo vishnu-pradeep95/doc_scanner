@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Auto select icon - LARGER version for camera screen (32dp) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    
+    <!-- Selection frame - corners only for modern look -->
+    <path
+        android:pathData="M5,5 L10,5 M5,5 L5,10"
+        android:strokeWidth="3"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M27,5 L22,5 M27,5 L27,10"
+        android:strokeWidth="3"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M5,27 L10,27 M5,27 L5,22"
+        android:strokeWidth="3"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M27,27 L22,27 M27,27 L27,22"
+        android:strokeWidth="3"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <!-- Inner document with checkmark -->
+    <path
+        android:pathData="M9,10 L23,10 L23,22 L9,22 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Happy eyes on document -->
+    <path
+        android:pathData="M 13,14 A 1.5,1.5 0 1,1 13,13.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 13.3,14 A 0.7,0.7 0 1,1 13.3,13.999 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <path
+        android:pathData="M 19,14 A 1.5,1.5 0 1,1 19,13.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 19.3,14 A 0.7,0.7 0 1,1 19.3,13.999 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <!-- Big checkmark -->
+    <path
+        android:pathData="M12,18 L14.5,20.5 L20,15"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Sparkles in corners -->
+    <path
+        android:pathData="M3,3 L3.5,4 L4.5,4.5 L3.5,5 L3,6 L2.5,5 L1.5,4.5 L2.5,4 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <path
+        android:pathData="M29,3 L29.5,4 L30.5,4.5 L29.5,5 L29,6 L28.5,5 L27.5,4.5 L28.5,4 Z"
+        android:fillColor="#FFE66D"/>
+    
+</vector>

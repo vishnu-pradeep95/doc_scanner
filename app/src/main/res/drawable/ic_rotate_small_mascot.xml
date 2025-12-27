@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rotate icon with spinning arrow mascot -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Circular arrow -->
+    <path
+        android:pathData="M12,4 A8,8 0 1,1 5.5,8"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Arrow head -->
+    <path
+        android:pathData="M3,8 L5.5,8 L5.5,10.5"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Happy center face -->
+    <path
+        android:pathData="M 12,12 A 3,3 0 1,1 12,11.999 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Dizzy spiral eyes (spinning!) -->
+    <path
+        android:pathData="M10.5,11.5 Q11,12 11.5,11.5"
+        android:strokeWidth="1"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    <path
+        android:pathData="M12.5,11.5 Q13,12 13.5,11.5"
+        android:strokeWidth="1"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Wheee mouth -->
+    <path
+        android:pathData="M10.5,13 Q12,14 13.5,13"
+        android:strokeWidth="1"
+        android:strokeColor="#FF6B6B"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

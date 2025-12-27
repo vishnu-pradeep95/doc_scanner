@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add page icon - Plus sign with happy paper mascot -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Document background -->
+    <path
+        android:pathData="M5,3 L15,3 L19,7 L19,21 L5,21 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Folded corner -->
+    <path
+        android:pathData="M15,3 L15,7 L19,7 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.3"/>
+    
+    <!-- Big plus sign -->
+    <path
+        android:pathData="M12,9 L12,17 M8,13 L16,13"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"/>
+    
+    <!-- Happy sparkle eyes -->
+    <path
+        android:pathData="M9,10 L9.5,10.8 L10.3,11.3 L9.5,11.8 L9,12.6 L8.5,11.8 L7.7,11.3 L8.5,10.8 Z"
+        android:fillColor="#FFE66D"/>
+    
+    <path
+        android:pathData="M15,10 L15.5,10.8 L16.3,11.3 L15.5,11.8 L15,12.6 L14.5,11.8 L13.7,11.3 L14.5,10.8 Z"
+        android:fillColor="#FFE66D"/>
+    
+</vector>

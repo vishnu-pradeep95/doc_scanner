@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Happy PDF document mascot for history list items -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Document body -->
+    <path
+        android:pathData="M10,4 L30,4 L38,12 L38,44 L10,44 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="2.5"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Folded corner -->
+    <path
+        android:pathData="M30,4 L30,12 L38,12 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.4"/>
+    
+    <!-- PDF badge -->
+    <path
+        android:pathData="M14,18 L34,18 L34,26 L14,26 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- PDF text -->
+    <path
+        android:pathData="M17,21 L17,24 M17,21 L19,21 Q20,21 20,22 Q20,23 19,23 L17,23"
+        android:strokeWidth="1.2"
+        android:strokeColor="#FFFFFF"/>
+    
+    <path
+        android:pathData="M22,21 L22,24 M22,21 Q24.5,21 24.5,22.5 Q24.5,24 22,24"
+        android:strokeWidth="1.2"
+        android:strokeColor="#FFFFFF"/>
+    
+    <path
+        android:pathData="M26.5,21 L26.5,24 M26.5,21 L29,21 M26.5,22.5 L28.5,22.5"
+        android:strokeWidth="1.2"
+        android:strokeColor="#FFFFFF"/>
+    
+    <!-- Googly eyes -->
+    <path
+        android:pathData="M 20,32 A 3,3 0 1,1 20,31.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 21,32 A 1.5,1.5 0 1,1 21,31.999 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <path
+        android:pathData="M 28,32 A 3,3 0 1,1 28,31.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 29,32 A 1.5,1.5 0 1,1 29,31.999 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <!-- Happy smile -->
+    <path
+        android:pathData="M18,37 Q24,41 30,37"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

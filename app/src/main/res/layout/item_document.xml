@@ -5,9 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/white"
     app:rippleColor="@color/ripple_color">
 
     <LinearLayout
@@ -16,14 +17,12 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <!-- PDF Icon -->
+        <!-- Happy PDF Document Mascot Icon -->
         <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:contentDescription="@null"
-            android:padding="8dp"
-            android:src="@drawable/ic_pdf"
-            app:tint="@color/accent" />
+            android:src="@drawable/ic_pdf_document_mascot" />
 
         <!-- Document info -->
         <LinearLayout
@@ -34,16 +33,16 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- Document name -->
+            <!-- Document name - VISIBLE with explicit dark color -->
             <TextView
                 android:id="@+id/textDocumentName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/nunito_bold"
+                android:textColor="#2C3E50"
+                android:textSize="15sp"
                 tools:text="Business Contract.pdf" />
 
             <!-- Document details (pages, size, date) -->
@@ -52,35 +51,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/gray_medium"
+                android:fontFamily="@font/nunito_regular"
+                android:textColor="#7F8C8D"
                 android:textSize="12sp"
                 tools:text="5 pages • 1.2 MB • Dec 26, 2025" />
 
         </LinearLayout>
 
-        <!-- Share button -->
+        <!-- Share button with mascot icon -->
         <ImageButton
             android:id="@+id/btnShare"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/share_pdf"
             android:padding="8dp"
-            android:src="@drawable/ic_share"
-            app:tint="@color/gray_medium" />
+            android:src="@drawable/ic_share_small_mascot" />
 
-        <!-- Delete button -->
+        <!-- Delete button with mascot icon -->
         <ImageButton
             android:id="@+id/btnDelete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/delete_document"
             android:padding="8dp"
-            android:src="@drawable/ic_delete"
-            app:tint="@color/gray_medium" />
+            android:src="@drawable/ic_delete_small_mascot" />
 
     </LinearLayout>
 

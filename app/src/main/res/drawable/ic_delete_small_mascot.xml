@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Delete icon with gentle trash can for history items -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Trash can body -->
+    <path
+        android:pathData="M6,7 L18,7 L17,21 L7,21 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Trash can lid -->
+    <path
+        android:pathData="M4,5 L20,5 L20,7 L4,7 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Handle -->
+    <path
+        android:pathData="M9,3 L15,3 L15,5 L9,5 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Understanding eyes (not sad) -->
+    <path
+        android:pathData="M 10,11 A 1,1 0 1,1 10,10.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 10,10.8 A 0.5,0.5 0 1,1 10,10.799 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <path
+        android:pathData="M 14,11 A 1,1 0 1,1 14,10.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 14,10.8 A 0.5,0.5 0 1,1 14,10.799 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <!-- Gentle expression -->
+    <path
+        android:pathData="M9.5,14 L14.5,14"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"/>
+    
+</vector>

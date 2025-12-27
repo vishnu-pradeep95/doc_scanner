@@ -89,47 +89,44 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="1" />
 
-        <!-- Drag handle - hold to reorder -->
+        <!-- Drag handle - hold to reorder (mascot style) -->
         <ImageView
             android:id="@+id/dragHandle"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/icon_button_bg"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/icon_button_bg_light"
             android:contentDescription="@string/drag_to_reorder"
-            android:padding="8dp"
-            android:src="@drawable/ic_drag_handle"
+            android:padding="5dp"
+            android:src="@drawable/ic_menu_mascot"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:tint="@color/white" />
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Rotate button -->
+        <!-- Rotate button (mascot style) -->
         <ImageButton
             android:id="@+id/btnRotate"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/icon_button_bg"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/icon_button_bg_light"
             android:contentDescription="@string/rotate_page"
-            android:padding="8dp"
-            android:src="@drawable/ic_rotate"
+            android:padding="5dp"
+            android:src="@drawable/ic_rotate_small_mascot"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnDelete"
-            app:tint="@color/white" />
+            app:layout_constraintEnd_toStartOf="@id/btnDelete" />
 
-        <!-- Delete button -->
+        <!-- Delete button (mascot style) -->
         <ImageButton
             android:id="@+id/btnDelete"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/icon_button_bg"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/icon_button_bg_light"
             android:contentDescription="@string/delete_page"
-            android:padding="8dp"
-            android:src="@drawable/ic_delete"
+            android:padding="5dp"
+            android:src="@drawable/ic_delete_page_mascot"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/white" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

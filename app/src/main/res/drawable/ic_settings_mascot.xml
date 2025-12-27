@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings/Menu icon - Gear with happy face -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Gear outer -->
+    <path
+        android:pathData="M12,2 L14,4 L16.5,3.5 L18,6 L20.5,7.5 L20,10 L22,12 L20,14 L20.5,16.5 L18,18 L16.5,20.5 L14,20 L12,22 L10,20 L7.5,20.5 L6,18 L3.5,16.5 L4,14 L2,12 L4,10 L3.5,7.5 L6,6 L7.5,3.5 L10,4 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Inner circle -->
+    <path
+        android:pathData="M 12,12 A 4,4 0 1,1 12,11.999 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Happy eyes -->
+    <path
+        android:pathData="M 10,11 A 0.8,0.8 0 1,1 10,10.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 10,10.8 A 0.4,0.4 0 1,1 10,10.799 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <path
+        android:pathData="M 14,11 A 0.8,0.8 0 1,1 14,10.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 14,10.8 A 0.4,0.4 0 1,1 14,10.799 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <!-- Smile -->
+    <path
+        android:pathData="M10,13 Q12,14 14,13"
+        android:strokeWidth="1.2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

@@ -54,8 +54,13 @@ class RecentDocumentsAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(document: DocumentEntry) {
-            // Set document name
-            binding.textDocName.text = document.name
+            // Set document name - fallback to filename if name is empty
+            val displayName = if (document.name.isNotBlank()) {
+                document.name
+            } else {
+                java.io.File(document.filePath).nameWithoutExtension
+            }
+            binding.textDocName.text = displayName
 
             // Format and set date
             val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())

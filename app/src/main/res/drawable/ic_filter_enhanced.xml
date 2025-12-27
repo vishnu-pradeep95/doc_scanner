@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Enhanced filter icon - Sun with rays (brightness boost) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    
+    <!-- Sun center -->
+    <path
+        android:pathData="M 10,10 A 3,3 0 1,1 10,9.999 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Sun rays -->
+    <path
+        android:pathData="M10,2 L10,5 M10,15 L10,18 M2,10 L5,10 M15,10 L18,10"
+        android:strokeWidth="2"
+        android:strokeColor="#FF6B6B"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M4,4 L6,6 M14,14 L16,16 M4,16 L6,14 M14,6 L16,4"
+        android:strokeWidth="2"
+        android:strokeColor="#FF6B6B"
+        android:strokeLineCap="round"/>
+    
+    <!-- Happy face -->
+    <path
+        android:pathData="M 9,9.5 A 0.3,0.3 0 1,1 9,9.499 Z"
+        android:fillColor="#2C3E50"/>
+    <path
+        android:pathData="M 11,9.5 A 0.3,0.3 0 1,1 11,9.499 Z"
+        android:fillColor="#2C3E50"/>
+    <path
+        android:pathData="M8.5,10.5 Q10,11.2 11.5,10.5"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

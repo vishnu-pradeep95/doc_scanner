@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Share icon with happy paper airplane for history items -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Paper airplane body -->
+    <path
+        android:pathData="M3,3 L21,12 L3,21 L7,12 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineJoin="round"/>
+    
+    <!-- Center line -->
+    <path
+        android:pathData="M3,3 L7,12 L21,12"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineJoin="round"/>
+    
+    <!-- Happy eye -->
+    <path
+        android:pathData="M 10,10 A 1,1 0 1,1 10,9.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0.8"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 10.2,9.8 A 0.4,0.4 0 1,1 10.2,9.799 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <!-- Trail sparkle -->
+    <path
+        android:pathData="M5,8 L5.3,8.5 L5.8,8.8 L5.3,9.1 L5,9.6 L4.7,9.1 L4.2,8.8 L4.7,8.5 Z"
+        android:fillColor="#FFE66D"/>
+    
+</vector>

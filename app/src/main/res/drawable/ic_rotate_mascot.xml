@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rotate icon - Happy spinning document with motion lines -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Circular arrow path -->
+    <path
+        android:pathData="M12,4 A8,8 0 1,1 6.3,7.8"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Arrow head -->
+    <path
+        android:pathData="M4,8 L6.3,7.8 L6,10"
+        android:strokeWidth="2.5"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Document in center spinning -->
+    <path
+        android:pathData="M9,10 L15,10 L15,16 L9,16 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"/>
+    
+    <!-- Dizzy happy eyes (spinning!) -->
+    <path
+        android:pathData="M10,12 L10.8,12.8 M10.8,12 L10,12.8"
+        android:strokeWidth="1.2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"/>
+    
+    <path
+        android:pathData="M13.2,12 L14,12.8 M14,12 L13.2,12.8"
+        android:strokeWidth="1.2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"/>
+    
+    <!-- Wheee smile -->
+    <path
+        android:pathData="M10.5,14.5 Q12,15.5 13.5,14.5"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FF6B6B"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Motion sparkles -->
+    <path
+        android:pathData="M17,6 L17.3,6.5 L17.8,6.8 L17.3,7.1 L17,7.6 L16.7,7.1 L16.2,6.8 L16.7,6.5 Z"
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.6"/>
+    
+    <path
+        android:pathData="M18,17 L18.3,17.5 L18.8,17.8 L18.3,18.1 L18,18.6 L17.7,18.1 L17.2,17.8 L17.7,17.5 Z"
+        android:fillColor="#4ECDC4"
+        android:fillAlpha="0.6"/>
+    
+</vector>

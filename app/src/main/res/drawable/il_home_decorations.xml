@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="160dp"
+    android:viewportWidth="200"
+    android:viewportHeight="160">
+    
+    <!-- Floating document 1 - tilted right (top) -->
+    <group
+        android:pivotX="150"
+        android:pivotY="40"
+        android:rotation="15">
+        
+        <!-- Paper shadow -->
+        <path
+            android:pathData="M128,30 L172,30 L172,70 L128,70 Z"
+            android:fillColor="#20000000" />
+        
+        <!-- Paper body -->
+        <path
+            android:pathData="M125,27 L169,27 L169,67 L125,67 Z"
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="2"
+            android:strokeColor="#2C3E50" />
+        
+        <!-- Document lines -->
+        <path
+            android:pathData="M132,38 L162,38"
+            android:strokeWidth="2"
+            android:strokeColor="#E0E0E0" />
+        <path
+            android:pathData="M132,46 L155,46"
+            android:strokeWidth="2"
+            android:strokeColor="#E0E0E0" />
+        <path
+            android:pathData="M132,54 L158,54"
+            android:strokeWidth="2"
+            android:strokeColor="#E0E0E0" />
+        
+        <!-- Happy face on document -->
+        <path
+            android:pathData="M141,42 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+            android:fillColor="#2C3E50" />
+        <path
+            android:pathData="M153,42 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+            android:fillColor="#2C3E50" />
+        <path
+            android:pathData="M144,50 Q147,54 150,50"
+            android:strokeWidth="1.5"
+            android:strokeColor="#2C3E50"
+            android:fillColor="#00000000" />
+    </group>
+    
+    <!-- Floating document 2 - tilted left (middle) -->
+    <group
+        android:pivotX="170"
+        android:pivotY="90"
+        android:rotation="-10">
+        
+        <!-- Paper shadow -->
+        <path
+            android:pathData="M153,78 L193,78 L193,115 L153,115 Z"
+            android:fillColor="#20000000" />
+        
+        <!-- Paper body with slight color tint -->
+        <path
+            android:pathData="M150,75 L190,75 L190,112 L150,112 Z"
+            android:fillColor="#FFF5E6"
+            android:strokeWidth="2"
+            android:strokeColor="#2C3E50" />
+        
+        <!-- Document lines -->
+        <path
+            android:pathData="M157,85 L183,85"
+            android:strokeWidth="2"
+            android:strokeColor="#FFD4A3" />
+        <path
+            android:pathData="M157,93 L178,93"
+            android:strokeWidth="2"
+            android:strokeColor="#FFD4A3" />
+        
+        <!-- Winking face -->
+        <path
+            android:pathData="M163,88 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+            android:fillColor="#2C3E50" />
+        <!-- Wink eye -->
+        <path
+            android:pathData="M175,87 L179,89"
+            android:strokeWidth="2"
+            android:strokeColor="#2C3E50" />
+        <path
+            android:pathData="M167,96 Q170,100 173,96"
+            android:strokeWidth="1.5"
+            android:strokeColor="#2C3E50"
+            android:fillColor="#00000000" />
+    </group>
+    
+    <!-- Small sparkle 1 -->
+    <path
+        android:pathData="M120,55 L122,50 L124,55 L129,57 L124,59 L122,64 L120,59 L115,57 Z"
+        android:fillColor="#FFE66D" />
+    
+    <!-- Small sparkle 2 -->
+    <path
+        android:pathData="M140,100 L141,97 L142,100 L145,101 L142,102 L141,105 L140,102 L137,101 Z"
+        android:fillColor="#4ECDC4" />
+    
+    <!-- Tiny floating circles/bubbles -->
+    <path
+        android:pathData="M110,85 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0"
+        android:fillColor="#20FF6B6B" />
+    <path
+        android:pathData="M180,130 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0"
+        android:fillColor="#204ECDC4" />
+    <path
+        android:pathData="M130,120 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#20FFE66D" />
+    
+</vector>

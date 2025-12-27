@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Share icon - Happy paper airplane with trail -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Paper airplane body -->
+    <path
+        android:pathData="M3,3 L21,12 L3,21 L8,12 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineJoin="round"/>
+    
+    <!-- Center line -->
+    <path
+        android:pathData="M3,3 L8,12 L21,12"
+        android:strokeWidth="2"
+        android:strokeColor="#2C3E50"
+        android:strokeLineJoin="round"/>
+    
+    <!-- Happy eye on airplane -->
+    <path
+        android:pathData="M 10,10 A 1,1 0 1,1 10,9.999 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:strokeColor="#2C3E50"/>
+    <path
+        android:pathData="M 10.2,9.8 A 0.5,0.5 0 1,1 10.2,9.799 Z"
+        android:fillColor="#2C3E50"/>
+    
+    <!-- Trail sparkles -->
+    <path
+        android:pathData="M5,7 L5.3,7.5 L5.8,7.8 L5.3,8.1 L5,8.6 L4.7,8.1 L4.2,7.8 L4.7,7.5 Z"
+        android:fillColor="#FFE66D"
+        android:fillAlpha="0.8"/>
+    
+    <path
+        android:pathData="M6,15 L6.3,15.5 L6.8,15.8 L6.3,16.1 L6,16.6 L5.7,16.1 L5.2,15.8 L5.7,15.5 Z"
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.8"/>
+    
+    <!-- Little hearts in trail -->
+    <path
+        android:pathData="M4,12 L3.5,11.6 Q3,11.2 3,10.7 Q3,10.2 3.5,10.2 Q3.8,10.2 4,10.5 Q4.2,10.2 4.5,10.2 Q5,10.2 5,10.7 Q5,11.2 4.5,11.6 Z"
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.6"/>
+    
+</vector>

@@ -2,24 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Home button -->
+    <!-- Home button (mascot style) -->
     <item
         android:id="@+id/action_home"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_home_mascot"
         android:title="@string/go_home"
         app:showAsAction="always" />
 
-    <!-- Document history -->
+    <!-- Document history (mascot style) -->
     <item
         android:id="@+id/action_history"
-        android:icon="@drawable/ic_history"
+        android:icon="@drawable/ic_history_mascot"
         android:title="@string/view_history"
         app:showAsAction="ifRoom" />
 
-    <!-- OCR placeholder menu item (coming soon) -->
+    <!-- OCR placeholder menu item (mascot style) -->
     <item
         android:id="@+id/action_ocr"
-        android:icon="@drawable/ic_ocr"
+        android:icon="@drawable/ic_ocr_mascot"
         android:title="@string/recognize_text"
         app:showAsAction="ifRoom" />
 

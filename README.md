@@ -32,17 +32,19 @@ This isn't just another document scanner - it's a **joyful experience**! Every i
 ### 📸 Scanning & Capture
 - **CameraX Integration** - Professional camera with live preview
 - **Auto Document Scanner** - ML Kit powered edge detection
-- **Batch Mode** - Quickly capture multiple pages
-- **Document Filters** - Original, Enhanced, B&W modes
+- **Batch Mode** - Quickly capture multiple pages in sequence
+- **Document Filters** - Original, Magic, Enhanced, Sharpen, B&W modes
 - **Smart Cropping** - Precise edge adjustment with CanHub
+- **Import Images** - Add photos from gallery
 
-### 🎨 Beautiful UI
-- **Playful Mascot Icons** - 7 custom sticker-style icons with character
+### 🎨 Beautiful Mascot UI
+- **Playful Mascot Icons** - 20+ custom sticker-style icons with googly eyes
 - **Bounce Animations** - Every card tap feels satisfying
 - **Sparkle Effects** - Camera capture button with animated ring
-- **Nunito Font** - Custom bundled fonts throughout
+- **Nunito Font** - Custom bundled fonts (4 weights)
 - **Soft Corners** - 28dp radius for friendly, approachable feel
 - **Cartoon Theme** - Coral Red (#FF6B6B), Turquoise (#4ECDC4), Yellow (#FFE66D)
+- **Dark Mode Ready** - Full dark theme support
 
 ### 📋 Document Management
 - **Multi-Page PDFs** - Combine pages with custom naming
@@ -51,14 +53,16 @@ This isn't just another document scanner - it's a **joyful experience**! Every i
 - **Recent Documents** - Beautiful thumbnails with rounded corners
 - **Document History** - Track all your scanned PDFs
 - **Easy Sharing** - Share via any app with FileProvider
+- **PDF Rename** - Custom names for your documents
 
 ### 🛠️ PDF Tools
-- **Merge PDFs** 💕 - Two documents hugging with a heart
-- **Split PDFs** ✂️ - Document with googly-eyed scissors
-- **Compress PDFs** 💨 - Squeezed document with dizzy eyes
+- **Merge PDFs** 💕 - Combine multiple PDFs into one
+- **Split PDFs** ✂️ - Extract specific pages from a PDF
+- **Compress PDFs** 💨 - Reduce file size for sharing
 
 ### 🔍 OCR (Text Recognition)
 - **ML Kit Integration** - Extract text from documents
+- **Multi-Page OCR** - Process all pages at once
 - **Copy to Clipboard** - One-tap text copying
 - **Offline Processing** - Works without internet
 
@@ -270,19 +274,79 @@ Edit `res/values/themes_cartoon.xml`:
 
 ## 🚧 Roadmap
 
-- [x] Phase 1: Basic scanning (capture, crop, PDF)
-- [x] Phase 2: Document filters & enhancement
-- [x] Phase 3: Page reordering & batch scanning
-- [x] Phase 4: OCR with ML Kit
-- [x] Phase 5: Auto edge detection
-- [x] Phase 6: Dark mode & improved UX
-- [x] Phase 7: PDF merge, split, compress
-- [x] **Phase 8: Cartoon theme with mascot icons** ← We are here! 🎉
-- [ ] Phase 9: Searchable PDFs with embedded text
-- [ ] Phase 10: Cloud backup & sync
-- [ ] Phase 11: Document folders & organization
-- [ ] Phase 12: Advanced filters (perspective correction)
-- [ ] Phase 13: Export to other formats (DOCX, JPG)
+### ✅ Completed Phases
+
+- [x] **Phase 1**: Basic scanning (capture, crop, PDF)
+- [x] **Phase 2**: Document filters & enhancement  
+- [x] **Phase 3**: Page reordering & batch scanning
+- [x] **Phase 4**: OCR with ML Kit
+- [x] **Phase 5**: Auto edge detection
+- [x] **Phase 6**: Dark mode support
+- [x] **Phase 7**: PDF merge, split, compress tools
+- [x] **Phase 8**: Cartoon theme with mascot icons 🎨
+- [x] **Phase 9**: Enhanced UI/UX polish ← **Current Release!** 🎉
+
+### 🔜 Upcoming Features
+
+#### Phase 10: Smart Document Features
+- [ ] **Searchable PDFs** - Embed OCR text layer for search
+- [ ] **PDF Import** - Import existing PDFs and add/edit pages
+- [ ] **Signature Support** - Draw or import signatures
+- [ ] **Annotations** - Add text, highlights, and stamps
+
+#### Phase 11: Organization & Management
+- [ ] **Folders & Tags** - Organize documents by category
+- [ ] **Search Documents** - Find by name, date, or content
+- [ ] **Favorites** - Quick access to important documents
+- [ ] **Archive** - Move old documents out of main view
+- [ ] **Document Templates** - ID cards, receipts, contracts
+
+#### Phase 12: Cloud & Sync
+- [ ] **Google Drive Integration** - Auto-backup to cloud
+- [ ] **Dropbox Support** - Sync across devices
+- [ ] **OneDrive Integration** - Microsoft ecosystem support
+- [ ] **Share to Cloud** - Direct upload from app
+
+#### Phase 13: Advanced Editing
+- [ ] **Perspective Correction** - Auto-straighten skewed documents
+- [ ] **Background Removal** - Clean document backgrounds
+- [ ] **Text Recognition Editing** - Edit OCR'd text before saving
+- [ ] **Page Numbering** - Auto-add page numbers to PDFs
+- [ ] **Watermarks** - Add custom watermarks to documents
+
+#### Phase 14: Export & Integration
+- [ ] **Export Formats** - DOCX, PNG, JPEG, TIFF
+- [ ] **Email Integration** - Send directly via email
+- [ ] **Print Support** - Print to wireless printers
+- [ ] **Fax Integration** - Send documents via fax service
+- [ ] **QR Code Scanning** - Scan QR codes in documents
+
+#### Phase 15: Accessibility & Localization
+- [ ] **Voice Commands** - "Take photo", "Save PDF"
+- [ ] **Screen Reader Support** - TalkBack optimization
+- [ ] **Multi-language OCR** - Support 50+ languages
+- [ ] **RTL Support** - Right-to-left language layouts
+- [ ] **App Localization** - UI in multiple languages
+
+#### Phase 16: Pro Features (Future)
+- [ ] **Batch Processing** - Process multiple documents at once
+- [ ] **Custom Themes** - Create your own color schemes
+- [ ] **Widgets** - Home screen quick-scan widget
+- [ ] **Shortcuts** - App shortcuts for common actions
+- [ ] **Apple Watch / WearOS** - Quick capture from wrist
+
+---
+
+## 💡 Feature Ideas & Suggestions
+
+Have an idea? We'd love to hear it! Open an issue with the `feature-request` label.
+
+**Popular Requests:**
+- 📁 Document categorization
+- 🔐 Password-protected PDFs
+- 📊 Analytics dashboard
+- 🌙 AMOLED dark mode
+- 📱 Tablet-optimized layout
 
 ---
 

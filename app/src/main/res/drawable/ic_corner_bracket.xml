@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Animated corner decoration for camera viewfinder -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Top-left corner bracket with sparkle -->
+    <path
+        android:pathData="M8,0 L8,16 M0,8 L16,8"
+        android:strokeWidth="3"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"/>
+    
+    <!-- Sparkle in corner -->
+    <path
+        android:pathData="M5,5 L5.5,6 L6.5,6.5 L5.5,7 L5,8 L4.5,7 L3.5,6.5 L4.5,6 Z"
+        android:fillColor="#FFE66D"/>
+    
+</vector>

@@ -8,19 +8,27 @@
     android:background="@color/black"
     tools:context=".ui.CameraFragment">
 
-    <!-- Home button - top left -->
-    <ImageButton
-        android:id="@+id/btnHome"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="12dp"
-        android:background="@drawable/circle_button_bg"
-        android:contentDescription="@string/go_home"
-        android:src="@drawable/ic_home"
-        android:padding="12dp"
+    <!-- Home button - playful mascot style -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#DD2C3E50"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
+        app:layout_constraintTop_toTopOf="parent">
+        
+        <ImageButton
+            android:id="@+id/btnHome"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/go_home"
+            android:src="@drawable/ic_home_mascot"
+            android:padding="10dp" />
+            
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
@@ -32,7 +40,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Document frame overlay hint -->
+    <!-- Document frame overlay with playful corner brackets -->
     <View
         android:id="@+id/frameOverlay"
         android:layout_width="0dp"
@@ -45,6 +53,50 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.4" />
+    
+    <!-- Corner bracket decorations -->
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_corner_bracket"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="@id/frameOverlay"
+        app:layout_constraintTop_toTopOf="@id/frameOverlay"
+        android:layout_marginStart="-8dp"
+        android:layout_marginTop="-8dp" />
+    
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_corner_bracket"
+        android:rotation="90"
+        android:contentDescription="@null"
+        app:layout_constraintEnd_toEndOf="@id/frameOverlay"
+        app:layout_constraintTop_toTopOf="@id/frameOverlay"
+        android:layout_marginEnd="-8dp"
+        android:layout_marginTop="-8dp" />
+    
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_corner_bracket"
+        android:rotation="270"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="@id/frameOverlay"
+        app:layout_constraintBottom_toBottomOf="@id/frameOverlay"
+        android:layout_marginStart="-8dp"
+        android:layout_marginBottom="-8dp" />
+    
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_corner_bracket"
+        android:rotation="180"
+        android:contentDescription="@null"
+        app:layout_constraintEnd_toEndOf="@id/frameOverlay"
+        app:layout_constraintBottom_toBottomOf="@id/frameOverlay"
+        android:layout_marginEnd="-8dp"
+        android:layout_marginBottom="-8dp" />
 
     <!-- Permission denied view - Cartoon themed -->
     <LinearLayout
@@ -121,79 +173,95 @@
 
     </LinearLayout>
 
-    <!-- Bottom controls -->
-    <LinearLayout
+    <!-- Bottom controls - Playful and balanced -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/controlsLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/overlay"
-        android:gravity="center"
-        android:orientation="horizontal"
         android:paddingVertical="20dp"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Batch mode toggle -->
-        <ImageButton
-            android:id="@+id/btnBatchMode"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/btn_camera_action_bg"
-            android:contentDescription="@string/batch_mode"
-            android:padding="10dp"
-            android:src="@drawable/ic_batch_cute"
-            app:tint="@color/white" />
-        
-        <!-- Spacer -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0.5" />
-
-        <!-- Capture button - Playful mascot design with animation hint -->
-        <FrameLayout
+        <!-- Batch mode toggle - Left side -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardBatchMode"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#DD2C3E50"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            
+            <ImageButton
+                android:id="@+id/btnBatchMode"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/batch_mode"
+                android:padding="12dp"
+                android:src="@drawable/ic_batch_mascot_large" />
+                
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Capture button - Centered perfectly -->
+        <FrameLayout
+            android:id="@+id/captureContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
             
             <!-- Sparkle background hint -->
             <View
-                android:layout_width="90dp"
-                android:layout_height="90dp"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
                 android:layout_gravity="center"
                 android:background="@drawable/sparkle_ring"
-                android:alpha="0.6" />
+                android:alpha="0.5" />
             
             <ImageButton
                 android:id="@+id/btnCapture"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_capture_button_mascot"
                 android:scaleType="fitCenter"
                 android:contentDescription="@string/capture_photo" />
                 
         </FrameLayout>
-        
-        <!-- Spacer -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0.5" />
 
-        <!-- Auto-scan button (ML Kit Document Scanner) - cute magic wand -->
-        <ImageButton
-            android:id="@+id/btnAutoScan"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/btn_camera_action_bg"
-            android:contentDescription="@string/auto_scan"
-            android:padding="10dp"
-            android:src="@drawable/ic_auto_scan_cute"
-            app:tint="@color/white" />
+        <!-- Auto-scan button - Right side -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAutoScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#DD2C3E50"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            
+            <ImageButton
+                android:id="@+id/btnAutoScan"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/auto_scan"
+                android:padding="12dp"
+                android:src="@drawable/ic_auto_select_mascot_large" />
+                
+        </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
     
     <!-- View pages button - floating above controls when pages exist -->
     <com.google.android.material.button.MaterialButton

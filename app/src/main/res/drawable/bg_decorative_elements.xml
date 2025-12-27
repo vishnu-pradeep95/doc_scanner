@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Decorative floating elements - sparkles, dots, shapes -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp"
+    android:height="200dp"
+    android:viewportWidth="300"
+    android:viewportHeight="200"
+    android:alpha="0.15">
+    
+    <!-- Floating sparkles -->
+    <path
+        android:pathData="M50,30 L51,33 L54,34 L51,35 L50,38 L49,35 L46,34 L49,33 Z"
+        android:fillColor="#4ECDC4"/>
+    
+    <path
+        android:pathData="M180,50 L181,53 L184,54 L181,55 L180,58 L179,55 L176,54 L179,53 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <path
+        android:pathData="M250,120 L251,123 L254,124 L251,125 L250,128 L249,125 L246,124 L249,123 Z"
+        android:fillColor="#FFE66D"/>
+    
+    <path
+        android:pathData="M80,160 L81,163 L84,164 L81,165 L80,168 L79,165 L76,164 L79,163 Z"
+        android:fillColor="#4ECDC4"/>
+    
+    <!-- Floating dots -->
+    <path
+        android:pathData="M 120,40 A 3,3 0 1,1 120,39.999 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <path
+        android:pathData="M 200,100 A 3,3 0 1,1 200,99.999 Z"
+        android:fillColor="#4ECDC4"/>
+    
+    <path
+        android:pathData="M 30,90 A 3,3 0 1,1 30,89.999 Z"
+        android:fillColor="#FFE66D"/>
+    
+    <path
+        android:pathData="M 270,70 A 3,3 0 1,1 270,69.999 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <!-- Small circles -->
+    <path
+        android:pathData="M 150,140 A 5,5 0 1,1 150,139.999 Z"
+        android:fillColor="@android:color/transparent"
+        android:strokeWidth="2"
+        android:strokeColor="#4ECDC4"/>
+    
+    <path
+        android:pathData="M 220,30 A 5,5 0 1,1 220,29.999 Z"
+        android:fillColor="@android:color/transparent"
+        android:strokeWidth="2"
+        android:strokeColor="#FFE66D"/>
+    
+    <!-- Squiggly lines -->
+    <path
+        android:pathData="M100,100 Q110,95 120,100 T140,100"
+        android:strokeWidth="2"
+        android:strokeColor="#FF6B6B"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <path
+        android:pathData="M230,150 Q240,145 250,150 T270,150"
+        android:strokeWidth="2"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

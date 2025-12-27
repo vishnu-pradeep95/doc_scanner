@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pdfscanner.app.R
 import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.databinding.ItemDocumentBinding
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -67,8 +68,14 @@ class HistoryAdapter(
         fun bind(document: DocumentEntry) {
             val isSelected = selectedItems.contains(document.id)
             
-            // Document name
-            binding.textDocumentName.text = document.name
+            // Document name - fallback to filename if name is empty
+            val displayName = if (document.name.isNotBlank()) {
+                document.name
+            } else {
+                // Extract filename without extension as fallback
+                File(document.filePath).nameWithoutExtension
+            }
+            binding.textDocumentName.text = displayName
             
             // Format details: "5 pages • 1.2 MB • Dec 26, 2025"
             val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
