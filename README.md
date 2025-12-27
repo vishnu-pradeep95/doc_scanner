@@ -2,16 +2,30 @@
 
 A modern Android document scanner app built with CameraX, ML Kit, and Material Design 3. Capture documents, apply filters, extract text with OCR, and generate multi-page PDFs.
 
-**🎨 Now featuring a Studio Ghibli-inspired design** with warm, natural colors and a gentle aesthetic.
+**🎨 Featuring a Studio Ghibli-inspired design** with warm, natural colors and a gentle aesthetic.
 
-## 🚀 Quick Start (For Beginners)
+## 🚀 Quick Start
 
-**See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed instructions including:**
-- Installing Android Studio
-- Understanding the project structure
-- Building and running the app
-- Debugging tips
-- Key Android concepts explained
+### Prerequisites
+- Android Studio Hedgehog (2023.1.1) or newer
+- Android SDK 34
+- JDK 17
+- Min SDK: 24 (Android 7.0)
+
+### Clone & Run
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/pdf_scanner_app.git
+cd pdf_scanner_app
+
+# Open in Android Studio or build from command line
+./gradlew assembleDebug
+
+# Install on connected device
+./gradlew installDebug
+```
+
+**📖 New to Android development? See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed instructions.**
 
 ## Features
 
@@ -27,99 +41,109 @@ A modern Android document scanner app built with CameraX, ML Kit, and Material D
 - **Document Filters** - 7 professional filters including Enhanced, B&W, Sepia, and more
 - **Re-edit Pages** - Tap any page to crop/rotate again
 
-### 📄 Organize & Export
-- **Page Reordering** - Drag & drop to rearrange pages
-- **Multi-Selection** - Long-press to select multiple pages
-- **Selection Order PDF** - Create PDF from selected pages in tap order
-- **Batch Delete** - Delete multiple selected pages at once
+### 📄 PDF Operations
+- **Multi-page PDFs** - Combine scanned pages into a single PDF
 - **Custom PDF Names** - Name your PDFs before saving
+- **Merge PDFs** - Combine multiple existing PDFs into one
+- **Split PDFs** - Split a PDF into individual page files
+- **Compress PDFs** - Reduce PDF file size with JPEG compression (Low/Medium/High)
 
-### 🔍 Text Recognition
-- **OCR** - Extract text from scanned documents using ML Kit
+### 🔍 Text Recognition (OCR)
+- **Full OCR** - Extract text from all scanned documents using ML Kit
 - **Selected Pages OCR** - Run OCR on just selected pages
 - **Copy Text** - Copy extracted text to clipboard
-- **Clear Icon** - Distinctive "Aa" icon for text recognition
+- **Works Offline** - On-device ML processing
 
 ### 📚 Document Management
 - **Home Screen** - Quick access to scan, history, and recent documents
-- **Document History** - Access all previously created PDFs
-- **Secure Sharing** - Share PDFs via FileProvider
-- **Privacy First** - All files stored in app-private storage
+- **Document History** - Access all previously created PDFs with multi-select
+- **Share** - Share single or multiple PDFs via any app
+- **Delete** - Delete individual or multiple documents
+- **View PDFs** - Built-in PDF viewer or open in external apps
 
 ### 🌙 Appearance
 - **Dark Mode** - System-synced, light, or dark themes
 - **Studio Ghibli Design** - Warm, nature-inspired color palette
-- **Smooth Transitions** - Polished UI with Material 3
-
-## Screenshots
-
-| Camera | Preview + Filters | Pages | Selection Mode |
-|--------|-------------------|-------|----------------|
-| Capture or auto-scan | Apply filters & crop | Manage & reorder | Multi-select pages |
-
-## Requirements
-
-- Android Studio Hedgehog (2023.1.1) or newer
-- Android SDK 34
-- Kotlin 1.9.x
-- Min SDK: 24 (Android 7.0)
-
-## Setup
-
-1. Open the project in Android Studio
-2. Sync Gradle files (happens automatically, or File → Sync Project with Gradle Files)
-3. Run on device or emulator with camera support
-
-## Architecture
-
-- **Single Activity** with Navigation Component
-- **MVVM** pattern with `ScannerViewModel`
-- **View Binding** for type-safe view access
+- **Smooth UI** - Material Design 3 components
 
 ## Key Dependencies
 
-| Library | Purpose |
-|---------|---------|
-| CameraX 1.3.x | Camera capture |
-| CanHub Image Cropper 4.5.0 | Crop/rotate functionality |
-| ML Kit Text Recognition 16.0 | On-device OCR |
-| ML Kit Document Scanner 16.0.0-beta1 | Auto edge detection |
-| Navigation Component | Fragment navigation |
-| Material Design 3 | UI components |
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      MainActivity                           │
+│                    (NavHostFragment)                        │
+├─────────────────────────────────────────────────────────────┤
+│  HomeFragment → CameraFragment → PreviewFragment            │
+│       │              ↓                  ↓                   │
+│       │         PagesFragment ←─────────┘                   │
+│       │              │                                      │
+│       └──→ HistoryFragment → PdfViewerFragment              │
+│       └──→ SettingsFragment                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- **Single Activity** with Navigation Component
+- **MVVM** pattern with `ScannerViewModel` shared across fragments
+- **View Binding** for type-safe view access
+- **Coroutines** for async operations (image processing, PDF generation)
+- **FileProvider** for secure file sharing between apps
+
+## Key Dependencies
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| CameraX | 1.3.x | Camera capture with lifecycle awareness |
+| CanHub Image Cropper | 4.5.0 | Crop/rotate functionality |
+| ML Kit Text Recognition | 16.0.x | On-device OCR |
+| ML Kit Document Scanner | 16.0.0-beta1 | Auto edge detection |
+| Navigation Component | 2.7.x | Fragment navigation with Safe Args |
+| Material Design 3 | 1.11.x | UI components |
 
 ## Project Structure
 
 ```
 app/src/main/
 ├── java/com/pdfscanner/app/
-│   ├── MainActivity.kt          # App entry point
+│   ├── MainActivity.kt              # Single activity entry point
+│   │
 │   ├── adapter/
-│   │   ├── PagesAdapter.kt      # Page thumbnails (drag & drop + multi-select)
-│   │   └── HistoryAdapter.kt    # Document history list
+│   │   ├── PagesAdapter.kt          # Page grid with drag-drop & multi-select
+│   │   ├── HistoryAdapter.kt        # Document history list with selection
+│   │   └── RecentDocumentsAdapter.kt # Home screen recent docs
+│   │
 │   ├── data/
-│   │   └── DocumentHistory.kt   # PDF history storage (SharedPrefs + JSON)
+│   │   └── DocumentHistory.kt       # PDF history storage (SharedPrefs + JSON)
+│   │
 │   ├── ocr/
-│   │   └── OcrProcessor.kt      # ML Kit Text Recognition
+│   │   └── OcrProcessor.kt          # ML Kit Text Recognition wrapper
+│   │
 │   ├── ui/
-│   │   ├── HomeFragment.kt      # Home screen with quick actions
-│   │   ├── CameraFragment.kt    # Camera + batch mode + auto-scan
-│   │   ├── PreviewFragment.kt   # Image preview/edit + filters
-│   │   ├── PagesFragment.kt     # Page list, selection mode, PDF generation
-│   │   ├── HistoryFragment.kt   # Document history screen
-│   │   └── SettingsFragment.kt  # Theme and app settings
+│   │   ├── HomeFragment.kt          # Landing screen with quick actions
+│   │   ├── CameraFragment.kt        # CameraX + batch mode + auto-scan
+│   │   ├── PreviewFragment.kt       # Image preview, filters, crop
+│   │   ├── PagesFragment.kt         # Page management, PDF generation
+│   │   ├── HistoryFragment.kt       # Document history with merge/split/compress
+│   │   ├── PdfViewerFragment.kt     # Built-in PDF viewer
+│   │   └── SettingsFragment.kt      # Theme and app settings
+│   │
 │   ├── util/
-│   │   ├── ImageProcessor.kt    # Document filters (7 modes)
-│   │   ├── DocumentScanner.kt   # ML Kit Document Scanner integration
-│   │   └── ThemeManager.kt      # Dark mode handling
+│   │   ├── ImageProcessor.kt        # 7 document filter modes
+│   │   ├── PdfUtils.kt              # Merge, split, compress PDF operations
+│   │   ├── DocumentScanner.kt       # ML Kit Document Scanner integration
+│   │   └── AppPreferences.kt        # SharedPreferences wrapper
+│   │
 │   └── viewmodel/
-│       └── ScannerViewModel.kt  # Shared data holder
+│       └── ScannerViewModel.kt      # Shared state across fragments
+│
 └── res/
-    ├── layout/                  # XML UI layouts
-    ├── menu/                    # Toolbar menus
-    ├── navigation/              # Navigation graph
-    ├── drawable/                # Vector icons & shapes
-    ├── values/                  # Strings, colors, themes
-    └── xml/                     # FileProvider config
+    ├── layout/                      # Fragment and item layouts
+    ├── menu/                        # Toolbar menus
+    ├── navigation/nav_graph.xml     # Navigation flow definition
+    ├── drawable/                    # Vector icons, shapes, gradients
+    ├── values/                      # Strings, colors, themes, dimensions
+    └── xml/file_paths.xml           # FileProvider path configuration
 ```
 
 ## Document Filters
@@ -162,9 +186,39 @@ All Kotlin source files contain extensive comments explaining:
 - [x] Phase 4: OCR with ML Kit Text Recognition
 - [x] Phase 5: Auto-edge detection, multi-selection, modern UI
 - [x] Phase 6: Home screen, dark mode, advanced filters, Studio Ghibli design
-- [ ] Phase 7: Cloud backup, annotations, folder organization
+- [x] Phase 7: PDF operations (merge, split, compress), improved navigation
+- [ ] Phase 8: Cloud backup, annotations, folder organization
+
+## File Storage
+
+All files are stored in app-private storage (no storage permissions needed):
+
+| Type | Location | Example |
+|------|----------|---------|
+| Scanned Images | `filesDir/scans/` | `SCAN_20251227_143052.jpg` |
+| Processed Images | `filesDir/processed/` | `PROC_20251227_143052.jpg` |
+| Generated PDFs | `filesDir/pdfs/` | `MyDocument_20251227_143052.pdf` |
+
+**Note:** Uninstalling the app deletes all files.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## Changelog
+
+### v1.7.0 (Phase 7) - December 2025
+- ✨ **PDF Merge** - Combine multiple PDFs into one document
+- ✨ **PDF Split** - Split PDF into individual page files
+- ✨ **PDF Compression** - Reduce file size with JPEG compression (3 levels)
+- ✨ **Home Button** - Quick navigation to home from all screens
+- ✨ **Multi-Select Share/Delete** - Share or delete multiple documents at once
+- 🔧 **FileProvider Fix** - Fixed sharing issues with correct authority
+- 🎨 **UI Polish** - Rounded corners, consistent styling
 
 ### v1.6.0 (Phase 6) - January 2025
 - ✨ **Home Screen** - New landing page with quick actions and recent documents

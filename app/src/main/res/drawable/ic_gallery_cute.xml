@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cute gallery/import icon with hearts -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Photo frame -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M21,19V5c0,-1.1 -0.9,-2 -2,-2H5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h14C20.1,21 21,20.1 21,19z" />
+    
+    <!-- Mountain/landscape -->
+    <path
+        android:fillColor="#9333EA"
+        android:pathData="M5,18l3,-4 2,2.5 4,-5 5,6.5H5z" />
+    
+    <!-- Sun with cute face -->
+    <path
+        android:fillColor="#FACC15"
+        android:pathData="M8.5,9m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+    
+    <!-- Little sparkle -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M18,3l0.3,0.6 0.6,0.3 -0.6,0.3 -0.3,0.6 -0.3,-0.6 -0.6,-0.3 0.6,-0.3z" />
+    
+    <!-- Another sparkle -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M4,8l0.3,0.6 0.6,0.3 -0.6,0.3 -0.3,0.6 -0.3,-0.6 -0.6,-0.3 0.6,-0.3z" />
+</vector>

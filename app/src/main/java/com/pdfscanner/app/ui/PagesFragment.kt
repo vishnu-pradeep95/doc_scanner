@@ -143,6 +143,10 @@ class PagesFragment : Fragment() {
         // Handle menu item clicks
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.action_home -> {
+                    findNavController().navigate(R.id.action_pages_to_home)
+                    true
+                }
                 R.id.action_history -> {
                     // Navigate to document history
                     findNavController().navigate(R.id.action_pages_to_history)
@@ -1058,7 +1062,7 @@ class PagesFragment : Fragment() {
              */
             val pdfUri = FileProvider.getUriForFile(
                 requireContext(),
-                "${requireContext().packageId}.fileprovider",  // Authority from manifest
+                "${requireContext().packageName}.fileprovider",  // Authority from manifest
                 pdfFile
             )
 

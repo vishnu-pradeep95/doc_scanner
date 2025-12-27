@@ -16,6 +16,7 @@ package com.pdfscanner.app.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +34,8 @@ import com.pdfscanner.app.databinding.FragmentHistoryBinding
 import com.pdfscanner.app.util.PdfUtils
 import kotlinx.coroutines.launch
 import java.io.File
+
+private const val TAG = "HistoryFragment"
 
 /**
  * Fragment displaying list of previously created PDFs
@@ -70,6 +73,17 @@ class HistoryFragment : Fragment() {
             findNavController().navigateUp()
         }
         
+        // Setup toolbar menu (home button)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_home -> {
+                    findNavController().navigate(R.id.action_history_to_home)
+                    true
+                }
+                else -> false
+            }
+        }
+        
         // Setup selection toolbar
         setupSelectionToolbar()
         
@@ -90,6 +104,14 @@ class HistoryFragment : Fragment() {
         
         binding.selectionToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.action_share_selected -> {
+                    shareSelectedDocuments()
+                    true
+                }
+                R.id.action_delete_selected -> {
+                    confirmDeleteSelected()
+                    true
+                }
                 R.id.action_merge -> {
                     performMerge()
                     true
@@ -109,6 +131,93 @@ class HistoryFragment : Fragment() {
                 else -> false
             }
         }
+    }
+    
+    /**
+     * Share multiple selected documents
+     */
+    private fun shareSelectedDocuments() {
+        val selected = historyAdapter.getSelectedDocuments()
+        if (selected.isEmpty()) {
+            Toast.makeText(requireContext(), "No documents selected", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        try {
+            val uris = ArrayList<Uri>()
+            for (doc in selected) {
+                val file = File(doc.filePath)
+                if (file.exists()) {
+                    val uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "${requireContext().packageName}.fileprovider",
+                        file
+                    )
+                    uris.add(uri)
+                }
+            }
+            
+            if (uris.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+                return
+            }
+            
+            val shareIntent = if (uris.size == 1) {
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "application/pdf"
+                    putExtra(Intent.EXTRA_STREAM, uris[0])
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            } else {
+                Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                    type = "application/pdf"
+                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            }
+            
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_pdf)))
+            historyAdapter.exitSelectionMode()
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sharing documents", e)
+            Toast.makeText(requireContext(), R.string.error_sharing_pdf, Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    /**
+     * Confirm deletion of selected documents
+     */
+    private fun confirmDeleteSelected() {
+        val selected = historyAdapter.getSelectedDocuments()
+        if (selected.isEmpty()) {
+            Toast.makeText(requireContext(), "No documents selected", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_document)
+            .setMessage("Delete ${selected.size} selected document(s)?")
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                deleteSelectedDocuments(selected)
+            }
+            .show()
+    }
+    
+    /**
+     * Delete all selected documents
+     */
+    private fun deleteSelectedDocuments(documents: List<DocumentEntry>) {
+        var deletedCount = 0
+        for (doc in documents) {
+            repository.removeDocument(doc.id, deleteFile = true)
+            deletedCount++
+        }
+        
+        historyAdapter.exitSelectionMode()
+        loadDocuments()
+        Toast.makeText(requireContext(), "Deleted $deletedCount document(s)", Toast.LENGTH_SHORT).show()
     }
     
     /**
@@ -387,59 +496,85 @@ class HistoryFragment : Fragment() {
     }
     
     /**
-     * Open a PDF document using system viewer
+     * Open a PDF document - shows options to view in-app or externally
      */
     private fun openDocument(document: DocumentEntry) {
+        val file = File(document.filePath)
+        if (!file.exists()) {
+            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            loadDocuments()
+            return
+        }
+        
+        // Try external viewer first, fall back to built-in
         try {
-            val file = File(document.filePath)
-            if (!file.exists()) {
-                Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
-                loadDocuments()  // Refresh list to remove missing files
-                return
-            }
-            
-            // Get content URI via FileProvider
             val uri = FileProvider.getUriForFile(
                 requireContext(),
-                "${requireContext().packageName}.provider",
+                "${requireContext().packageName}.fileprovider",
                 file
             )
             
-            // Create intent to view PDF
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, "application/pdf")
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             
-            // Check if there's an app to handle PDFs
             if (intent.resolveActivity(requireContext().packageManager) != null) {
-                startActivity(intent)
+                // Show choice dialog
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(document.name)
+                    .setItems(arrayOf(
+                        getString(R.string.view_in_app),
+                        getString(R.string.open_externally)
+                    )) { _, which ->
+                        when (which) {
+                            0 -> openInBuiltInViewer(document)
+                            1 -> startActivity(intent)
+                        }
+                    }
+                    .show()
             } else {
-                Toast.makeText(requireContext(), R.string.no_pdf_viewer, Toast.LENGTH_SHORT).show()
+                // No external viewer, use built-in
+                openInBuiltInViewer(document)
             }
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), R.string.error_opening_pdf, Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "Error opening document", e)
+            // Fall back to built-in viewer
+            openInBuiltInViewer(document)
         }
+    }
+    
+    /**
+     * Open document in built-in PDF viewer
+     */
+    private fun openInBuiltInViewer(document: DocumentEntry) {
+        val action = HistoryFragmentDirections.actionHistoryToPdfViewer(
+            pdfPath = document.filePath,
+            pdfName = document.name
+        )
+        findNavController().navigate(action)
     }
     
     /**
      * Share a PDF document
      */
     private fun shareDocument(document: DocumentEntry) {
+        val file = File(document.filePath)
+        if (!file.exists()) {
+            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            loadDocuments()
+            return
+        }
+        
         try {
-            val file = File(document.filePath)
-            if (!file.exists()) {
-                Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
-                loadDocuments()
-                return
-            }
-            
             // Get content URI via FileProvider
             val uri = FileProvider.getUriForFile(
                 requireContext(),
-                "${requireContext().packageName}.provider",
+                "${requireContext().packageName}.fileprovider",
                 file
             )
+            
+            Log.d(TAG, "Sharing PDF: ${document.name}, URI: $uri")
             
             // Create share intent
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -450,7 +585,9 @@ class HistoryFragment : Fragment() {
             }
             
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_pdf)))
+            
         } catch (e: Exception) {
+            Log.e(TAG, "Error sharing PDF", e)
             Toast.makeText(requireContext(), R.string.error_sharing_pdf, Toast.LENGTH_SHORT).show()
         }
     }

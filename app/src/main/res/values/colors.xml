@@ -55,6 +55,9 @@
     <color name="selection_overlay">#4D6B9AC4</color>
     <color name="selection_border">#6B9AC4</color>
     
+    <!-- Ripple effect color -->
+    <color name="ripple_color">#306B9AC4</color>
+    
     <!-- Capture button -->
     <color name="capture_button">#FFFFFF</color>
     <color name="capture_button_border">#E8A87C</color>

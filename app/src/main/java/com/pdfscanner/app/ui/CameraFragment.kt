@@ -286,6 +286,14 @@ class CameraFragment : Fragment() {
      * Setup button click listeners
     */
     private fun setupUI() {
+        // Home button - navigate back to home
+        binding.btnHome.setOnClickListener {
+            if (isBatchMode) {
+                exitBatchMode()
+            }
+            findNavController().navigate(R.id.action_camera_to_home)
+        }
+        
         // Capture button - takes a photo
         binding.btnCapture.setOnClickListener {
             takePhoto()
@@ -615,7 +623,7 @@ class CameraFragment : Fragment() {
     private fun takePhoto() {
         // Safety check - imageCapture might not be initialized if camera failed
         val imageCapture = imageCapture ?: return
-
+        
         // Show loading indicator, disable button (prevent double-tap)
         binding.progressBar.visibility = View.VISIBLE
         binding.btnCapture.isEnabled = false
@@ -674,9 +682,6 @@ class CameraFragment : Fragment() {
                         viewModel.addPage(savedUri)
                         batchCaptureCount++
                         updateBatchUI()
-                        
-                        // Brief visual feedback - flash effect would go here
-                        // For now, we just update the counter
                     } else {
                         // NORMAL MODE: Navigate to preview for crop/edit
                         // Store in ViewModel for PreviewFragment to access

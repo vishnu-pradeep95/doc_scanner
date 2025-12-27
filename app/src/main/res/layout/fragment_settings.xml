@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?colorSurface"
+            app:menu="@menu/menu_settings"
             app:title="@string/settings"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:titleTextColor="?android:textColorPrimary" />

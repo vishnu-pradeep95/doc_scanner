@@ -248,6 +248,17 @@ class PreviewFragment : Fragment() {
             // Navigate back to previous screen (camera)
             findNavController().navigateUp()
         }
+        
+        // Setup toolbar menu (home button)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_home -> {
+                    findNavController().navigate(R.id.action_preview_to_home)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     /**

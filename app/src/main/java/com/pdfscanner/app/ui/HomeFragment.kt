@@ -4,6 +4,7 @@
  * PURPOSE:
  * Serves as the main entry point for the app, providing:
  * - Quick access to scanning features (New Scan, Auto Scan, Import)
+ * - PDF Tools (Merge, Split, Compress)
  * - Recent documents list
  * - Current session status (if pages are being edited)
  * - Access to settings
@@ -28,8 +29,10 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.pdfscanner.app.R
 import com.pdfscanner.app.adapter.RecentDocumentsAdapter
@@ -37,7 +40,14 @@ import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.data.DocumentHistoryRepository
 import com.pdfscanner.app.databinding.FragmentHomeBinding
 import com.pdfscanner.app.util.DocumentScanner
+import com.pdfscanner.app.util.PdfUtils
 import com.pdfscanner.app.viewmodel.ScannerViewModel
+import kotlinx.coroutines.launch
+
+// PDF operation modes
+private enum class PdfOperation {
+    MERGE, SPLIT, COMPRESS
+}
 
 /**
  * HomeFragment - The main landing screen of the app
@@ -59,6 +69,9 @@ class HomeFragment : Fragment() {
 
     // ML Kit Document Scanner
     private lateinit var documentScanner: GmsDocumentScanner
+    
+    // Current PDF operation mode
+    private var currentPdfOperation: PdfOperation? = null
 
     // Activity result launcher for document scanner
     private val scannerLauncher = registerForActivityResult(
@@ -72,6 +85,20 @@ class HomeFragment : Fragment() {
         ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
         handleGalleryResult(uris)
+    }
+    
+    // Activity result launcher for PDF picker (multiple)
+    private val pdfPickerMultiple = registerForActivityResult(
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris: List<Uri> ->
+        handlePdfPickerResult(uris)
+    }
+    
+    // Activity result launcher for PDF picker (single)
+    private val pdfPickerSingle = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let { handlePdfPickerResult(listOf(it)) }
     }
 
     override fun onCreateView(
@@ -127,6 +154,22 @@ class HomeFragment : Fragment() {
         binding.cardImport.setOnClickListener {
             galleryLauncher.launch("image/*")
         }
+        
+        // PDF Tools
+        binding.cardMerge.setOnClickListener {
+            currentPdfOperation = PdfOperation.MERGE
+            pdfPickerMultiple.launch(arrayOf("application/pdf"))
+        }
+        
+        binding.cardSplit.setOnClickListener {
+            currentPdfOperation = PdfOperation.SPLIT
+            pdfPickerSingle.launch(arrayOf("application/pdf"))
+        }
+        
+        binding.cardCompress.setOnClickListener {
+            currentPdfOperation = PdfOperation.COMPRESS
+            pdfPickerSingle.launch(arrayOf("application/pdf"))
+        }
     }
 
     /**
@@ -136,6 +179,12 @@ class HomeFragment : Fragment() {
         recentDocsAdapter = RecentDocumentsAdapter(
             onDocumentClick = { document ->
                 openDocument(document)
+            },
+            onShareClick = { document ->
+                shareDocument(document)
+            },
+            onDeleteClick = { document ->
+                confirmDeleteDocument(document)
             }
         )
 
@@ -274,7 +323,7 @@ class HomeFragment : Fragment() {
     }
 
     /**
-     * Open a document from history
+     * Open a document from history using built-in PDF viewer
      */
     private fun openDocument(document: DocumentEntry) {
         if (!document.exists()) {
@@ -283,22 +332,231 @@ class HomeFragment : Fragment() {
             return
         }
 
-        // Open PDF with external viewer or share
+        // Open with built-in PDF viewer
+        val action = HomeFragmentDirections.actionHomeToPdfViewer(
+            pdfPath = document.filePath,
+            pdfName = document.name
+        )
+        findNavController().navigate(action)
+    }
+    
+    /**
+     * Share a document
+     */
+    private fun shareDocument(document: DocumentEntry) {
+        val file = java.io.File(document.filePath)
+        if (!file.exists()) {
+            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            loadRecentDocuments()
+            return
+        }
+        
         try {
-            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
-                setDataAndType(
-                    androidx.core.content.FileProvider.getUriForFile(
-                        requireContext(),
-                        "${requireContext().packageName}.provider",
-                        java.io.File(document.filePath)
-                    ),
-                    "application/pdf"
-                )
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
+                file
+            )
+            
+            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                putExtra(android.content.Intent.EXTRA_SUBJECT, document.name)
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            startActivity(intent)
+            
+            startActivity(android.content.Intent.createChooser(shareIntent, getString(R.string.share_pdf)))
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), R.string.no_pdf_viewer, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.error_sharing_pdf, Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    /**
+     * Confirm before deleting a document
+     */
+    private fun confirmDeleteDocument(document: DocumentEntry) {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_document)
+            .setMessage(getString(R.string.confirm_delete_document, document.name))
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                deleteDocument(document)
+            }
+            .show()
+    }
+    
+    /**
+     * Delete a document
+     */
+    private fun deleteDocument(document: DocumentEntry) {
+        historyRepository.removeDocument(document.id, deleteFile = true)
+        loadRecentDocuments()
+        Toast.makeText(requireContext(), R.string.document_deleted, Toast.LENGTH_SHORT).show()
+    }
+    
+    /**
+     * Handle PDF picker results for merge/split/compress
+     */
+    private fun handlePdfPickerResult(uris: List<Uri>) {
+        if (uris.isEmpty()) {
+            currentPdfOperation = null
+            return
+        }
+        
+        // Take persistent permission for the URIs
+        uris.forEach { uri ->
+            try {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                // Permission may not be available, continue anyway
+            }
+        }
+        
+        when (currentPdfOperation) {
+            PdfOperation.MERGE -> performMerge(uris)
+            PdfOperation.SPLIT -> performSplit(uris.first())
+            PdfOperation.COMPRESS -> performCompress(uris.first())
+            null -> {}
+        }
+        
+        currentPdfOperation = null
+    }
+    
+    /**
+     * Merge multiple PDFs
+     */
+    private fun performMerge(uris: List<Uri>) {
+        if (uris.size < 2) {
+            Toast.makeText(requireContext(), R.string.select_pdfs_to_merge, Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        binding.loadingText.text = getString(R.string.merging_pdfs)
+        binding.loadingOverlay.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            val result = PdfUtils.mergePdfs(
+                context = requireContext(),
+                pdfUris = uris,
+                outputName = "Merged"
+            )
+            
+            binding.loadingOverlay.visibility = View.GONE
+            
+            if (result.success && result.outputUri != null) {
+                // Add to history
+                val file = java.io.File(result.outputUri.path!!)
+                historyRepository.addDocument(
+                    name = file.nameWithoutExtension,
+                    filePath = file.absolutePath,
+                    pageCount = uris.size  // Approximate
+                )
+                
+                loadRecentDocuments()
+                Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    /**
+     * Split a PDF into pages
+     */
+    private fun performSplit(uri: Uri) {
+        binding.loadingText.text = getString(R.string.splitting_pdf)
+        binding.loadingOverlay.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            val result = PdfUtils.splitPdf(
+                context = requireContext(),
+                pdfUri = uri,
+                baseName = "Page"
+            )
+            
+            binding.loadingOverlay.visibility = View.GONE
+            
+            if (result.success && !result.outputUris.isNullOrEmpty()) {
+                // Add each split page to history
+                result.outputUris.forEach { pageUri ->
+                    val file = java.io.File(pageUri.path!!)
+                    historyRepository.addDocument(
+                        name = file.nameWithoutExtension,
+                        filePath = file.absolutePath,
+                        pageCount = 1
+                    )
+                }
+                
+                loadRecentDocuments()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.split_success, result.outputUris.size),
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    /**
+     * Compress a PDF
+     */
+    private fun performCompress(uri: Uri) {
+        // Show compression level dialog
+        val levels = arrayOf(
+            getString(R.string.compression_low),
+            getString(R.string.compression_medium),
+            getString(R.string.compression_high)
+        )
+        
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.compression_level)
+            .setItems(levels) { _, which ->
+                val level = when (which) {
+                    0 -> PdfUtils.CompressionLevel.HIGH   // Low compression = high quality
+                    1 -> PdfUtils.CompressionLevel.MEDIUM
+                    else -> PdfUtils.CompressionLevel.LOW // High compression = low quality
+                }
+                executeCompress(uri, level)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+    
+    /**
+     * Execute PDF compression
+     */
+    private fun executeCompress(uri: Uri, level: PdfUtils.CompressionLevel) {
+        binding.loadingText.text = getString(R.string.compressing_pdf)
+        binding.loadingOverlay.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            val result = PdfUtils.compressPdf(
+                context = requireContext(),
+                pdfUri = uri,
+                level = level,
+                outputName = "Compressed"
+            )
+            
+            binding.loadingOverlay.visibility = View.GONE
+            
+            if (result.success && result.outputUri != null) {
+                val file = java.io.File(result.outputUri.path!!)
+                historyRepository.addDocument(
+                    name = file.nameWithoutExtension,
+                    filePath = file.absolutePath,
+                    pageCount = 1  // Unknown
+                )
+                
+                loadRecentDocuments()
+                Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

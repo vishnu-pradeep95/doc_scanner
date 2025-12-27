@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cute split icon with scissors and papers -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Center paper (being split) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,2h8c0.55,0 1,0.45 1,1v18c0,0.55 -0.45,1 -1,1H8c-0.55,0 -1,-0.45 -1,-1V3C7,2.45 7.45,2 8,2z" />
+    
+    <!-- Dotted line (cut mark) -->
+    <path
+        android:strokeColor="#89B0AE"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:pathData="M12,4v3M12,9v3M12,14v3M12,19v2" />
+    
+    <!-- Left arrow -->
+    <path
+        android:fillColor="#89B0AE"
+        android:pathData="M5,12l3,-3v2h2v2H8v2z" />
+    
+    <!-- Right arrow -->
+    <path
+        android:fillColor="#89B0AE"
+        android:pathData="M19,12l-3,-3v2h-2v2h2v2z" />
+    
+    <!-- Cute sparkles -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M4,6l0.3,0.6 0.6,0.3 -0.6,0.3 -0.3,0.6 -0.3,-0.6 -0.6,-0.3 0.6,-0.3z" />
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M20,6l0.3,0.6 0.6,0.3 -0.6,0.3 -0.3,0.6 -0.3,-0.6 -0.6,-0.3 0.6,-0.3z" />
+</vector>

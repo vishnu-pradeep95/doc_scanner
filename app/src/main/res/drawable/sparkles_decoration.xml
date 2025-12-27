@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cute sparkle decorations -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="40dp"
+    android:viewportWidth="100"
+    android:viewportHeight="40">
+    
+    <!-- Sparkle 1 - yellow -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M15,10l1.5,3.5L20,15l-3.5,1.5L15,20l-1.5,-3.5L10,15l3.5,-1.5z"/>
+    
+    <!-- Sparkle 2 - pink (smaller) -->
+    <path
+        android:fillColor="#FF6B9D"
+        android:pathData="M40,5l0.8,1.8L42.6,7.6L40.8,8.4L40,10.2l-0.8,-1.8L37.4,7.6l1.8,-0.8z"/>
+    
+    <!-- Sparkle 3 - blue -->
+    <path
+        android:fillColor="#87CEEB"
+        android:pathData="M70,15l1.2,2.8L74,19l-2.8,1.2L70,23l-1.2,-2.8L66,19l2.8,-1.2z"/>
+    
+    <!-- Sparkle 4 - gold (small) -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M90,8l0.6,1.4L92,10l-1.4,0.6L90,12l-0.6,-1.4L88,10l1.4,-0.6z"/>
+</vector>

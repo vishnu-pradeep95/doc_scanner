@@ -55,6 +55,18 @@ class SettingsFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+        
+        // Setup toolbar menu (home button)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_home -> {
+                    // Navigate back to home
+                    findNavController().navigate(R.id.action_settings_to_home)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setupSettings() {

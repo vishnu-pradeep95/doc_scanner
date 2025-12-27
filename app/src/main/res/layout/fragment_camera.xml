@@ -8,6 +8,20 @@
     android:background="@color/black"
     tools:context=".ui.CameraFragment">
 
+    <!-- Home button - top left -->
+    <ImageButton
+        android:id="@+id/btnHome"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/circle_button_bg"
+        android:contentDescription="@string/go_home"
+        android:src="@drawable/ic_home"
+        android:padding="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
     <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
@@ -115,12 +129,12 @@
         <!-- Batch mode toggle -->
         <ImageButton
             android:id="@+id/btnBatchMode"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/btn_camera_action_bg"
             android:contentDescription="@string/batch_mode"
-            android:padding="8dp"
-            android:src="@drawable/ic_batch_mode"
+            android:padding="10dp"
+            android:src="@drawable/ic_batch_cute"
             app:tint="@color/white" />
         
         <!-- Spacer -->
@@ -129,12 +143,13 @@
             android:layout_height="0dp"
             android:layout_weight="0.5" />
 
-        <!-- Capture button -->
+        <!-- Capture button - cute heart design -->
         <ImageButton
             android:id="@+id/btnCapture"
-            style="@style/CaptureButton"
-            android:contentDescription="@string/capture_photo"
-            android:src="@android:color/transparent" />
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/capture_button_cute"
+            android:contentDescription="@string/capture_photo" />
         
         <!-- Spacer -->
         <View
@@ -142,15 +157,15 @@
             android:layout_height="0dp"
             android:layout_weight="0.5" />
 
-        <!-- Auto-scan button (ML Kit Document Scanner) -->
+        <!-- Auto-scan button (ML Kit Document Scanner) - cute magic wand -->
         <ImageButton
             android:id="@+id/btnAutoScan"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/btn_camera_action_bg"
             android:contentDescription="@string/auto_scan"
-            android:padding="8dp"
-            android:src="@drawable/ic_auto_scan"
+            android:padding="10dp"
+            android:src="@drawable/ic_auto_scan_cute"
             app:tint="@color/white" />
 
     </LinearLayout>

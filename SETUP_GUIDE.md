@@ -1,4 +1,4 @@
-# Android PDF Scanner App - Beginner's Complete Guide
+# Android PDF Scanner App - Developer Setup Guide
 
 ## Table of Contents
 1. [Setting Up Your Development Environment](#1-setting-up-your-development-environment)
@@ -8,10 +8,17 @@
 5. [Debugging](#5-debugging)
 6. [Key Android Concepts](#6-key-android-concepts)
 7. [Common Issues & Solutions](#7-common-issues--solutions)
+8. [Code Style & Conventions](#8-code-style--conventions)
+9. [Feature Implementation Guide](#9-feature-implementation-guide)
 
 ---
 
 ## 1. Setting Up Your Development Environment
+
+### Prerequisites
+- **Operating System**: Windows 10/11, macOS 10.14+, or Linux
+- **RAM**: 8GB minimum (16GB recommended)
+- **Disk Space**: 10GB for Android Studio + SDK
 
 ### Step 1: Install Android Studio
 1. Download Android Studio from: https://developer.android.com/studio
@@ -25,14 +32,23 @@
 3. Go to **File → Settings → Appearance & Behavior → System Settings → Android SDK**
 4. Ensure **Android 14 (API 34)** is checked and installed
 5. Under **SDK Tools** tab, ensure these are installed:
-   - Android SDK Build-Tools
+   - Android SDK Build-Tools 34.0.0
    - Android SDK Platform-Tools
    - Android Emulator
    - Intel x86 Emulator Accelerator (HAXM) - for faster emulation
 
-### Step 3: Open This Project
+### Step 3: Clone and Open the Project
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/pdf_scanner_app.git
+cd pdf_scanner_app
+
+# Or open existing project
+# In Android Studio: File → Open → Navigate to project folder
+```
+
 1. In Android Studio: **File → Open**
-2. Navigate to `C:\Users\vishn\Documents\pdf_scanner_app`
+2. Navigate to the project folder
 3. Click **OK**
 4. Wait for Gradle sync (bottom progress bar) - first time takes 5-10 minutes
 5. If prompted to update Gradle or plugins, click **Update**
@@ -404,3 +420,144 @@ The app uses a warm, nature-inspired color palette:
 - Cream-colored surfaces
 - Gentle gradients instead of harsh solid colors
 
+---
+
+## 8. Code Style & Conventions
+
+### Kotlin Style
+```kotlin
+// Use meaningful names
+val selectedDocuments: List<DocumentEntry>  // Good
+val docs: List<DocumentEntry>               // Avoid
+
+// Use extension functions for readability
+fun Uri.toFile(): File = File(this.path!!)
+
+// Use scope functions appropriately
+binding.apply {
+    btnCapture.setOnClickListener { capture() }
+    btnGallery.setOnClickListener { openGallery() }
+}
+```
+
+### View Binding Pattern
+```kotlin
+// Always use this pattern in Fragments
+private var _binding: FragmentCameraBinding? = null
+private val binding get() = _binding!!
+
+override fun onCreateView(...): View {
+    _binding = FragmentCameraBinding.inflate(inflater, container, false)
+    return binding.root
+}
+
+override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null  // Prevent memory leaks!
+}
+```
+
+### LiveData Encapsulation
+```kotlin
+// In ViewModel - private mutable, public immutable
+private val _pages = MutableLiveData<List<Uri>>(emptyList())
+val pages: LiveData<List<Uri>> = _pages
+
+// To update, reassign the entire list
+fun addPage(uri: Uri) {
+    val current = _pages.value.orEmpty().toMutableList()
+    current.add(uri)
+    _pages.value = current  // Triggers observers
+}
+```
+
+### FileProvider Usage
+```kotlin
+// Always use the correct authority from AndroidManifest.xml
+val uri = FileProvider.getUriForFile(
+    context,
+    "${context.packageName}.fileprovider",  // Must match manifest!
+    file
+)
+```
+
+---
+
+## 9. Feature Implementation Guide
+
+### Adding a New Fragment
+1. Create layout file: `res/layout/fragment_new.xml`
+2. Create Kotlin class: `ui/NewFragment.kt`
+3. Add to navigation graph: `res/navigation/nav_graph.xml`
+4. Add navigation actions from other fragments
+
+### Adding a New Menu Item
+1. Create/edit menu XML: `res/menu/menu_fragment.xml`
+2. Add menu to toolbar in layout: `app:menu="@menu/menu_fragment"`
+3. Handle clicks in Fragment:
+```kotlin
+binding.toolbar.setOnMenuItemClickListener { menuItem ->
+    when (menuItem.itemId) {
+        R.id.action_new -> { doSomething(); true }
+        else -> false
+    }
+}
+```
+
+### Adding a New Filter
+1. Open `util/ImageProcessor.kt`
+2. Add new enum value to `FilterMode`
+3. Implement filter in `applyFilter()` function
+4. Add button in `fragment_preview.xml`
+
+### Adding PDF Operations
+1. Open `util/PdfUtils.kt`
+2. Add new suspend function following existing patterns
+3. Handle in Fragment with coroutines:
+```kotlin
+lifecycleScope.launch {
+    val result = PdfUtils.newOperation(context, params)
+    if (result.success) {
+        // Update UI
+    }
+}
+```
+
+---
+
+## Quick Command Reference
+
+```powershell
+# Build commands
+./gradlew assembleDebug          # Build debug APK
+./gradlew assembleRelease        # Build release APK
+./gradlew installDebug           # Build and install on device
+./gradlew clean                  # Clean build outputs
+
+# Testing
+./gradlew test                   # Run unit tests
+./gradlew connectedAndroidTest   # Run instrumented tests
+
+# Code quality
+./gradlew lint                   # Run lint checks
+./gradlew ktlintCheck            # Check Kotlin style
+
+# Dependency management
+./gradlew dependencies           # Show dependency tree
+./gradlew --refresh-dependencies # Force refresh dependencies
+```
+
+---
+
+## Getting Help
+
+- **Android Documentation**: https://developer.android.com/docs
+- **Kotlin Documentation**: https://kotlinlang.org/docs/
+- **Stack Overflow**: Tag questions with `android`, `kotlin`
+- **Project Issues**: Open an issue on GitHub
+
+---
+
+## License
+
+MIT License - See LICENSE file for details

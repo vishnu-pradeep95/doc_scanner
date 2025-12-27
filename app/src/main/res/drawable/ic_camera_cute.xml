@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cute cartoonish camera icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Camera body - pink -->
+    <path
+        android:fillColor="#FF6B9D"
+        android:pathData="M20,4h-3.17L15,2H9L7.17,4H4C2.9,4 2,4.9 2,6v12c0,1.1 0.9,2 2,2h16c1.1,0 2,-0.9 2,-2V6C22,4.9 21.1,4 20,4z" />
+    
+    <!-- Camera body highlight -->
+    <path
+        android:fillColor="#FF8FB3"
+        android:pathData="M20,4h-3.17L15,2H9L7.17,4H4C2.9,4 2,4.9 2,6v3h20V6C22,4.9 21.1,4 20,4z" />
+    
+    <!-- Lens outer circle - white -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,8c-3.31,0 -6,2.69 -6,6s2.69,6 6,6 6,-2.69 6,-6 -2.69,-6 -6,-6z" />
+    
+    <!-- Lens inner - blue -->
+    <path
+        android:fillColor="#4A90D9"
+        android:pathData="M12,9.5c-2.49,0 -4.5,2.01 -4.5,4.5s2.01,4.5 4.5,4.5 4.5,-2.01 4.5,-4.5 -2.01,-4.5 -4.5,-4.5z" />
+    
+    <!-- Lens reflection -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,12m-1.2,0a1.2,1.2 0,1 1,2.4 0a1.2,1.2 0,1 1,-2.4 0"/>
+    
+    <!-- Flash indicator -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M19,7m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"/>
+    
+    <!-- Sparkle -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M21,1l0.5,1L23,2.5L21.5,3L21,4L20.5,3L19,2.5L20.5,2z"/>
+</vector>

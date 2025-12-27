@@ -127,6 +127,8 @@ class HistoryAdapter(
         isSelectionMode = true
         selectedItems.clear()
         notifyDataSetChanged()
+        // Notify fragment that selection mode started
+        onSelectionChanged?.invoke(0, true)
     }
     
     /**

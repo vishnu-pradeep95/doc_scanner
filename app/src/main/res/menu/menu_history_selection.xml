@@ -2,13 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Share selected PDFs -->
+    <item
+        android:id="@+id/action_share_selected"
+        android:icon="@drawable/ic_share"
+        android:title="@string/share"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <!-- Delete selected PDFs -->
+    <item
+        android:id="@+id/action_delete_selected"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/delete"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
     <!-- Merge selected PDFs -->
     <item
         android:id="@+id/action_merge"
         android:icon="@drawable/ic_merge"
         android:title="@string/merge_pdfs"
         app:iconTint="@color/white"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <!-- Split PDF into pages -->
     <item
@@ -16,7 +32,7 @@
         android:icon="@drawable/ic_split"
         android:title="@string/split_pdf"
         app:iconTint="@color/white"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <!-- Compress selected PDF -->
     <item
@@ -24,7 +40,7 @@
         android:icon="@drawable/ic_compress"
         android:title="@string/compress_pdf"
         app:iconTint="@color/white"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <!-- Select All -->
     <item

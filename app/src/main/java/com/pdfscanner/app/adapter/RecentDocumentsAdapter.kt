@@ -10,9 +10,11 @@ import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.pdfscanner.app.R
 import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.databinding.ItemRecentDocumentBinding
 import java.io.File
@@ -29,7 +31,9 @@ import kotlinx.coroutines.withContext
  * Adapter for displaying recent documents in horizontal scrolling list
  */
 class RecentDocumentsAdapter(
-    private val onDocumentClick: (DocumentEntry) -> Unit
+    private val onDocumentClick: (DocumentEntry) -> Unit,
+    private val onShareClick: ((DocumentEntry) -> Unit)? = null,
+    private val onDeleteClick: ((DocumentEntry) -> Unit)? = null
 ) : ListAdapter<DocumentEntry, RecentDocumentsAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -66,6 +70,28 @@ class RecentDocumentsAdapter(
             // Click listener
             binding.root.setOnClickListener {
                 onDocumentClick(document)
+            }
+            
+            // Long-press listener - show popup menu
+            binding.root.setOnLongClickListener { view ->
+                val popup = PopupMenu(view.context, view)
+                popup.menuInflater.inflate(R.menu.menu_recent_document, popup.menu)
+                
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_share -> {
+                            onShareClick?.invoke(document)
+                            true
+                        }
+                        R.id.action_delete -> {
+                            onDeleteClick?.invoke(document)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popup.show()
+                true
             }
         }
 

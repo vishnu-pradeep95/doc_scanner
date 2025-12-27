@@ -8,37 +8,44 @@
     android:background="@color/background"
     tools:context=".ui.HistoryFragment">
 
-    <!-- Toolbar - Studio Ghibli style with soft surface colors -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <!-- Toolbar container - holds both toolbars -->
+    <FrameLayout
+        android:id="@+id/toolbarContainer"
         android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/surface"
-        android:elevation="2dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_primary"
-        app:title="@string/document_history"
-        app:titleTextColor="@color/text_primary" />
+        app:layout_constraintTop_toTopOf="parent">
+        
+        <!-- Normal Toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surface"
+            android:elevation="2dp"
+            app:menu="@menu/menu_history"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/text_primary"
+            app:title="@string/document_history"
+            app:titleTextColor="@color/text_primary" />
 
-    <!-- Selection Mode Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/selectionToolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/ghibli_forest"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/menu_history_selection"
-        app:navigationIcon="@drawable/ic_close"
-        app:navigationIconTint="@color/white"
-        app:titleTextColor="@color/white"
-        tools:title="2 selected"
-        tools:visibility="visible" />
+        <!-- Selection Mode Toolbar - overlays normal toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/selectionToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/ghibli_forest"
+            android:elevation="4dp"
+            android:visibility="gone"
+            app:menu="@menu/menu_history_selection"
+            app:navigationIcon="@drawable/ic_close"
+            app:navigationIconTint="@color/white"
+            app:titleTextColor="@color/white"
+            tools:title="2 selected"
+            tools:visibility="visible" />
+            
+    </FrameLayout>
 
     <!-- Help text for multi-selection -->
     <TextView
@@ -53,7 +60,7 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarContainer" />
 
     <!-- Document list -->
     <androidx.recyclerview.widget.RecyclerView

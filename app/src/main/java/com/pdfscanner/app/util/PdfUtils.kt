@@ -54,8 +54,13 @@ object PdfUtils {
     
     // Default DPI for rendering (higher = better quality, larger file)
     private const val DEFAULT_DPI = 150
-    private const val HIGH_QUALITY_DPI = 300
-    private const val COMPRESSED_DPI = 100
+    private const val HIGH_QUALITY_DPI = 200
+    private const val COMPRESSED_DPI = 72  // Much lower for aggressive compression
+    
+    // Compression scale factors (multiply page dimensions)
+    private const val HIGH_QUALITY_SCALE = 1.5f
+    private const val MEDIUM_SCALE = 1.0f
+    private const val LOW_SCALE = 0.6f
     
     // JPEG quality for compression (0-100)
     private const val HIGH_QUALITY = 90
@@ -350,7 +355,7 @@ object PdfUtils {
     }
     
     /**
-     * Compress a PDF by reducing image quality
+     * Compress a PDF by reducing image quality using JPEG compression
      * 
      * @param context Application context
      * @param pdfUri URI of the PDF to compress
@@ -377,35 +382,57 @@ object PdfUtils {
             val renderer = PdfRenderer(pfd)
             val pdfDocument = PdfDocument()
             
-            // Select DPI and quality based on compression level
-            val (dpi, quality) = when (level) {
-                CompressionLevel.LOW -> Pair(COMPRESSED_DPI, LOW_QUALITY)
-                CompressionLevel.MEDIUM -> Pair(DEFAULT_DPI, MEDIUM_QUALITY)
-                CompressionLevel.HIGH -> Pair(DEFAULT_DPI, HIGH_QUALITY)
+            // Select parameters based on compression level
+            val (scale, jpegQuality) = when (level) {
+                CompressionLevel.LOW -> Pair(0.5f, 40)    // Aggressive: 50% size, 40% quality
+                CompressionLevel.MEDIUM -> Pair(0.7f, 60) // Balanced: 70% size, 60% quality
+                CompressionLevel.HIGH -> Pair(0.9f, 80)   // Light: 90% size, 80% quality
             }
             
-            // Process each page
+            // Create temp directory for compressed images
+            val tempDir = File(context.cacheDir, "pdf_compress_temp")
+            if (!tempDir.exists()) tempDir.mkdirs()
+            
+            // Process each page: render -> compress as JPEG -> add to PDF
             for (i in 0 until renderer.pageCount) {
                 val page = renderer.openPage(i)
                 
-                // Calculate dimensions at selected DPI
-                val width = (page.width * dpi / 72f).toInt()
-                val height = (page.height * dpi / 72f).toInt()
+                // Scale dimensions based on compression level
+                val width = (page.width * scale).toInt().coerceAtLeast(100)
+                val height = (page.height * scale).toInt().coerceAtLeast(100)
                 
-                // Render page
+                // Render page to bitmap
                 val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                 bitmap.eraseColor(Color.WHITE)
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                 page.close()
                 
-                // Add to new PDF (lower resolution = smaller file)
-                val pageInfo = PdfDocument.PageInfo.Builder(width, height, i + 1).create()
+                // Compress to JPEG and reload (this actually reduces quality/size)
+                val tempJpeg = File(tempDir, "page_$i.jpg")
+                FileOutputStream(tempJpeg).use { fos ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, fos)
+                }
+                bitmap.recycle()
+                
+                // Load the compressed JPEG back
+                val compressedBitmap = android.graphics.BitmapFactory.decodeFile(tempJpeg.absolutePath)
+                
+                // Add compressed bitmap to PDF
+                val pageInfo = PdfDocument.PageInfo.Builder(
+                    compressedBitmap.width, 
+                    compressedBitmap.height, 
+                    i + 1
+                ).create()
                 val newPage = pdfDocument.startPage(pageInfo)
-                newPage.canvas.drawBitmap(bitmap, 0f, 0f, null)
+                newPage.canvas.drawBitmap(compressedBitmap, 0f, 0f, null)
                 pdfDocument.finishPage(newPage)
                 
-                bitmap.recycle()
+                compressedBitmap.recycle()
+                tempJpeg.delete()
             }
+            
+            // Cleanup temp directory
+            tempDir.delete()
             
             // Save compressed PDF
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -426,14 +453,22 @@ object PdfUtils {
             
             Log.d(TAG, "Compressed PDF: $originalSize -> $newSize bytes ($savingsPercent% reduction)")
             
+            // Check if we actually saved space
+            if (newSize >= originalSize) {
+                // Delete the larger file and report failure
+                outputFile.delete()
+                return@withContext PdfOperationResult(
+                    success = false,
+                    message = "PDF is already optimized (no reduction possible)",
+                    originalSize = originalSize,
+                    newSize = newSize
+                )
+            }
+            
             PdfOperationResult(
                 success = true,
                 outputUri = Uri.fromFile(outputFile),
-                message = if (savingsPercent > 0) {
-                    "Reduced by $savingsPercent% (${formatFileSize(originalSize)} → ${formatFileSize(newSize)})"
-                } else {
-                    "Compressed (${formatFileSize(newSize)})"
-                },
+                message = "Reduced by $savingsPercent% (${formatFileSize(originalSize)} → ${formatFileSize(newSize)})",
                 originalSize = originalSize,
                 newSize = newSize
             )
