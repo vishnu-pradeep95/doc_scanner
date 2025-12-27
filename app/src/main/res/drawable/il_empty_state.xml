@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Empty State Illustration
+    
+    Shown when there are no scanned documents yet.
+    A friendly illustration encouraging the user to start scanning.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="180dp"
+    android:viewportWidth="200"
+    android:viewportHeight="180">
+    
+    <!-- Shadow ellipse -->
+    <path
+        android:fillColor="#15000000"
+        android:pathData="M100,165m-60,0a60,10 0,1 1,120 0a60,10 0,1 1,-120 0" />
+    
+    <!-- Stack of papers (back) -->
+    <path
+        android:fillColor="@color/cartoon_outline_variant"
+        android:pathData="M55,45h90c3.3,0 6,2.7 6,6v90c0,3.3 -2.7,6 -6,6H55c-3.3,0 -6,-2.7 -6,-6V51c0,-3.3 2.7,-6 6,-6z" />
+    
+    <!-- Stack of papers (middle) -->
+    <path
+        android:fillColor="@color/cartoon_surface_variant"
+        android:pathData="M50,40h90c3.3,0 6,2.7 6,6v90c0,3.3 -2.7,6 -6,6H50c-3.3,0 -6,-2.7 -6,-6V46c0,-3.3 2.7,-6 6,-6z" />
+    
+    <!-- Stack of papers (front) -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M45,35h90c3.3,0 6,2.7 6,6v90c0,3.3 -2.7,6 -6,6H45c-3.3,0 -6,-2.7 -6,-6V41c0,-3.3 2.7,-6 6,-6z" />
+    
+    <!-- Front paper outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_outline"
+        android:strokeWidth="2"
+        android:pathData="M45,35h90c3.3,0 6,2.7 6,6v90c0,3.3 -2.7,6 -6,6H45c-3.3,0 -6,-2.7 -6,-6V41c0,-3.3 2.7,-6 6,-6z" />
+    
+    <!-- Question mark circle -->
+    <path
+        android:fillColor="@color/cartoon_secondary_light"
+        android:pathData="M90,80m-25,0a25,25 0,1 1,50 0a25,25 0,1 1,-50 0" />
+    
+    <!-- Question mark -->
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:strokeColor="@color/cartoon_secondary_dark"
+        android:strokeWidth="2"
+        android:pathData="M85,68c0,-5.5 4.5,-10 10,-10s10,4.5 10,10c0,4 -2.5,7 -6,9v5h-8v-8c0,-2 1.5,-3.5 3.5,-4c2.5,-0.5 4.5,-2 4.5,-4c0,-2.2 -1.8,-4 -4,-4s-4,1.8 -4,4h-6z" />
+    
+    <!-- Question mark dot -->
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:pathData="M90,95m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    
+    <!-- Plus icon (encouraging action) -->
+    <path
+        android:fillColor="@color/cartoon_accent"
+        android:pathData="M160,55m-18,0a18,18 0,1 1,36 0a18,18 0,1 1,-36 0" />
+    
+    <!-- Plus horizontal -->
+    <path
+        android:fillColor="@color/cartoon_on_accent"
+        android:pathData="M152,52h16v6h-16z" />
+    
+    <!-- Plus vertical -->
+    <path
+        android:fillColor="@color/cartoon_on_accent"
+        android:pathData="M157,47h6v16h-6z" />
+    
+    <!-- Decorative stars/sparkles -->
+    <path
+        android:fillColor="@color/cartoon_accent"
+        android:pathData="M25,50l3,6l6,3l-6,3l-3,6l-3,-6l-6,-3l6,-3z" />
+    
+    <path
+        android:fillColor="@color/cartoon_primary_light"
+        android:pathData="M175,120l2,4l4,2l-4,2l-2,4l-2,-4l-4,-2l4,-2z" />
+    
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:pathData="M30,130l2,4l4,2l-4,2l-2,4l-2,-4l-4,-2l4,-2z" />
+    
+</vector>

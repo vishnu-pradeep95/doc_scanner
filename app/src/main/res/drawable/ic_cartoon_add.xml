@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Add/Plus Icon
+    
+    A playful plus icon with thick stroke.
+    Used for add page, new scan actions.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Background circle -->
+    <path
+        android:fillColor="@color/cartoon_accent"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z" />
+    
+    <!-- Plus sign - horizontal -->
+    <path
+        android:fillColor="@color/cartoon_on_accent"
+        android:pathData="M7,11h10v2H7z" />
+    
+    <!-- Plus sign - vertical -->
+    <path
+        android:fillColor="@color/cartoon_on_accent"
+        android:pathData="M11,7h2v10h-2z" />
+    
+    <!-- Circle outline for cartoon effect -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_accent_dark"
+        android:strokeWidth="1"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z" />
+    
+</vector>

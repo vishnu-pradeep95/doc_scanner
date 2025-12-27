@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Capture Button State Animator
+    
+    Special animation for the main capture/scan button:
+    - Larger scale effect for more dramatic feedback
+    - Extra bounce on release for satisfying feel
+    - Matches the fun, cartoon aesthetic
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Pressed State - Big squeeze effect -->
+    <item android:state_pressed="true">
+        <set>
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="150"
+                android:valueTo="0.88"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="150"
+                android:valueTo="0.88"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="150"
+                android:valueTo="4dp"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+        </set>
+    </item>
+    
+    <!-- Normal State - Bouncy return -->
+    <item android:state_enabled="true">
+        <set>
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="300"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/overshoot" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="300"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/overshoot" />
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="300"
+                android:valueTo="12dp"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+        </set>
+    </item>
+    
+    <!-- Disabled State -->
+    <item>
+        <set>
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="0"
+                android:valueTo="8dp"
+                android:valueType="floatType" />
+        </set>
+    </item>
+    
+</selector>

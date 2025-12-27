@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Card Background
+    
+    Card background with rounded corners and subtle shadow effect
+    for a playful, lifted appearance.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Shadow layer (offset for cartoon effect) -->
+    <item
+        android:bottom="0dp"
+        android:left="3dp"
+        android:right="0dp"
+        android:top="3dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="20dp" />
+            <solid android:color="@color/cartoon_shadow" />
+        </shape>
+    </item>
+    
+    <!-- Main card surface -->
+    <item
+        android:bottom="3dp"
+        android:left="0dp"
+        android:right="3dp"
+        android:top="0dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="20dp" />
+            <solid android:color="@color/cartoon_surface" />
+        </shape>
+    </item>
+    
+</layer-list>

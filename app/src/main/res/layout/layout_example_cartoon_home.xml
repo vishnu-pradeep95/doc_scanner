@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CARTOON STYLE EXAMPLE LAYOUT
+    
+    This file demonstrates how to apply the cartoon theme to a typical screen.
+    Copy these patterns when migrating other fragments to the cartoon style.
+    
+    Key elements demonstrated:
+    1. Cartoon header with mascot
+    2. Cartoon quick action cards with bouncy animations
+    3. Cartoon section headers
+    4. Empty state with illustration
+    5. Cartoon FAB
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cartoon_background"
+    tools:context=".ui.HomeFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="100dp">
+
+            <!-- ============================================= -->
+            <!-- CARTOON HEADER SECTION                        -->
+            <!-- Fun gradient background with mascot           -->
+            <!-- ============================================= -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/cartoon_header_bg"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="48dp"
+                android:paddingBottom="24dp">
+
+                <!-- Top Bar with Logo and Settings -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Mini Mascot/Logo -->
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/il_scanner_mascot"
+                        android:contentDescription="@string/app_name" />
+
+                    <!-- App Title with Cartoon Font -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="@string/app_name"
+                        android:textColor="@color/cartoon_on_primary"
+                        android:textSize="28sp"
+                        android:fontFamily="@font/nunito_extrabold"
+                        android:letterSpacing="0"
+                        android:textStyle="bold" />
+
+                    <!-- Settings Button - Cartoon Style -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSettings"
+                        style="@style/Widget.Cartoon.Button.Icon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/settings"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@drawable/ic_settings"
+                        app:iconTint="@color/cartoon_on_primary"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:cornerRadius="24dp"
+                        app:backgroundTint="@color/cartoon_surface_transparent" />
+
+                </LinearLayout>
+
+                <!-- Fun Subtitle -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Let's scan something fun! 📄✨"
+                    android:textColor="@color/cartoon_on_primary_variant"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/nunito_bold" />
+
+            </LinearLayout>
+
+            <!-- ============================================= -->
+            <!-- QUICK ACTIONS SECTION                         -->
+            <!-- Colorful action cards with cartoon style      -->
+            <!-- ============================================= -->
+            
+            <!-- Section Header with Emoji -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🚀 Quick Actions"
+                    android:textColor="@color/cartoon_on_background"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/nunito_bold" />
+            </LinearLayout>
+
+            <!-- Action Cards Grid -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="16dp">
+
+                <!-- New Scan Card - Primary Color -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardNewScan"
+                    style="@style/Widget.Cartoon.Card.Elevated"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/cartoon_primary"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:rippleColor="@color/cartoon_primary_ripple">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <!-- Cartoon Camera Icon -->
+                        <ImageView
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:src="@drawable/ic_cartoon_camera"
+                            app:tint="@color/cartoon_on_primary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/new_scan"
+                            android:textColor="@color/cartoon_on_primary"
+                            android:textSize="15sp"
+                            android:fontFamily="@font/nunito_bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Auto Scan Card - Secondary Color -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAutoScan"
+                    style="@style/Widget.Cartoon.Card.Elevated"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/cartoon_secondary"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:rippleColor="@color/cartoon_secondary_ripple">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <ImageView
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:src="@drawable/ic_auto_scan_cute"
+                            app:tint="@color/cartoon_on_secondary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/auto_scan"
+                            android:textColor="@color/cartoon_on_secondary"
+                            android:textSize="15sp"
+                            android:fontFamily="@font/nunito_bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Import Card - Accent Color -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardImport"
+                    style="@style/Widget.Cartoon.Card.Elevated"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/cartoon_accent"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:rippleColor="@color/cartoon_accent_ripple">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <ImageView
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:src="@drawable/ic_gallery_cute"
+                            app:tint="@color/cartoon_on_accent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/import_image"
+                            android:textColor="@color/cartoon_on_accent"
+                            android:textSize="15sp"
+                            android:fontFamily="@font/nunito_bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- ============================================= -->
+            <!-- PDF TOOLS SECTION                             -->
+            <!-- Smaller tool cards with outlined style        -->
+            <!-- ============================================= -->
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="28dp"
+                android:text="🛠️ PDF Tools"
+                android:textColor="@color/cartoon_on_background"
+                android:textSize="20sp"
+                android:fontFamily="@font/nunito_bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="16dp">
+
+                <!-- Merge Tool Card - Outlined Style -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMerge"
+                    style="@style/Widget.Cartoon.Card.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="@color/cartoon_primary"
+                    app:strokeWidth="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/cartoon_surface"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_merge_cute"
+                            app:tint="@color/cartoon_primary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/merge"
+                            android:textColor="@color/cartoon_primary"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/nunito_bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Split Tool Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSplit"
+                    style="@style/Widget.Cartoon.Card.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="@color/cartoon_secondary"
+                    app:strokeWidth="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/cartoon_surface"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_split_cute"
+                            app:tint="@color/cartoon_secondary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/split"
+                            android:textColor="@color/cartoon_secondary"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/nunito_bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Compress Tool Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCompress"
+                    style="@style/Widget.Cartoon.Card.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="@color/cartoon_tertiary"
+                    app:strokeWidth="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/cartoon_surface"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_compress_cute"
+                            app:tint="@color/cartoon_tertiary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/compress"
+                            android:textColor="@color/cartoon_tertiary"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/nunito_bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- OCR Tool Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardOcr"
+                    style="@style/Widget.Cartoon.Card.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="@color/cartoon_accent"
+                    app:strokeWidth="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/cartoon_surface"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_ocr_cute"
+                            app:tint="@color/cartoon_accent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/ocr"
+                            android:textColor="@color/cartoon_accent"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/nunito_bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- ============================================= -->
+            <!-- RECENT SCANS SECTION                          -->
+            <!-- Shows recent documents or empty state         -->
+            <!-- ============================================= -->
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="28dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="📁 Recent Scans"
+                    android:textColor="@color/cartoon_on_background"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/nunito_bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewAll"
+                    style="@style/Widget.Cartoon.Button.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="View All"
+                    android:textSize="14sp"
+                    app:cornerRadius="18dp" />
+
+            </LinearLayout>
+
+            <!-- Empty State (shown when no recent scans) -->
+            <LinearLayout
+                android:id="@+id/emptyStateContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="visible">
+
+                <!-- Fun Empty State Illustration -->
+                <ImageView
+                    android:layout_width="180dp"
+                    android:layout_height="160dp"
+                    android:src="@drawable/il_empty_state"
+                    android:contentDescription="No scans yet" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="No scans yet!"
+                    android:textColor="@color/cartoon_on_background"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/nunito_bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Tap the camera to start scanning 📸"
+                    android:textColor="@color/cartoon_on_background_secondary"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/nunito_regular"
+                    android:gravity="center" />
+
+                <!-- Call-to-Action Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStartScanning"
+                    style="@style/Widget.Cartoon.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="24dp"
+                    android:paddingHorizontal="32dp"
+                    android:text="Start Scanning!"
+                    android:textSize="16sp"
+                    app:icon="@drawable/ic_cartoon_camera"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:cornerRadius="28dp" />
+
+            </LinearLayout>
+
+            <!-- RecyclerView for Recent Scans (hidden when empty) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerRecentScans"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_recent_scan_cartoon" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ============================================= -->
+    <!-- CARTOON FAB                                   -->
+    <!-- Big, colorful floating action button          -->
+    <!-- ============================================= -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabScan"
+        style="@style/Widget.Cartoon.FAB.Extended"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:text="New Scan"
+        android:textSize="16sp"
+        app:backgroundTint="@color/cartoon_primary"
+        app:icon="@drawable/ic_cartoon_camera"
+        app:iconTint="@color/cartoon_on_primary"
+        app:iconSize="28dp"
+        app:cornerRadius="28dp"
+        app:elevation="8dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

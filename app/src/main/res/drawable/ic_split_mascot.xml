@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Playful Split PDF Icon - Document splitting with face -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Main document with face -->
+    <path
+        android:pathData="M14,6 L34,6 L34,8 L38,8 L38,14 L34,14 L34,42 A3,3 0,0,1 31,45 L17,45 A3,3 0,0,1 14,42 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round" />
+    
+    <!-- Eyes -->
+    <path android:pathData="M 22.5,18 A 2.5,2.5 0 1,1 17.5,18 A 2.5,2.5 0 1,1 22.5,18" android:fillColor="#FFFFFF" />
+    <path android:pathData="M 21.3,18 A 1.3,1.3 0 1,1 18.7,18 A 1.3,1.3 0 1,1 21.3,18" android:fillColor="#2D3436" />
+    <path android:pathData="M 30.5,18 A 2.5,2.5 0 1,1 25.5,18 A 2.5,2.5 0 1,1 30.5,18" android:fillColor="#FFFFFF" />
+    <path android:pathData="M 30.3,18 A 1.3,1.3 0 1,1 27.7,18 A 1.3,1.3 0 1,1 30.3,18" android:fillColor="#2D3436" />
+    
+    <!-- Split line through middle with dots instead of dashes -->
+    <path
+        android:pathData="M24,8 L24,42"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <!-- Dots along split line -->
+    <path android:pathData="M 25,14 A 1,1 0 1,1 23,14 A 1,1 0 1,1 25,14" android:fillColor="#FFFFFF" />
+    <path android:pathData="M 25,24 A 1,1 0 1,1 23,24 A 1,1 0 1,1 25,24" android:fillColor="#FFFFFF" />
+    <path android:pathData="M 25,34 A 1,1 0 1,1 23,34 A 1,1 0 1,1 25,34" android:fillColor="#FFFFFF" />
+    
+    <!-- Scissors -->
+    <path
+        android:pathData="M8,20 L14,26 L8,32"
+        android:strokeColor="#FFE66D"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path android:pathData="M 11,20 A 3,3 0 1,1 5,20 A 3,3 0 1,1 11,20" android:fillColor="#FFE66D" android:strokeColor="#2D3436" android:strokeWidth="2" />
+    <path android:pathData="M 11,32 A 3,3 0 1,1 5,32 A 3,3 0 1,1 11,32" android:fillColor="#FFE66D" android:strokeColor="#2D3436" android:strokeWidth="2" />
+    <path android:pathData="M 8,20 A 1,1 0 1,1 6,20 A 1,1 0 1,1 8,20" android:fillColor="#2D3436" />
+    <path android:pathData="M 8,32 A 1,1 0 1,1 6,32 A 1,1 0 1,1 8,32" android:fillColor="#2D3436" />
+    
+    <!-- Happy mouth -->
+    <path
+        android:pathData="M20,28 Q24,30 28,28"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+</vector>

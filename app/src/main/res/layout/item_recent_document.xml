@@ -18,28 +18,40 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- PDF Preview/Icon area -->
+        <!-- PDF Preview/Icon area with rounded top corners -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/surface_variant">
+            android:layout_height="120dp"
+            android:background="@color/surface_variant"
+            android:clipToOutline="true">
 
             <ImageView
                 android:id="@+id/imagePreview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
+                android:contentDescription="Document preview"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
-            <!-- PDF icon overlay -->
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+            <!-- PDF icon badge with cartoon theme -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_gravity="bottom|end"
                 android:layout_margin="8dp"
-                android:src="@drawable/ic_pdf_badge"
-                android:background="@drawable/badge_bg"
-                android:padding="4dp" />
+                app:cardCornerRadius="18dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="?attr/colorPrimary">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_pdf"
+                    android:padding="6dp"
+                    android:contentDescription="PDF badge"
+                    app:tint="?attr/colorOnPrimary" />
+
+            </com.google.android.material.card.MaterialCardView>
 
         </FrameLayout>
 

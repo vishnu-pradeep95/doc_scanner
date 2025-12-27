@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Share Icon
+    
+    A playful share icon with thick strokes.
+    Used for sharing PDFs and documents.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Top circle -->
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:pathData="M18,4m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    
+    <!-- Middle circle -->
+    <path
+        android:fillColor="@color/cartoon_primary"
+        android:pathData="M6,12m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    
+    <!-- Bottom circle -->
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:pathData="M18,20m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    
+    <!-- Connection lines -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_outline"
+        android:strokeWidth="2"
+        android:pathData="M8.59,13.51l6.83,3.98M15.41,6.51l-6.82,3.98" />
+    
+    <!-- Circle outlines for cartoon effect -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_on_surface"
+        android:strokeWidth="1"
+        android:pathData="M18,4m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_on_surface"
+        android:strokeWidth="1"
+        android:pathData="M6,12m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_on_surface"
+        android:strokeWidth="1"
+        android:pathData="M18,20m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    
+</vector>

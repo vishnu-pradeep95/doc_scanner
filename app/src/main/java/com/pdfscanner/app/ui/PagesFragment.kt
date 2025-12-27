@@ -31,6 +31,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 
 // AlertDialog for confirmation prompts
@@ -274,17 +275,33 @@ class PagesFragment : Fragment() {
      * Show dialog with OCR results and copy/share options
      */
     private fun showOcrResultDialog(text: String) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.recognized_text)
-            .setMessage(text)
-            .setPositiveButton(R.string.copy_text) { _, _ ->
-                copyToClipboard(text)
-            }
-            .setNeutralButton(R.string.share) { _, _ ->
-                shareText(text)
-            }
-            .setNegativeButton(R.string.close, null)
-            .show()
+        // Inflate custom dialog layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_ocr_result, null)
+        val textOcrResult = dialogView.findViewById<TextView>(R.id.textOcrResult)
+        val btnCopy = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCopy)
+        val btnShare = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnShare)
+        val btnClose = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnClose)
+        
+        textOcrResult.text = text
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        btnCopy.setOnClickListener {
+            copyToClipboard(text)
+        }
+        
+        btnShare.setOnClickListener {
+            shareText(text)
+            dialog.dismiss()
+        }
+        
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
     
     /**

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Playful Wand/Magic Icon - Sticker style -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Wand stick with outline -->
+    <path
+        android:pathData="M12,36 L33,15"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M12,36 L33,15"
+        android:strokeColor="#FFE66D"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+    
+    <!-- Star at top with thick outline -->
+    <path
+        android:pathData="M38,10 L40,6 L42,10 L46,12 L42,14 L40,18 L38,14 L34,12 Z"
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round" />
+    
+    <!-- Sparkle 1 -->
+    <path
+        android:pathData="M16,24 L17,22 L18,24 L20,25 L18,26 L17,28 L16,26 L14,25 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round" />
+    
+    <!-- Sparkle 2 -->
+    <path
+        android:pathData="M28,32 L29,30 L30,32 L32,33 L30,34 L29,36 L28,34 L26,33 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round" />
+    
+    <!-- Sparkle 3 small -->
+    <path
+        android:pathData="M 26,20 A 2,2 0 1,1 22,20 A 2,2 0 1,1 26,20"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="1.5" />
+</vector>

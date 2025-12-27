@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Scanner Mascot Illustration
+    
+    A friendly cartoon scanner character - a happy document scanner
+    with eyes and a smile. This creates a fun, approachable feel for the app.
+    
+    Size: 120dp x 120dp for use as hero illustrations
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- Shadow -->
+    <path
+        android:fillColor="#1A000000"
+        android:pathData="M60,108m-35,0a35,8 0,1 1,70 0a35,8 0,1 1,-70 0" />
+    
+    <!-- Scanner body (main shape) -->
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:pathData="M20,30h80c5.5,0 10,4.5 10,10v50c0,5.5 -4.5,10 -10,10H20c-5.5,0 -10,-4.5 -10,-10V40c0,-5.5 4.5,-10 10,-10z" />
+    
+    <!-- Body outline for cartoon effect -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_secondary_dark"
+        android:strokeWidth="3"
+        android:pathData="M20,30h80c5.5,0 10,4.5 10,10v50c0,5.5 -4.5,10 -10,10H20c-5.5,0 -10,-4.5 -10,-10V40c0,-5.5 4.5,-10 10,-10z" />
+    
+    <!-- Scanner lid -->
+    <path
+        android:fillColor="@color/cartoon_primary"
+        android:pathData="M15,25h90c3.3,0 6,2.7 6,6v8H9v-8c0,-3.3 2.7,-6 6,-6z" />
+    
+    <!-- Lid outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_primary_dark"
+        android:strokeWidth="2"
+        android:pathData="M15,25h90c3.3,0 6,2.7 6,6v8H9v-8c0,-3.3 2.7,-6 6,-6z" />
+    
+    <!-- Scanner glass surface -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M25,45h70v40H25z" />
+    
+    <!-- Glass outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_outline"
+        android:strokeWidth="2"
+        android:pathData="M25,45h70v40H25z" />
+    
+    <!-- Left eye (white) -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M45,58m-10,0a10,12 0,1 1,20 0a10,12 0,1 1,-20 0" />
+    
+    <!-- Left eye outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_on_surface"
+        android:strokeWidth="2"
+        android:pathData="M45,58m-10,0a10,12 0,1 1,20 0a10,12 0,1 1,-20 0" />
+    
+    <!-- Left pupil -->
+    <path
+        android:fillColor="@color/cartoon_on_surface"
+        android:pathData="M47,60m-5,0a5,6 0,1 1,10 0a5,6 0,1 1,-10 0" />
+    
+    <!-- Left eye sparkle -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M43,54m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+    
+    <!-- Right eye (white) -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M75,58m-10,0a10,12 0,1 1,20 0a10,12 0,1 1,-20 0" />
+    
+    <!-- Right eye outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_on_surface"
+        android:strokeWidth="2"
+        android:pathData="M75,58m-10,0a10,12 0,1 1,20 0a10,12 0,1 1,-20 0" />
+    
+    <!-- Right pupil -->
+    <path
+        android:fillColor="@color/cartoon_on_surface"
+        android:pathData="M77,60m-5,0a5,6 0,1 1,10 0a5,6 0,1 1,-10 0" />
+    
+    <!-- Right eye sparkle -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M73,54m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+    
+    <!-- Smile -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_primary"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M50,75 Q60,85 70,75" />
+    
+    <!-- Blush marks (left) -->
+    <path
+        android:fillColor="@color/cartoon_primary_light"
+        android:pathData="M30,68m-5,0a5,3 0,1 1,10 0a5,3 0,1 1,-10 0" />
+    
+    <!-- Blush marks (right) -->
+    <path
+        android:fillColor="@color/cartoon_primary_light"
+        android:pathData="M90,68m-5,0a5,3 0,1 1,10 0a5,3 0,1 1,-10 0" />
+    
+    <!-- Scanner light strip -->
+    <path
+        android:fillColor="@color/cartoon_accent"
+        android:pathData="M25,50h70v3H25z" />
+    
+    <!-- Document being scanned (peeking out) -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M35,90h50v15c0,2.2 -1.8,4 -4,4H39c-2.2,0 -4,-1.8 -4,-4V90z" />
+    
+    <!-- Document lines -->
+    <path
+        android:fillColor="@color/cartoon_outline"
+        android:pathData="M40,95h40v2H40zM40,100h30v2H40z" />
+    
+</vector>

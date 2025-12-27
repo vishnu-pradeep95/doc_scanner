@@ -1,0 +1,81 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="180dp"
+    android:viewportWidth="180"
+    android:viewportHeight="180">
+    
+    <!-- Happy camera character illustration -->
+    
+    <!-- Camera body -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M40,60 L140,60 Q150,60 150,70 L150,140 Q150,150 140,150 L40,150 Q30,150 30,140 L30,70 Q30,60 40,60 Z"/>
+    
+    <!-- Camera top (viewfinder bump) -->
+    <path
+        android:fillColor="#FF5252"
+        android:pathData="M60,45 L120,45 Q125,45 125,50 L125,60 L55,60 L55,50 Q55,45 60,45 Z"/>
+    
+    <!-- Lens circle -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M90,105 A25,25 0 1,1 90,105 Z"/>
+    
+    <!-- Lens inner circle -->
+    <path
+        android:fillColor="#B8E6E0"
+        android:pathData="M90,105 A15,15 0 1,1 90,105 Z"/>
+    
+    <!-- Lens reflection shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,95 A8,8 0 1,1 85,95 Z"/>
+    
+    <!-- Flash -->
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M120,75 L130,75 Q135,75 135,80 L135,85 Q135,90 130,90 L120,90 Z"/>
+    
+    <!-- Cute eyes -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M65,85 A4,4 0 1,1 65,85 Z"/>
+    
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M115,85 A4,4 0 1,1 115,85 Z"/>
+    
+    <!-- Happy smile -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M70,125 Q90,135 110,125"/>
+    
+    <!-- Rosy cheeks -->
+    <path
+        android:fillColor="#FFA07A"
+        android:pathData="M55,105 A6,4 0 1,1 55,105 Z"/>
+    
+    <path
+        android:fillColor="#FFA07A"
+        android:pathData="M125,105 A6,4 0 1,1 125,105 Z"/>
+    
+    <!-- Sparkles around camera -->
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M20,70 L22,75 L27,77 L22,79 L20,84 L18,79 L13,77 L18,75 Z"/>
+    
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M160,70 L162,75 L167,77 L162,79 L160,84 L158,79 L153,77 L158,75 Z"/>
+    
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M20,120 L22,125 L27,127 L22,129 L20,134 L18,129 L13,127 L18,125 Z"/>
+    
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M160,120 L162,125 L167,127 L162,129 L160,134 L158,129 L153,127 L158,125 Z"/>
+</vector>

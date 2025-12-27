@@ -19,7 +19,7 @@
             android:orientation="vertical"
             android:paddingBottom="100dp">
 
-            <!-- App Header - Ghibli Sky Gradient -->
+            <!-- App Header - Cartoon Themed -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -27,7 +27,8 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="24dp"
                 android:paddingTop="48dp"
-                android:paddingBottom="32dp">
+                android:paddingBottom="32dp"
+                android:elevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -35,44 +36,66 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <!-- Happy document icon instead of scanner logo -->
                     <ImageView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:src="@drawable/ic_scanner_logo"
-                        app:tint="@color/text_primary"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:src="@drawable/ic_document_happy"
+                        app:tint="?attr/colorPrimary"
                         android:contentDescription="App logo" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="@string/app_name"
-                        android:textColor="@color/text_primary"
-                        android:textSize="26sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="-0.02"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
 
-                    <ImageButton
-                        android:id="@+id/btnSettings"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/settings"
-                        android:src="@drawable/ic_settings"
-                        app:tint="@color/text_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_name"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="28sp"
+                            android:fontFamily="@font/nunito_extrabold"
+                            android:letterSpacing="-0.01"
+                            android:shadowColor="#40000000"
+                            android:shadowDx="0"
+                            android:shadowDy="2"
+                            android:shadowRadius="4" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/home_subtitle"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/nunito_regular" />
+
+                    </LinearLayout>
+
+                    <!-- Rounded settings button with background -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+
+                        <ImageButton
+                            android:id="@+id/btnSettings"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/settings"
+                            android:src="@drawable/ic_settings"
+                            android:padding="12dp"
+                            app:tint="?attr/colorPrimary" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/home_subtitle"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif" />
 
             </LinearLayout>
 
@@ -94,15 +117,18 @@
                 android:paddingHorizontal="16dp"
                 android:paddingTop="16dp">
 
-                <!-- New Scan Card -->
+                <!-- New Scan Card - with bounce animation -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardNewScan"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="4dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="3dp"
                     app:strokeWidth="0dp">
 
                     <LinearLayout
@@ -114,9 +140,9 @@
                         android:padding="20dp">
 
                         <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_camera_cute" />
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:src="@drawable/ic_camera_mascot" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -131,15 +157,18 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Auto Scan Card -->
+                <!-- Auto Scan Card - with bounce animation -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardAutoScan"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="4dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="3dp"
                     app:strokeWidth="0dp">
 
                     <LinearLayout
@@ -151,9 +180,9 @@
                         android:padding="20dp">
 
                         <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_auto_scan_cute" />
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:src="@drawable/ic_auto_scan_mascot" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -168,15 +197,18 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Import Card -->
+                <!-- Import Card - with bounce animation -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardImport"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="4dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="3dp"
                     app:strokeWidth="0dp">
 
                     <LinearLayout
@@ -188,9 +220,9 @@
                         android:padding="20dp">
 
                         <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_gallery_cute" />
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:src="@drawable/ic_import_mascot" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -232,7 +264,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="4dp"
-                    app:cardCornerRadius="20dp"
+                    app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
 
@@ -269,7 +301,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="4dp"
-                    app:cardCornerRadius="20dp"
+                    app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
 
@@ -282,9 +314,9 @@
                         android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:src="@drawable/ic_split_cute" />
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_split_mascot" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -306,7 +338,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="4dp"
-                    app:cardCornerRadius="20dp"
+                    app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
 
@@ -319,9 +351,9 @@
                         android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:src="@drawable/ic_compress_cute" />
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_compress_mascot" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -470,9 +502,9 @@
                         android:gravity="center_vertical">
 
                         <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_pages"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:src="@drawable/ic_merge_mascot" />
                             app:tint="@color/primary" />
 
                         <LinearLayout

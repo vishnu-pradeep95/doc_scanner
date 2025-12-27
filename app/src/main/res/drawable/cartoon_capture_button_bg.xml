@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Capture Button Background
+    
+    A large, colorful, playful capture button with:
+    - Bright coral/red fill
+    - Thick white outline for cartoon effect
+    - Inner circle camera icon area
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Outer Shadow Ring (cartoon drop shadow effect) -->
+    <item
+        android:bottom="4dp"
+        android:left="4dp"
+        android:right="0dp"
+        android:top="0dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/cartoon_shadow" />
+        </shape>
+    </item>
+    
+    <!-- White Outline Ring -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/cartoon_surface" />
+        </shape>
+    </item>
+    
+    <!-- Main Colorful Circle -->
+    <item
+        android:bottom="6dp"
+        android:left="6dp"
+        android:right="6dp"
+        android:top="6dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="50%p"
+                android:startColor="@color/cartoon_capture_button_start"
+                android:endColor="@color/cartoon_capture_button_end" />
+        </shape>
+    </item>
+    
+    <!-- Inner White Circle (camera lens area) -->
+    <item
+        android:bottom="18dp"
+        android:left="18dp"
+        android:right="18dp"
+        android:top="18dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/cartoon_surface" />
+        </shape>
+    </item>
+    
+    <!-- Inner Colored Circle -->
+    <item
+        android:bottom="22dp"
+        android:left="22dp"
+        android:right="22dp"
+        android:top="22dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/cartoon_primary" />
+        </shape>
+    </item>
+    
+</layer-list>

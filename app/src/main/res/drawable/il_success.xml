@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Success Illustration
+    
+    Shown when PDF generation is complete.
+    A happy document with a checkmark.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="150dp"
+    android:height="150dp"
+    android:viewportWidth="150"
+    android:viewportHeight="150">
+    
+    <!-- Shadow -->
+    <path
+        android:fillColor="#15000000"
+        android:pathData="M75,140m-45,0a45,8 0,1 1,90 0a45,8 0,1 1,-90 0" />
+    
+    <!-- Document body -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M35,15h55l30,30v85c0,4.4 -3.6,8 -8,8H35c-4.4,0 -8,-3.6 -8,-8V23c0,-4.4 3.6,-8 8,-8z" />
+    
+    <!-- Document outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_outline"
+        android:strokeWidth="3"
+        android:pathData="M35,15h55l30,30v85c0,4.4 -3.6,8 -8,8H35c-4.4,0 -8,-3.6 -8,-8V23c0,-4.4 3.6,-8 8,-8z" />
+    
+    <!-- Folded corner -->
+    <path
+        android:fillColor="@color/cartoon_secondary_light"
+        android:pathData="M90,15v30h30L90,15z" />
+    
+    <!-- Corner outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_outline"
+        android:strokeWidth="2"
+        android:pathData="M90,15v30h30" />
+    
+    <!-- Success checkmark circle -->
+    <path
+        android:fillColor="@color/cartoon_success"
+        android:pathData="M75,85m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
+    
+    <!-- Circle outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_success_dark"
+        android:strokeWidth="3"
+        android:pathData="M75,85m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
+    
+    <!-- Checkmark -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_surface"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M60,85l10,10l20,-20" />
+    
+    <!-- Celebration sparkles -->
+    <path
+        android:fillColor="@color/cartoon_accent"
+        android:pathData="M20,40l3,6l6,3l-6,3l-3,6l-3,-6l-6,-3l6,-3z" />
+    
+    <path
+        android:fillColor="@color/cartoon_primary"
+        android:pathData="M130,60l2,4l4,2l-4,2l-2,4l-2,-4l-4,-2l4,-2z" />
+    
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:pathData="M25,110l2,4l4,2l-4,2l-2,4l-2,-4l-4,-2l4,-2z" />
+    
+    <path
+        android:fillColor="@color/cartoon_tertiary"
+        android:pathData="M125,110l3,6l6,3l-6,3l-3,6l-3,-6l-6,-3l6,-3z" />
+    
+</vector>

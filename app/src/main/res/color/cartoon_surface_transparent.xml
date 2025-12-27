@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Semi-transparent surface color
+    Used for overlay buttons on colored backgrounds
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:color="#40FFFFFF" />
+    <item android:color="#20FFFFFF" />
+</selector>

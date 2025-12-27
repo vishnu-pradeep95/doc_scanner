@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Badge Background
+    
+    Small pill-shaped background for badges/tags.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    
+    <solid android:color="@color/cartoon_secondary_container" />
+    <corners android:radius="12dp" />
+    
+</shape>

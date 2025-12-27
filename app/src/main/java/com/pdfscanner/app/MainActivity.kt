@@ -61,6 +61,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply saved theme BEFORE super.onCreate() for smooth theme transition
         val prefs = AppPreferences(this)
+        
+        // Apply the selected app style (Ghibli or Cartoon)
+        applyAppStyle(prefs)
+        
+        // Apply dark/light mode preference
         AppCompatDelegate.setDefaultNightMode(prefs.getThemeMode())
         
         // ALWAYS call super first - this runs the parent class's onCreate
@@ -112,5 +117,16 @@ class MainActivity : AppCompatActivity() {
         
         // NavController is available but not used here since Fragments navigate themselves
         // You could add: setupActionBarWithNavController(navController) for toolbar integration
+    }
+    
+    /**
+     * Apply the selected app style theme
+     * 
+     * This must be called BEFORE super.onCreate() to properly apply the theme.
+     * The theme is set using setTheme() which changes the base theme for the Activity.
+     */
+    private fun applyAppStyle(prefs: AppPreferences) {
+        // Always use Cartoon theme
+        setTheme(R.style.Theme_PDFScanner_Cartoon)
     }
 }

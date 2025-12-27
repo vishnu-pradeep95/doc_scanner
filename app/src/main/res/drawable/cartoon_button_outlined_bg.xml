@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Outlined Button Background
+    
+    Outlined button style with thick cartoon-style border
+    and ripple effect.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/cartoon_primary_light">
+    
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+    
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <stroke
+                android:width="3dp"
+                android:color="@color/cartoon_primary" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    
+</ripple>

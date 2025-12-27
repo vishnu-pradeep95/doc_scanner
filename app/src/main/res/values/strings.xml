@@ -104,6 +104,14 @@
     <!-- Settings -->
     <string name="settings">Settings</string>
     <string name="appearance">Appearance</string>
+    <string name="app_style">App Style</string>
+    <string name="app_style_desc">Choose your visual theme</string>
+    <string name="style_classic">Classic</string>
+    <string name="style_cartoon">Cartoon</string>
+    <string name="style_changed">Style Changed</string>
+    <string name="style_restart_message">Restart the app to apply the new style?</string>
+    <string name="restart_now">Restart Now</string>
+    <string name="restart_later">Later</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="dark_mode_desc">Switch between light and dark themes</string>
     <string name="default_filter">Default Filter</string>
@@ -159,6 +167,13 @@
     <string name="filter_sharpen">Sharpen</string>
     <string name="filter_no_shadow">No Shadow</string>
     <string name="filter_whiteboard">Whiteboard</string>
+    
+    <!-- OCR -->
+    <string name="ocr">OCR</string>
+    
+    <!-- Dialogs -->
+    <string name="success">Success!</string>
+    <string name="pdf_created_successfully">Your PDF has been created successfully</string>
     
     <!-- PDF Viewer -->
     <string name="pdf_page">PDF page</string>

@@ -17,31 +17,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
         
-        <!-- Normal Toolbar -->
+        <!-- Normal Toolbar - Cartoon themed -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/surface"
+            android:background="?attr/colorSurface"
             android:elevation="2dp"
             app:menu="@menu/menu_history"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="@color/text_primary"
+            app:navigationIconTint="?attr/colorOnSurface"
             app:title="@string/document_history"
-            app:titleTextColor="@color/text_primary" />
+            app:titleTextColor="?attr/colorOnSurface" />
 
-        <!-- Selection Mode Toolbar - overlays normal toolbar -->
+        <!-- Selection Mode Toolbar - Cartoon primary color -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/selectionToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/ghibli_forest"
+            android:background="?attr/colorPrimary"
             android:elevation="4dp"
             android:visibility="gone"
             app:menu="@menu/menu_history_selection"
             app:navigationIcon="@drawable/ic_close"
-            app:navigationIconTint="@color/white"
-            app:titleTextColor="@color/white"
+            app:navigationIconTint="?attr/colorOnPrimary"
+            app:titleTextColor="?attr/colorOnPrimary"
             tools:title="2 selected"
             tools:visibility="visible" />
             
@@ -76,7 +76,7 @@
         app:layout_constraintTop_toBottomOf="@id/helpText"
         tools:listitem="@layout/item_document" />
 
-    <!-- Empty state -->
+    <!-- Empty state - Cartoon themed -->
     <LinearLayout
         android:id="@+id/emptyState"
         android:layout_width="wrap_content"
@@ -92,12 +92,11 @@
         tools:visibility="visible">
 
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:alpha="0.5"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:contentDescription="@null"
-            android:src="@drawable/ic_pdf"
-            app:tint="@color/gray_medium" />
+            android:src="@drawable/illustration_empty_folder"
+            app:tint="?attr/colorPrimary" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -105,8 +104,8 @@
             android:layout_marginTop="16dp"
             android:gravity="center"
             android:text="@string/no_documents_yet"
-            android:textColor="@color/gray_medium"
-            android:textSize="16sp" />
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -114,8 +113,8 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="@string/create_first_pdf_hint"
-            android:textColor="@color/gray_light"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
     </LinearLayout>
 

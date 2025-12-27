@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Camera Icon
+    
+    A playful camera icon with thick strokes for cartoon effect.
+    Used for capture/scan actions.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Camera body -->
+    <path
+        android:fillColor="@color/cartoon_primary"
+        android:pathData="M4,6h3l2,-2h6l2,2h3c1.1,0 2,0.9 2,2v10c0,1.1 -0.9,2 -2,2H4c-1.1,0 -2,-0.9 -2,-2V8c0,-1.1 0.9,-2 2,-2z" />
+    
+    <!-- Thick outline for cartoon effect -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/cartoon_on_primary"
+        android:strokeWidth="1.5"
+        android:pathData="M4,6h3l2,-2h6l2,2h3c1.1,0 2,0.9 2,2v10c0,1.1 -0.9,2 -2,2H4c-1.1,0 -2,-0.9 -2,-2V8c0,-1.1 0.9,-2 2,-2z" />
+    
+    <!-- Lens outer circle -->
+    <path
+        android:fillColor="@color/cartoon_surface"
+        android:pathData="M12,9m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    
+    <!-- Lens inner circle -->
+    <path
+        android:fillColor="@color/cartoon_secondary"
+        android:pathData="M12,9m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
+    
+    <!-- Flash indicator -->
+    <path
+        android:fillColor="@color/cartoon_accent"
+        android:pathData="M5,8l1,0l0,1l-1,0z" />
+    
+</vector>

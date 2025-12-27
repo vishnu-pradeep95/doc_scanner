@@ -46,7 +46,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.4" />
 
-    <!-- Permission denied view -->
+    <!-- Permission denied view - Cartoon themed -->
     <LinearLayout
         android:id="@+id/permissionLayout"
         android:layout_width="wrap_content"
@@ -60,19 +60,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <ImageView
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:contentDescription="@null"
+            android:src="@drawable/illustration_camera"
+            app:tint="@color/white" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:gravity="center"
             android:text="@string/camera_permission_required"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="@color/white" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGrantPermission"
+            style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:text="@string/grant_permission" />
 
     </LinearLayout>
@@ -143,13 +152,29 @@
             android:layout_height="0dp"
             android:layout_weight="0.5" />
 
-        <!-- Capture button - cute heart design -->
-        <ImageButton
-            android:id="@+id/btnCapture"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/capture_button_cute"
-            android:contentDescription="@string/capture_photo" />
+        <!-- Capture button - Playful mascot design with animation hint -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            
+            <!-- Sparkle background hint -->
+            <View
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center"
+                android:background="@drawable/sparkle_ring"
+                android:alpha="0.6" />
+            
+            <ImageButton
+                android:id="@+id/btnCapture"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_capture_button_mascot"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/capture_photo" />
+                
+        </FrameLayout>
         
         <!-- Spacer -->
         <View

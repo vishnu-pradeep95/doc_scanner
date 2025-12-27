@@ -48,16 +48,16 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Filter selection buttons -->
+    <!-- Filter selection buttons - Cartoon theme -->
     <LinearLayout
         android:id="@+id/filterLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/surface"
+        android:background="?attr/colorSurfaceContainerLow"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
+        android:paddingVertical="16dp"
         app:layout_constraintBottom_toTopOf="@id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -67,8 +67,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
             android:text="@string/filter_label"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="?attr/colorOnSurface" />
 
         <HorizontalScrollView
             android:layout_width="0dp"
@@ -86,48 +86,48 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterOriginal"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="64dp"
+                    android:minWidth="80dp"
                     android:text="@string/filter_original"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterMagic"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="64dp"
+                    android:minWidth="80dp"
                     android:text="@string/filter_magic"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterEnhanced"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="64dp"
+                    android:minWidth="80dp"
                     android:text="@string/filter_enhanced"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterSharpen"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="64dp"
+                    android:minWidth="80dp"
                     android:text="@string/filter_sharpen"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFilterBw"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="64dp"
+                    android:minWidth="80dp"
                     android:text="@string/filter_bw"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
             

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Input Field Stroke Color Selector
+    
+    Changes stroke color based on input field state:
+    - Focused: Primary color (coral red)
+    - Error: Error red
+    - Enabled: Outline gray
+    - Disabled: Lighter gray
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Focused state - highlight with primary color -->
+    <item android:state_focused="true" android:color="@color/cartoon_primary" />
+    
+    <!-- Error state (when used with TextInputLayout) -->
+    <item android:state_activated="false" android:color="@color/cartoon_error" />
+    
+    <!-- Enabled but not focused -->
+    <item android:state_enabled="true" android:color="@color/cartoon_outline" />
+    
+    <!-- Disabled state -->
+    <item android:color="@color/cartoon_outline_variant" />
+    
+</selector>

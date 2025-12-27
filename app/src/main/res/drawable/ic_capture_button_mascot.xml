@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Enhanced Capture Button - Playful shutter style -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+    
+    <!-- Outer ring - white with shadow -->
+    <path
+        android:pathData="M 78,40 A 38,38 0 1,1 2,40 A 38,38 0 1,1 78,40"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="3" />
+    
+    <!-- Inner colored ring -->
+    <path
+        android:pathData="M 72,40 A 32,32 0 1,1 8,40 A 32,32 0 1,1 72,40"
+        android:strokeColor="#FF6B6B"
+        android:strokeWidth="5" />
+    
+    <!-- Center button -->
+    <path
+        android:pathData="M 64,40 A 24,24 0 1,1 16,40 A 24,24 0 1,1 64,40"
+        android:fillColor="#FF6B6B" />
+    
+    <!-- Shutter segments for camera feel -->
+    <path
+        android:pathData="M40,18 L40,28"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M40,52 L40,62"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M18,40 L28,40"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M52,40 L62,40"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    
+    <!-- Camera icon in center -->
+    <path
+        android:pathData="M35,38 L45,38 A2,2 0,0,1 47,40 L47,46 A2,2 0,0,1 45,48 L35,48 A2,2 0,0,1 33,46 L33,40 A2,2 0,0,1 35,38 Z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M 43,43 A 3,3 0 1,1 37,43 A 3,3 0 1,1 43,43"
+        android:fillColor="#FF6B6B" />
+</vector>

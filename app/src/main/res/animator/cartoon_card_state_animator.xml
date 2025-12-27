@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Card Press Animator
+    
+    Subtle press effect for cards that makes them feel interactive
+    and alive in a cartoon-like way.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Pressed -->
+    <item android:state_pressed="true">
+        <set>
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="100"
+                android:valueTo="0.98"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="100"
+                android:valueTo="0.98"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="100"
+                android:valueTo="2dp"
+                android:valueType="floatType" />
+        </set>
+    </item>
+    
+    <!-- Normal -->
+    <item android:state_enabled="true">
+        <set>
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="200"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/overshoot" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="200"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/overshoot" />
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="200"
+                android:valueTo="8dp"
+                android:valueType="floatType" />
+        </set>
+    </item>
+    
+</selector>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Playful Camera Mascot Icon - Sticker style with googly eyes -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Camera body - rounded with thick outline -->
+    <path
+        android:pathData="M12,14 L36,14 A6,6 0,0,1 42,20 L42,36 A6,6 0,0,1 36,42 L12,42 A6,6 0,0,1 6,36 L6,20 A6,6 0,0,1 12,14 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round" />
+    
+    <!-- Camera top bump --><path
+        android:pathData="M18,8 L30,8 A3,3 0,0,1 33,11 L33,14 L15,14 L15,11 A3,3 0,0,1 18,8 Z"
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round" />
+    
+    <!-- Lens outer circle -->
+    <path
+        android:pathData="M 33,28 A 9,9 0 1,1 15,28 A 9,9 0 1,1 33,28"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2.5" />
+    
+    <!-- Lens inner circle -->
+    <path
+        android:pathData="M 30,28 A 6,6 0 1,1 18,28 A 6,6 0 1,1 30,28"
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2" />
+    
+    <!-- Lens reflection -->
+    <path
+        android:pathData="M 28.5,26 A 2.5,2.5 0 1,1 23.5,26 A 2.5,2.5 0 1,1 28.5,26"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.9" />
+    
+    <!-- Flash/viewfinder -->
+    <path
+        android:pathData="M 38.5,18 A 2.5,2.5 0 1,1 33.5,18 A 2.5,2.5 0 1,1 38.5,18"
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2" />
+    
+    <!-- Googly eye left -->
+    <path
+        android:pathData="M 17,20 A 3,3 0 1,1 11,20 A 3,3 0 1,1 17,20"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M 16.5,20 A 1.5,1.5 0 1,1 13.5,20 A 1.5,1.5 0 1,1 16.5,20"
+        android:fillColor="#2D3436" />
+    
+    <!-- Googly eye right -->
+    <path
+        android:pathData="M 25,20 A 3,3 0 1,1 19,20 A 3,3 0 1,1 25,20"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M 23.5,21 A 1.5,1.5 0 1,1 20.5,21 A 1.5,1.5 0 1,1 23.5,21"
+        android:fillColor="#2D3436" />
+    
+    <!-- Happy smile -->
+    <path
+        android:pathData="M12,36 Q18,39 24,39 Q30,39 36,36"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+</vector>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Button Ripple Drawable
+    
+    A ripple effect with the cartoon primary color for button backgrounds.
+    Uses rounded corners to match the cartoon style.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/cartoon_primary_ripple">
+    
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+    
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <solid android:color="@color/cartoon_primary" />
+        </shape>
+    </item>
+    
+</ripple>

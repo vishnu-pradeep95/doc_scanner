@@ -8,38 +8,47 @@
     android:background="@color/background"
     tools:context=".ui.PagesFragment">
 
-    <!-- Normal Toolbar - Ghibli styled -->
+    <!-- Normal Toolbar - Cartoon themed -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/surface"
-        android:elevation="2dp"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/menu_pages"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_primary"
+        app:navigationIconTint="?attr/colorOnSurface"
         app:title="@string/scanned_pages"
-        app:titleTextColor="@color/text_primary" />
+        app:titleTextColor="?attr/colorOnSurface" />
     
-    <!-- Selection Mode Toolbar - Accent colored -->
+    <!-- Selection Mode Toolbar - Cartoon primary color -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/selectionToolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/ghibli_water"
+        android:background="?attr/colorPrimary"
         android:visibility="gone"
+        android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/menu_pages_selection"
         app:navigationIcon="@drawable/ic_close"
-        app:navigationIconTint="@color/white"
-        app:titleTextColor="@color/white"
+        app:navigationIconTint="?attr/colorOnPrimary"
+        app:titleTextColor="?attr/colorOnPrimary"
         tools:title="3 selected"
         tools:visibility="visible" />
+
+    <!-- Barrier to ensure content is always below toolbar area -->
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/toolbarBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="toolbar,selectionToolbar" />
 
     <!-- Empty state -->
     <LinearLayout
@@ -56,20 +65,19 @@
         tools:visibility="visible">
         
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/ic_document"
-            android:alpha="0.4"
-            app:tint="@color/gray" />
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/illustration_empty_folder"
+            android:contentDescription="@string/no_pages" />
         
         <TextView
             android:id="@+id/emptyText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:text="@string/no_pages"
-            android:textColor="@color/text_secondary"
-            android:textSize="16sp" />
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            android:textColor="?attr/colorOnSurface" />
         
         <TextView
             android:layout_width="wrap_content"
@@ -82,7 +90,7 @@
         
     </LinearLayout>
 
-    <!-- Pages RecyclerView -->
+    <!-- Pages RecyclerView - constrained below toolbar barrier to avoid masking -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerPages"
         android:layout_width="0dp"
@@ -93,7 +101,7 @@
         app:layout_constraintBottom_toTopOf="@id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toBottomOf="@id/toolbarBarrier"
         app:spanCount="2"
         tools:itemCount="4"
         tools:listitem="@layout/item_page" />

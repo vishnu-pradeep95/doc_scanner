@@ -67,4 +67,72 @@
         <item name="android:textColor">@color/primary</item>
     </style>
 
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- CARTOON THEME - DARK MODE                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.PDFScanner.Cartoon" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Primary Colors - Slightly muted for dark mode -->
+        <item name="colorPrimary">@color/cartoon_primary</item>
+        <item name="colorPrimaryDark">@color/cartoon_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/cartoon_primary_container_dark</item>
+        <item name="colorOnPrimary">@color/cartoon_on_primary</item>
+        <item name="colorOnPrimaryContainer">@color/cartoon_on_primary_container</item>
+        
+        <!-- Secondary Colors -->
+        <item name="colorSecondary">@color/cartoon_secondary</item>
+        <item name="colorSecondaryContainer">@color/cartoon_secondary_container_dark</item>
+        <item name="colorOnSecondary">@color/cartoon_on_secondary</item>
+        <item name="colorOnSecondaryContainer">@color/cartoon_on_secondary_container</item>
+        
+        <!-- Tertiary Colors -->
+        <item name="colorTertiary">@color/cartoon_tertiary</item>
+        <item name="colorTertiaryContainer">@color/cartoon_tertiary_container_dark</item>
+        <item name="colorOnTertiary">@color/cartoon_on_tertiary</item>
+        
+        <!-- Accent -->
+        <item name="colorAccent">@color/cartoon_accent</item>
+        
+        <!-- Surface Colors - Dark surfaces -->
+        <item name="colorSurface">@color/cartoon_surface_dark</item>
+        <item name="colorSurfaceVariant">@color/cartoon_surface_variant_dark</item>
+        <item name="colorOnSurface">@color/cartoon_text_on_dark</item>
+        <item name="colorOnSurfaceVariant">@color/cartoon_text_secondary_dark</item>
+        
+        <!-- Background - Dark -->
+        <item name="android:colorBackground">@color/cartoon_background_dark</item>
+        <item name="android:windowBackground">@color/cartoon_background_dark</item>
+        
+        <!-- Error Colors -->
+        <item name="colorError">@color/cartoon_error</item>
+        <item name="colorErrorContainer">@color/cartoon_error_container_dark</item>
+        
+        <!-- Outline -->
+        <item name="colorOutline">@color/cartoon_outline_dark</item>
+        <item name="colorOutlineVariant">@color/cartoon_outline_variant_dark</item>
+        
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">@color/cartoon_background_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- Navigation Bar -->
+        <item name="android:navigationBarColor">@color/cartoon_background_dark</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- Typography - Playful Nunito Font (bundled TTF) -->
+        <item name="android:fontFamily">@font/nunito_bold</item>
+        <item name="fontFamily">@font/nunito_bold</item>
+        
+        <!-- Shape Appearances -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Cartoon.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Cartoon.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Cartoon.LargeComponent</item>
+        
+        <!-- Button Styles -->
+        <item name="materialButtonStyle">@style/Widget.Cartoon.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Cartoon.Button.Outlined</item>
+        
+        <!-- Card Style -->
+        <item name="materialCardViewStyle">@style/Widget.Cartoon.CardView</item>
+    </style>
+
 </resources>

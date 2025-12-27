@@ -1,0 +1,57 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Empty folder illustration - playful cartoon style -->
+    
+    <!-- Folder base -->
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M30,80 L30,160 Q30,170 40,170 L160,170 Q170,170 170,160 L170,80 Z"/>
+    
+    <!-- Folder tab -->
+    <path
+        android:fillColor="#FFDC5E"
+        android:pathData="M30,60 L30,80 L170,80 L170,70 Q170,60 160,60 L80,60 L70,50 Q65,45 55,45 L40,45 Q30,45 30,55 Z"/>
+    
+    <!-- Folder outline -->
+    <path
+        android:strokeColor="#FF6B6B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M30,80 L30,160 Q30,170 40,170 L160,170 Q170,170 170,160 L170,80 M30,60 L30,80 M170,80 L170,70 Q170,60 160,60 L80,60 L70,50 Q65,45 55,45 L40,45 Q30,45 30,55 L30,60"/>
+    
+    <!-- Cute sparkles around folder -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M180,100 L182,105 L187,107 L182,109 L180,114 L178,109 L173,107 L178,105 Z"/>
+    
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M20,120 L22,125 L27,127 L22,129 L20,134 L18,129 L13,127 L18,125 Z"/>
+    
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M185,140 L187,145 L192,147 L187,149 L185,154 L183,149 L178,147 L183,145 Z"/>
+    
+    <!-- Small dots inside folder to show it's empty -->
+    <path
+        android:fillColor="#FFA07A"
+        android:pathData="M70,110 A3,3 0 1,1 70,110 Z"/>
+    
+    <path
+        android:fillColor="#FFA07A"
+        android:pathData="M90,115 A3,3 0 1,1 90,115 Z"/>
+    
+    <path
+        android:fillColor="#FFA07A"
+        android:pathData="M110,120 A3,3 0 1,1 110,120 Z"/>
+    
+    <path
+        android:fillColor="#FFA07A"
+        android:pathData="M130,125 A3,3 0 1,1 130,125 Z"/>
+</vector>

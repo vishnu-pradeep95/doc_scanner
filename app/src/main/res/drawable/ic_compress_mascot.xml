@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Playful Compress PDF Icon - Document being squeezed -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Compressed document -->
+    <path
+        android:pathData="M18,8 L30,8 L30,6 L34,6 L34,12 L30,12 L30,42 A3,3 0,0,1 27,45 L21,45 A3,3 0,0,1 18,42 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round" />
+    
+    <!-- Squeeze marks (wavy sides) -->
+    <path
+        android:pathData="M18,20 Q15,24 18,28 Q15,32 18,36"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M30,20 Q33,24 30,28 Q33,32 30,36"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    
+    <!-- Eyes (dizzy from being squeezed) -->
+    <path
+        android:pathData="M20,18 L22,20 M22,18 L20,20"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M26,18 L28,20 M28,18 L26,20"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    
+    <!-- Squeezed mouth -->
+    <path
+        android:pathData="M21,26 L27,26"
+        android:strokeColor="#2D3436"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    
+    <!-- Left arrow pressing in -->
+    <path
+        android:pathData="M6,28 L12,28 M8,24 L6,28 L8,32"
+        android:strokeColor="#FF6B6B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    
+    <!-- Right arrow pressing in -->
+    <path
+        android:pathData="M42,28 L36,28 M40,24 L42,28 L40,32"
+        android:strokeColor="#FF6B6B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    
+    <!-- Size indicator -->
+    <path
+        android:pathData="M22,38 L26,38"
+        android:strokeColor="#FFE66D"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path android:pathData="M 25.5,38 A 1.5,1.5 0 1,1 22.5,38 A 1.5,1.5 0 1,1 25.5,38" android:fillColor="#FFE66D" />
+</vector>

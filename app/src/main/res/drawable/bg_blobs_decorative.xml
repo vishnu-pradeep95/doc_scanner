@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="400dp"
+    android:height="300dp"
+    android:viewportWidth="400"
+    android:viewportHeight="300"
+    android:alpha="0.1">
+    
+    <!-- Decorative blob background - subtle pattern -->
+    
+    <!-- Large blob -->
+    <path
+        android:fillColor="?attr/colorPrimary"
+        android:pathData="M100,150 Q150,100 200,120 Q250,140 280,100 Q310,60 350,80 Q390,100 380,150 Q370,200 320,220 Q270,240 220,210 Q170,180 120,200 Q70,220 60,170 Q50,120 100,150 Z"/>
+    
+    <!-- Medium blob -->
+    <path
+        android:fillColor="?attr/colorSecondary"
+        android:pathData="M50,80 Q80,50 110,70 Q140,90 160,60 Q180,30 210,50 Q240,70 230,110 Q220,150 180,165 Q140,180 110,155 Q80,130 60,140 Q40,150 30,110 Q20,70 50,80 Z"/>
+    
+    <!-- Small accent blob -->
+    <path
+        android:fillColor="?attr/colorTertiary"
+        android:pathData="M250,200 Q270,180 290,195 Q310,210 300,235 Q290,260 265,260 Q240,260 230,235 Q220,210 250,200 Z"/>
+</vector>

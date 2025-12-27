@@ -137,39 +137,63 @@ class HomeFragment : Fragment() {
     }
 
     /**
-     * Setup quick action card click listeners
+     * Setup quick action card click listeners with bounce animations
      */
     private fun setupQuickActions() {
-        // New Scan - Navigate to camera
+        // New Scan - Navigate to camera with bounce animation
         binding.cardNewScan.setOnClickListener {
+            animateCardClick(it)
             findNavController().navigate(R.id.action_home_to_camera)
         }
 
-        // Auto Scan - Launch ML Kit Document Scanner
+        // Auto Scan - Launch ML Kit Document Scanner with bounce animation
         binding.cardAutoScan.setOnClickListener {
+            animateCardClick(it)
             startAutoScan()
         }
 
-        // Import - Open gallery picker
+        // Import - Open gallery picker with bounce animation
         binding.cardImport.setOnClickListener {
+            animateCardClick(it)
             galleryLauncher.launch("image/*")
         }
         
-        // PDF Tools
+        // PDF Tools with bounce animations
         binding.cardMerge.setOnClickListener {
+            animateCardClick(it)
             currentPdfOperation = PdfOperation.MERGE
             pdfPickerMultiple.launch(arrayOf("application/pdf"))
         }
         
         binding.cardSplit.setOnClickListener {
+            animateCardClick(it)
             currentPdfOperation = PdfOperation.SPLIT
             pdfPickerSingle.launch(arrayOf("application/pdf"))
         }
         
         binding.cardCompress.setOnClickListener {
+            animateCardClick(it)
             currentPdfOperation = PdfOperation.COMPRESS
             pdfPickerSingle.launch(arrayOf("application/pdf"))
         }
+    }
+    
+    /**
+     * Animate card click with bounce effect
+     */
+    private fun animateCardClick(view: View) {
+        view.animate()
+            .scaleX(0.95f)
+            .scaleY(0.95f)
+            .setDuration(100)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
     }
 
     /**

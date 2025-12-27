@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cartoon Button State Animator
+    
+    Creates a playful "bouncy" effect when buttons are pressed:
+    - Pressed: Scales down slightly (0.95) and reduces elevation
+    - Released: Returns to normal with a satisfying pop
+    
+    This gives buttons a physical, tactile feel like cartoon buttons
+    being pushed into a surface.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Pressed State - Button pushed down -->
+    <item android:state_pressed="true">
+        <set>
+            <!-- Scale down for press effect -->
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="100"
+                android:valueTo="0.95"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="100"
+                android:valueTo="0.95"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+            <!-- Reduce elevation (shadow) when pressed -->
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="100"
+                android:valueTo="2dp"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+        </set>
+    </item>
+    
+    <!-- Enabled State - Normal button -->
+    <item android:state_enabled="true">
+        <set>
+            <!-- Return to full scale -->
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="200"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/overshoot" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="200"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/overshoot" />
+            <!-- Restore elevation -->
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="200"
+                android:valueTo="6dp"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+        </set>
+    </item>
+    
+    <!-- Disabled State -->
+    <item>
+        <set>
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:duration="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:duration="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+            <objectAnimator
+                android:propertyName="translationZ"
+                android:duration="0"
+                android:valueTo="0dp"
+                android:valueType="floatType" />
+        </set>
+    </item>
+    
+</selector>
