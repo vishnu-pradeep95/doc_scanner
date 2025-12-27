@@ -330,6 +330,7 @@ findNavController().navigate(action)
 
 ### File Storage Locations
 - Scanned images: `Internal Storage/Android/data/com.pdfscanner.app/files/scans/`
+- Processed images: `Internal Storage/Android/data/com.pdfscanner.app/files/processed/`
 - Generated PDFs: `Internal Storage/Android/data/com.pdfscanner.app/files/pdfs/`
 - These are **app-private** - uninstalling app deletes them
 
@@ -340,5 +341,38 @@ findNavController().navigate(action)
 ### Third-Party Libraries
 - **CameraX**: Google's camera library (handles device quirks)
 - **CanHub Image Cropper**: Fork of uCrop for crop/rotate
+- **ML Kit Text Recognition**: On-device OCR for text extraction
+- **ML Kit Document Scanner**: Automatic document edge detection
 - **Navigation Component**: Screen navigation
 - **Material Design 3**: UI components (buttons, cards, etc.)
+
+### Key Features Guide
+
+#### Auto-Scan (ML Kit Document Scanner)
+Tap the magic wand icon in the camera screen to launch ML Kit's built-in document scanner:
+- Automatic edge detection
+- Real-time guidance for optimal capture angle
+- Automatic perspective correction
+- Multi-page scanning in one session
+
+#### Multi-Selection Mode
+Long-press any page thumbnail to enter selection mode:
+- Selected pages show numbered badges (1, 2, 3...)
+- Numbers indicate the order you selected them
+- "Create PDF" uses this selection order
+- "Delete" removes all selected pages
+- Tap X in toolbar to exit selection mode
+
+#### OCR (Text Recognition)
+Tap the "Aa" icon in pages screen:
+- Text is extracted from all pages
+- View results in a dialog
+- Copy text to clipboard with one tap
+- Works offline using on-device ML
+
+#### Document Filters
+In preview screen, choose from:
+- **Original**: No processing
+- **Enhanced**: Better contrast for text
+- **B&W**: High contrast grayscale
+

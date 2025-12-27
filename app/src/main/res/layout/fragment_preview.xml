@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_light"
+    android:background="@color/surface_variant"
     tools:context=".ui.PreviewFragment">
 
     <!-- Toolbar -->
@@ -22,32 +22,40 @@
         app:title="Preview"
         app:titleTextColor="@color/white" />
 
-    <!-- Image preview -->
-    <ImageView
-        android:id="@+id/imagePreview"
+    <!-- Image preview card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/previewCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
-        android:background="@color/white"
-        android:contentDescription="Scanned page preview"
-        android:elevation="4dp"
-        android:scaleType="fitCenter"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
         app:layout_constraintBottom_toTopOf="@id/filterLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        tools:src="@tools:sample/backgrounds/scenic" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <ImageView
+            android:id="@+id/imagePreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:contentDescription="Scanned page preview"
+            android:scaleType="fitCenter"
+            tools:src="@tools:sample/backgrounds/scenic" />
+
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Filter selection buttons -->
     <LinearLayout
         android:id="@+id/filterLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
+        android:paddingVertical="12dp"
         app:layout_constraintBottom_toTopOf="@id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -57,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
             android:text="@string/filter_label"
-            android:textColor="@color/gray_dark"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButtonToggleGroup
@@ -105,11 +113,12 @@
         android:id="@+id/buttonsLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

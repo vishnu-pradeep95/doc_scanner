@@ -30,6 +30,11 @@
             android:name="imageUri"
             app:argType="string" />
         
+        <argument
+            android:name="editIndex"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        
         <action
             android:id="@+id/action_preview_to_camera"
             app:destination="@id/cameraFragment"
@@ -54,6 +59,10 @@
         <action
             android:id="@+id/action_pages_to_history"
             app:destination="@id/historyFragment" />
+        
+        <action
+            android:id="@+id/action_pages_to_preview"
+            app:destination="@id/previewFragment" />
     </fragment>
 
     <fragment

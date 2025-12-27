@@ -135,6 +135,7 @@ class PagesFragment : Fragment() {
     // ============================================================
 
     private fun setupToolbar() {
+        // Normal toolbar
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -154,6 +155,11 @@ class PagesFragment : Fragment() {
                 else -> false
             }
         }
+        
+        // Selection toolbar - close button exits selection mode
+        binding.selectionToolbar.setNavigationOnClickListener {
+            pagesAdapter.exitSelectionMode()
+        }
     }
 
     /**
@@ -169,7 +175,8 @@ class PagesFragment : Fragment() {
             return
         }
         
-        // Show loading
+        // Show loading with OCR-specific message
+        binding.loadingText.text = getString(R.string.ocr_processing)
         binding.loadingOverlay.visibility = View.VISIBLE
         
         lifecycleScope.launch {
@@ -269,13 +276,17 @@ class PagesFragment : Fragment() {
         /**
          * Create adapter with callbacks
          * 
-         * We pass lambdas for delete, move, and drag start events
+         * We pass lambdas for delete, click, move, drag start, and selection events
          * This is the "callback pattern" - adapter notifies us of events
          */
         pagesAdapter = PagesAdapter(
             onDeleteClick = { position ->
                 // Show confirmation dialog before deleting
                 showDeleteConfirmation(position)
+            },
+            onItemClick = { position ->
+                // Navigate to preview to edit this page
+                editPageAt(position)
             },
             onItemMoved = { fromPosition, toPosition ->
                 // Update ViewModel when pages are reordered
@@ -284,6 +295,10 @@ class PagesFragment : Fragment() {
             onDragStarted = { viewHolder ->
                 // Start drag when user touches the drag handle
                 itemTouchHelper.startDrag(viewHolder)
+            },
+            onSelectionChanged = { selectedCount, isSelectionMode ->
+                // Update UI based on selection mode
+                updateSelectionModeUI(selectedCount, isSelectionMode)
             }
         )
 
@@ -301,6 +316,46 @@ class PagesFragment : Fragment() {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = pagesAdapter
             itemTouchHelper.attachToRecyclerView(this)
+        }
+    }
+    
+    /**
+     * Update UI for selection mode
+     */
+    private fun updateSelectionModeUI(selectedCount: Int, isSelectionMode: Boolean) {
+        if (isSelectionMode) {
+            // Show selection toolbar and buttons
+            binding.toolbar.visibility = View.GONE
+            binding.selectionToolbar.visibility = View.VISIBLE
+            binding.selectionToolbar.title = getString(R.string.selected_count, selectedCount)
+            
+            binding.buttonsLayout.visibility = View.GONE
+            binding.selectionButtonsLayout.visibility = View.VISIBLE
+        } else {
+            // Show normal toolbar and buttons
+            binding.toolbar.visibility = View.VISIBLE
+            binding.selectionToolbar.visibility = View.GONE
+            
+            binding.buttonsLayout.visibility = View.VISIBLE
+            binding.selectionButtonsLayout.visibility = View.GONE
+        }
+    }
+    
+    /**
+     * Edit an existing page at the given position
+     * 
+     * Navigates to PreviewFragment with the page's URI and index,
+     * allowing the user to crop/filter the image again.
+     */
+    private fun editPageAt(position: Int) {
+        val pages = viewModel.pages.value ?: return
+        if (position in pages.indices) {
+            val uri = pages[position]
+            val action = PagesFragmentDirections.actionPagesToPreview(
+                imageUri = uri.toString(),
+                editIndex = position
+            )
+            findNavController().navigate(action)
         }
     }
 
@@ -321,6 +376,118 @@ class PagesFragment : Fragment() {
         // Share the generated PDF
         binding.fabShare.setOnClickListener {
             sharePdf()
+        }
+        
+        // ============================================================
+        // SELECTION MODE BUTTONS
+        // ============================================================
+        
+        // Delete selected pages
+        binding.btnDeleteSelected.setOnClickListener {
+            val selectedCount = pagesAdapter.getSelectedCount()
+            if (selectedCount > 0) {
+                showDeleteSelectedConfirmation(selectedCount)
+            }
+        }
+        
+        // Create PDF from selected pages (in selection order)
+        binding.btnCreatePdfSelected.setOnClickListener {
+            val selectedUris = pagesAdapter.getSelectedUrisInOrder()
+            if (selectedUris.isNotEmpty()) {
+                showPdfNameDialogForSelected(selectedUris)
+            }
+        }
+    }
+    
+    /**
+     * Show confirmation dialog for deleting selected pages
+     */
+    private fun showDeleteSelectedConfirmation(count: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.confirm_delete)
+            .setMessage(getString(R.string.confirm_delete_selected, count))
+            .setPositiveButton(R.string.delete) { _, _ ->
+                deleteSelectedPages()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+    
+    /**
+     * Delete all selected pages
+     */
+    private fun deleteSelectedPages() {
+        // Get positions in reverse order to avoid index shifting issues
+        val positions = pagesAdapter.getSelectedPositionsInOrder().sortedDescending()
+        positions.forEach { position ->
+            viewModel.removePage(position)
+        }
+        pagesAdapter.exitSelectionMode()
+        Toast.makeText(requireContext(), 
+            getString(R.string.selected_count, positions.size) + " deleted", 
+            Toast.LENGTH_SHORT).show()
+    }
+    
+    /**
+     * Show PDF name dialog for selected pages
+     */
+    private fun showPdfNameDialogForSelected(selectedUris: List<Uri>) {
+        val inputLayout = TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.pdf_name_hint)
+            boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
+            setPadding(48, 16, 48, 0)
+        }
+        
+        val editText = TextInputEditText(inputLayout.context)
+        inputLayout.addView(editText)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.name_your_pdf)
+            .setMessage("Creating PDF from ${selectedUris.size} selected pages")
+            .setView(inputLayout)
+            .setPositiveButton(R.string.create_pdf) { _, _ ->
+                val pdfName = editText.text?.toString()?.trim()
+                createPdfFromSelection(selectedUris, pdfName)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+    
+    /**
+     * Create PDF from selected pages
+     */
+    private fun createPdfFromSelection(selectedUris: List<Uri>, baseName: String?) {
+        binding.loadingText.text = getString(R.string.creating_pdf)
+        binding.loadingOverlay.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            try {
+                val pdfFile = withContext(Dispatchers.IO) {
+                    generatePdf(selectedUris, baseName)
+                }
+                
+                generatedPdfFile = pdfFile
+                
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    binding.fabShare.visibility = View.VISIBLE
+                    Toast.makeText(requireContext(), R.string.pdf_created, Toast.LENGTH_SHORT).show()
+                    
+                    // Save to history
+                    DocumentHistoryRepository.getInstance(requireContext())
+                        .addDocument(pdfFile.name, pdfFile.absolutePath, selectedUris.size)
+                    
+                    // Exit selection mode
+                    pagesAdapter.exitSelectionMode()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.loadingOverlay.visibility = View.GONE
+                    Toast.makeText(requireContext(), 
+                        "${getString(R.string.pdf_error)}: ${e.message}", 
+                        Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
@@ -375,11 +542,11 @@ class PagesFragment : Fragment() {
 
             // Show/hide empty state
             if (pages.isEmpty()) {
-                binding.emptyText.visibility = View.VISIBLE
+                binding.emptyState.visibility = View.VISIBLE
                 binding.recyclerPages.visibility = View.GONE
                 binding.btnCreatePdf.isEnabled = false
             } else {
-                binding.emptyText.visibility = View.GONE
+                binding.emptyState.visibility = View.GONE
                 binding.recyclerPages.visibility = View.VISIBLE
                 binding.btnCreatePdf.isEnabled = true
             }
@@ -440,7 +607,8 @@ class PagesFragment : Fragment() {
             return
         }
 
-        // Show loading overlay
+        // Show loading overlay with PDF-specific message
+        binding.loadingText.text = getString(R.string.creating_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
 
         /**
@@ -509,9 +677,10 @@ class PagesFragment : Fragment() {
      * 4. Close document
      * 
      * @param pageUris List of image URIs to include
+     * @param customBaseName Optional custom name for the PDF
      * @return File object pointing to generated PDF
      */
-    private fun generatePdf(pageUris: List<Uri>): File {
+    private fun generatePdf(pageUris: List<Uri>, customBaseName: String? = null): File {
         // Create new PDF document
         val pdfDocument = PdfDocument()
 
@@ -611,8 +780,11 @@ class PagesFragment : Fragment() {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
             .format(System.currentTimeMillis())
         
-        // Use custom name from ViewModel if set, otherwise default to "Scan"
-        val pdfFileName = viewModel.getPdfFileName(timestamp)
+        // Use custom name if provided, otherwise use ViewModel's name or default
+        val baseName = customBaseName?.takeIf { it.isNotEmpty() }
+            ?: viewModel.pdfBaseName.value?.takeIf { it.isNotEmpty() }
+            ?: "Scan"
+        val pdfFileName = "${baseName}_${timestamp}.pdf"
         val pdfFile = File(pdfsDir, pdfFileName)
 
         /**

@@ -8,6 +8,8 @@
     <string name="camera_permission_required">Camera permission is required to scan documents</string>
     <string name="permission_denied">Permission denied. Please enable camera permission in settings.</string>
     <string name="grant_permission">Grant Permission</string>
+    <string name="auto_scan">Auto Scan</string>
+    <string name="auto_scan_unavailable">Auto scan is not available on this device</string>
     
     <!-- Batch Mode -->
     <string name="batch_mode">Batch Mode</string>
@@ -21,6 +23,7 @@
     <string name="crop_rotate">Edit</string>
     <string name="add_page">Add Page</string>
     <string name="done">Done</string>
+    <string name="save_changes">Save</string>
     
     <!-- Preview Fragment - Filters -->
     <string name="filter_label">Filter:</string>
@@ -44,6 +47,15 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="drag_to_reorder">Drag to reorder</string>
+    
+    <!-- Multi-selection -->
+    <string name="selected_count">%d selected</string>
+    <string name="create_pdf_selected">Create PDF</string>
+    <string name="delete_selected">Delete</string>
+    <string name="clear_selection">Clear</string>
+    <string name="confirm_delete_selected">Delete %d selected pages?</string>
+    <string name="long_press_to_select">Long press to select multiple pages</string>
+    <string name="tap_to_edit">Tap to edit</string>
     
     <!-- PDF Naming -->
     <string name="name_your_pdf">Name Your PDF</string>

@@ -107,6 +107,14 @@ class PreviewFragment : Fragment() {
      * Starts with the captured image URI from navigation args
      */
     private var currentImageUri: Uri? = null
+    
+    /**
+     * Edit index - position of page being edited (from PagesFragment)
+     * 
+     * -1 means this is a NEW page (from camera capture)
+     * >= 0 means we're EDITING an existing page at this index
+     */
+    private var editIndex: Int = -1
 
     // ============================================================
     // FILTER STATE
@@ -211,6 +219,14 @@ class PreviewFragment : Fragment() {
          */
         currentImageUri = Uri.parse(args.imageUri)
         originalImageUri = currentImageUri  // Keep reference to original
+        
+        /**
+         * Get edit index from navigation arguments
+         * 
+         * -1 = new page (from camera)
+         * >= 0 = editing existing page at this index
+         */
+        editIndex = args.editIndex
 
         setupToolbar()
         setupButtons()
@@ -241,17 +257,26 @@ class PreviewFragment : Fragment() {
         /**
          * RETAKE BUTTON
          * User wants to discard this image and take a new one
+         * (Only available for new captures, not when editing existing pages)
          */
-        binding.btnRetake.setOnClickListener {
-            // Delete the captured file to free storage
-            // We don't want to keep images the user doesn't want
-            currentImageUri?.path?.let { path ->
-                File(path).delete()
+        if (editIndex >= 0) {
+            // Editing existing page - hide retake, show "Save" instead of "Add Page"
+            binding.btnRetake.visibility = View.GONE
+            binding.btnAddPage.text = getString(R.string.save_changes)
+        } else {
+            // New capture - show retake button
+            binding.btnRetake.visibility = View.VISIBLE
+            binding.btnRetake.setOnClickListener {
+                // Delete the captured file to free storage
+                // We don't want to keep images the user doesn't want
+                currentImageUri?.path?.let { path ->
+                    File(path).delete()
+                }
+                
+                // Navigate back to camera
+                // action_preview_to_camera pops back to camera (defined in nav_graph.xml)
+                findNavController().navigate(R.id.action_preview_to_camera)
             }
-            
-            // Navigate back to camera
-            // action_preview_to_camera pops back to camera (defined in nav_graph.xml)
-            findNavController().navigate(R.id.action_preview_to_camera)
         }
 
         /**
@@ -263,7 +288,7 @@ class PreviewFragment : Fragment() {
         }
 
         /**
-         * ADD PAGE BUTTON
+         * ADD PAGE / SAVE BUTTON
          * Save this image to the pages list and continue
          */
         binding.btnAddPage.setOnClickListener {
@@ -278,23 +303,32 @@ class PreviewFragment : Fragment() {
     }
 
     /**
-     * Add page to ViewModel and navigate to pages list
+     * Add or update page in ViewModel and navigate back
      * 
-     * @param uri The URI of the image to add (original or processed)
+     * @param uri The URI of the image to add/update (original or processed)
      */
     private fun addPageAndNavigate(uri: Uri) {
-        // Add to ViewModel's page list
-        viewModel.addPage(uri)
-        
-        // Track which filter was applied to this page
-        val pageIndex = viewModel.getPageCount() - 1
-        viewModel.setPageFilter(pageIndex, currentFilterType)
-        
-        // Clear the "current capture" since it's now in the list
-        viewModel.clearCurrentCapture()
+        if (editIndex >= 0) {
+            // EDITING existing page - update it in place
+            viewModel.updatePage(editIndex, uri)
+            viewModel.setPageFilter(editIndex, currentFilterType)
+            
+            // Navigate back to pages list
+            findNavController().navigateUp()
+        } else {
+            // NEW page - add to list
+            viewModel.addPage(uri)
+            
+            // Track which filter was applied to this page
+            val pageIndex = viewModel.getPageCount() - 1
+            viewModel.setPageFilter(pageIndex, currentFilterType)
+            
+            // Clear the "current capture" since it's now in the list
+            viewModel.clearCurrentCapture()
 
-        // Navigate to pages list to see all scanned pages
-        findNavController().navigate(R.id.action_preview_to_pages)
+            // Navigate to pages list to see all scanned pages
+            findNavController().navigate(R.id.action_preview_to_pages)
+        }
     }
 
     /**

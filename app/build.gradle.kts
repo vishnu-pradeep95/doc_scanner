@@ -202,6 +202,14 @@ dependencies {
     implementation("com.google.mlkit:text-recognition:16.0.0")
     
     // ===========================================
+    // ML KIT - Document Scanner (Auto Edge Detection)
+    // ===========================================
+    
+    // ML Kit Document Scanner - auto document detection with edge detection
+    // Provides built-in UI for scanning documents
+    implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
+    
+    // ===========================================
     // KOTLIN COROUTINES
     // ===========================================
     

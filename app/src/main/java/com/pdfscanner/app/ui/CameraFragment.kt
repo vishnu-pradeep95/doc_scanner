@@ -27,16 +27,20 @@
 package com.pdfscanner.app.ui
 
 // Android core imports
+import android.app.Activity
 import android.Manifest  // Permission constants
 import android.content.pm.PackageManager  // Permission check results
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater  // Converts XML to View objects
 import android.view.View
 import android.view.ViewGroup  // Base class for UI containers
 import android.widget.Toast  // Simple popup messages
 
 // Activity Result API - modern way to handle permission requests and activity results
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 
 // CameraX imports - Google's camera library
@@ -53,9 +57,13 @@ import androidx.fragment.app.Fragment  // Base Fragment class
 import androidx.fragment.app.activityViewModels  // Shared ViewModel injection
 import androidx.navigation.fragment.findNavController  // Navigation helper
 
+// ML Kit Document Scanner
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
+
 // Project-specific imports
 import com.pdfscanner.app.R  // Generated resource references (R.id.xxx, R.string.xxx)
 import com.pdfscanner.app.databinding.FragmentCameraBinding  // View Binding for fragment_camera.xml
+import com.pdfscanner.app.util.DocumentScanner
 import com.pdfscanner.app.viewmodel.ScannerViewModel
 
 // Java utilities
@@ -158,6 +166,28 @@ class CameraFragment : Fragment() {
     private var batchCaptureCount = 0
 
     // ============================================================
+    // ML KIT DOCUMENT SCANNER
+    // ============================================================
+    
+    /**
+     * Document scanner instance from ML Kit
+     * Provides automatic edge detection and perspective correction
+     */
+    private lateinit var documentScanner: GmsDocumentScanner
+    
+    /**
+     * Activity result launcher for document scanner
+     * 
+     * The ML Kit Document Scanner launches its own activity with camera UI,
+     * so we need to handle the result when scanning is complete.
+     */
+    private val scannerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result: ActivityResult ->
+        handleScannerResult(result)
+    }
+
+    // ============================================================
     // PERMISSION HANDLING
     // ============================================================
     
@@ -235,6 +265,13 @@ class CameraFragment : Fragment() {
         // newSingleThreadExecutor() = sequential execution, no race conditions
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        // Initialize ML Kit Document Scanner
+        // pageLimit=10 allows scanning up to 10 pages per session
+        documentScanner = DocumentScanner.createScanner(
+            pageLimit = 10,
+            enableGalleryImport = true
+        )
+
         // Setup UI components
         setupUI()
         
@@ -276,6 +313,88 @@ class CameraFragment : Fragment() {
         binding.btnBatchMode.setOnClickListener {
             toggleBatchMode()
         }
+        
+        // Auto-scan button - launches ML Kit Document Scanner
+        binding.btnAutoScan.setOnClickListener {
+            startAutoScan()
+        }
+    }
+    
+    /**
+     * Start auto-scan using ML Kit Document Scanner
+     * 
+     * This launches ML Kit's built-in scanning UI which provides:
+     * - Automatic document edge detection
+     * - Real-time guidance for best capture angle
+     * - Automatic perspective correction
+     * - Multi-page scanning support
+     */
+    private fun startAutoScan() {
+        try {
+            // Exit batch mode if active (auto-scan handles multi-page itself)
+            if (isBatchMode) {
+                exitBatchMode()
+            }
+            
+            // Launch the ML Kit Document Scanner
+            DocumentScanner.startScanning(
+                activity = requireActivity(),
+                scanner = documentScanner,
+                launcher = scannerLauncher
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start auto-scan", e)
+            Toast.makeText(
+                requireContext(),
+                R.string.auto_scan_unavailable,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+    
+    /**
+     * Handle results from ML Kit Document Scanner
+     * 
+     * @param result The activity result containing scanned pages
+     */
+    private fun handleScannerResult(result: ActivityResult) {
+        val scanResult = DocumentScanner.parseResult(result.resultCode, result.data)
+        
+        if (scanResult == null) {
+            // User cancelled or scan failed
+            Log.d(TAG, "Document scanning cancelled or failed")
+            return
+        }
+        
+        val pageUris = scanResult.pageUris
+        if (pageUris.isEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                "No pages scanned",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        
+        // Add all scanned pages to the ViewModel
+        pageUris.forEach { uri ->
+            viewModel.addPage(uri)
+        }
+        
+        // Show success message
+        val message = if (pageUris.size == 1) {
+            "1 page scanned"
+        } else {
+            "${pageUris.size} pages scanned"
+        }
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        
+        // Navigate to pages view to show the scanned pages
+        findNavController().navigate(R.id.action_camera_to_pages)
+    }
+    
+    companion object {
+        private const val TAG = "CameraFragment"
     }
     
     /**

@@ -1,6 +1,6 @@
 # PDF Scanner App
 
-A simple Android app to scan documents using CameraX, edit them with crop/rotate via CanHub Image Cropper, apply document-style filters, and generate multi-page PDFs.
+A modern Android document scanner app built with CameraX, ML Kit, and Material Design 3. Capture documents, apply filters, extract text with OCR, and generate multi-page PDFs.
 
 ## 🚀 Quick Start (For Beginners)
 
@@ -13,23 +13,39 @@ A simple Android app to scan documents using CameraX, edit them with crop/rotate
 
 ## Features
 
-- 📷 **Camera Capture** - Use CameraX to capture document images
-- ⚡ **Batch Scanning** - Capture multiple pages quickly without preview interruption
-- ✂️ **Crop & Rotate** - Edit scanned images with CanHub Image Cropper
-- 🎨 **Document Filters** - Enhance text with Original, Enhanced, and B&W modes
-- 🔀 **Page Reordering** - Drag & drop to rearrange pages before PDF creation
-- 📝 **Custom PDF Names** - Name your PDFs before saving
-- 📄 **Multi-page PDF** - Combine multiple scans into a single PDF
-- 📤 **Secure Sharing** - Share PDFs via FileProvider with proper permissions
-- 📚 **Document History** - Access and manage all previously created PDFs
-- 🔒 **Privacy First** - All files stored in app-private storage
-- � **OCR Text Recognition** - Extract and copy text from scanned documents using ML Kit
+### 📷 Capture & Scan
+- **Camera Capture** - High-quality document capture with CameraX
+- **Auto Edge Detection** - ML Kit Document Scanner with automatic boundary detection
+- **Batch Scanning** - Capture multiple pages quickly without preview interruption
+- **Gallery Import** - Import existing photos from gallery
+
+### ✂️ Edit & Enhance
+- **Crop & Rotate** - Precise editing with CanHub Image Cropper
+- **Document Filters** - Enhance text with Original, Enhanced, and B&W modes
+- **Re-edit Pages** - Tap any page to crop/rotate again
+
+### 📄 Organize & Export
+- **Page Reordering** - Drag & drop to rearrange pages
+- **Multi-Selection** - Long-press to select multiple pages
+- **Selection Order PDF** - Create PDF from selected pages in tap order
+- **Batch Delete** - Delete multiple selected pages at once
+- **Custom PDF Names** - Name your PDFs before saving
+
+### 🔍 Text Recognition
+- **OCR** - Extract text from scanned documents using ML Kit
+- **Copy Text** - Copy extracted text to clipboard
+- **Clear Icon** - Distinctive "Aa" icon for text recognition
+
+### 📚 Document Management
+- **Document History** - Access all previously created PDFs
+- **Secure Sharing** - Share PDFs via FileProvider
+- **Privacy First** - All files stored in app-private storage
 
 ## Screenshots
 
-| Camera | Preview + Filters | Pages |
-|--------|-------------------|-------|
-| Capture documents | Apply filters & crop | Manage & create PDF |
+| Camera | Preview + Filters | Pages | Selection Mode |
+|--------|-------------------|-------|----------------|
+| Capture or auto-scan | Apply filters & crop | Manage & reorder | Multi-select pages |
 
 ## Requirements
 
@@ -57,6 +73,7 @@ A simple Android app to scan documents using CameraX, edit them with crop/rotate
 | CameraX 1.3.x | Camera capture |
 | CanHub Image Cropper 4.5.0 | Crop/rotate functionality |
 | ML Kit Text Recognition 16.0 | On-device OCR |
+| ML Kit Document Scanner 16.0.0-beta1 | Auto edge detection |
 | Navigation Component | Fragment navigation |
 | Material Design 3 | UI components |
 
@@ -67,19 +84,20 @@ app/src/main/
 ├── java/com/pdfscanner/app/
 │   ├── MainActivity.kt          # App entry point
 │   ├── adapter/
-│   │   ├── PagesAdapter.kt      # Page thumbnails (with drag & drop)
+│   │   ├── PagesAdapter.kt      # Page thumbnails (drag & drop + multi-select)
 │   │   └── HistoryAdapter.kt    # Document history list
 │   ├── data/
 │   │   └── DocumentHistory.kt   # PDF history storage (SharedPrefs + JSON)
 │   ├── ocr/
-│   │   └── OcrProcessor.kt      # OCR design stub (ML Kit ready)
+│   │   └── OcrProcessor.kt      # ML Kit Text Recognition
 │   ├── ui/
-│   │   ├── CameraFragment.kt    # Camera screen + batch mode
+│   │   ├── CameraFragment.kt    # Camera + batch mode + auto-scan
 │   │   ├── PreviewFragment.kt   # Image preview/edit + filters
-│   │   ├── PagesFragment.kt     # Page list & PDF generation
+│   │   ├── PagesFragment.kt     # Page list, selection mode, PDF generation
 │   │   └── HistoryFragment.kt   # Document history screen
 │   ├── util/
-│   │   └── ImageProcessor.kt    # Document filters (Enhanced, B&W)
+│   │   ├── ImageProcessor.kt    # Document filters (Enhanced, B&W)
+│   │   └── DocumentScanner.kt   # ML Kit Document Scanner integration
 │   └── viewmodel/
 │       └── ScannerViewModel.kt  # Shared data holder
 └── res/
@@ -103,6 +121,14 @@ The app includes document-style filters to improve text legibility:
 
 Filters use Android's `ColorMatrix` for hardware-accelerated processing.
 
+## Multi-Selection Mode
+
+Long-press any page to enter selection mode:
+- Tap pages to select/deselect (numbered badges show selection order)
+- Create PDF from selected pages in the order you tapped them
+- Delete multiple pages at once
+- Exit with the X button in toolbar
+
 ## Code Documentation
 
 All Kotlin source files contain extensive comments explaining:
@@ -117,7 +143,37 @@ All Kotlin source files contain extensive comments explaining:
 - [x] Phase 2: Document filters & UX improvements
 - [x] Phase 3: Page reordering, batch scanning, document history
 - [x] Phase 4: OCR with ML Kit Text Recognition
-- [ ] Phase 5: Auto-edge detection, folders, search
+- [x] Phase 5: Auto-edge detection, multi-selection, modern UI
+- [ ] Phase 6: Dark mode, annotations, cloud backup
+
+## Changelog
+
+### v1.5.0 (Phase 5) - December 2024
+- ✨ **Auto Edge Detection** - ML Kit Document Scanner integration
+- ✨ **Multi-Selection Mode** - Long-press to select multiple pages
+- ✨ **Selection Order PDF** - Create PDF in the order pages were selected
+- ✨ **Batch Delete** - Delete multiple pages at once
+- 🎨 **Modern UI** - Updated colors, Material 3 styling, improved cards
+- 🔧 **OCR Icon** - Clear "Aa" icon for text recognition
+- 🔧 **Dynamic Loading Text** - Context-aware loading messages
+
+### v1.4.0 (Phase 4)
+- OCR text recognition with ML Kit
+- Copy extracted text to clipboard
+
+### v1.3.0 (Phase 3)
+- Page drag & drop reordering
+- Batch scanning mode
+- Document history with timestamps
+- Re-edit pages by tapping
+
+### v1.2.0 (Phase 2)
+- Document enhancement filters
+- Custom PDF naming
+
+### v1.1.0 (Phase 1)
+- Initial release
+- Camera capture, crop, PDF generation
 
 ## License
 

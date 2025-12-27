@@ -106,7 +106,8 @@
         android:background="@color/overlay"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="24dp"
+        android:paddingVertical="20dp"
+        android:paddingHorizontal="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -116,12 +117,17 @@
             android:id="@+id/btnBatchMode"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/batch_mode"
             android:padding="8dp"
             android:src="@drawable/ic_batch_mode"
             app:tint="@color/white" />
+        
+        <!-- Spacer -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
 
         <!-- Capture button -->
         <ImageButton
@@ -129,20 +135,40 @@
             style="@style/CaptureButton"
             android:contentDescription="@string/capture_photo"
             android:src="@android:color/transparent" />
-
-        <!-- View pages button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnViewPages"
-            style="@style/Widget.Material3.Button.TextButton"
+        
+        <!-- Spacer -->
+        <View
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/view_pages"
-            android:textColor="@color/white"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
+
+        <!-- Auto-scan button (ML Kit Document Scanner) -->
+        <ImageButton
+            android:id="@+id/btnAutoScan"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/auto_scan"
+            android:padding="8dp"
+            android:src="@drawable/ic_auto_scan"
+            app:tint="@color/white" />
 
     </LinearLayout>
+    
+    <!-- View pages button - floating above controls when pages exist -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnViewPages"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/view_pages"
+        android:visibility="gone"
+        app:icon="@drawable/ic_pages"
+        app:layout_constraintBottom_toTopOf="@id/controlsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <!-- Loading indicator -->
     <ProgressBar

@@ -5,9 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -26,6 +28,49 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
+        
+        <!-- Selection overlay (shown when in selection mode) -->
+        <View
+            android:id="@+id/selectionOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/selection_overlay"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/imageThumbnail"
+            app:layout_constraintEnd_toEndOf="@id/imageThumbnail"
+            app:layout_constraintStart_toStartOf="@id/imageThumbnail"
+            app:layout_constraintTop_toTopOf="@id/imageThumbnail"
+            tools:visibility="visible" />
+        
+        <!-- Selection checkbox -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkboxSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:visibility="gone"
+            android:buttonTint="@color/accent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible"
+            tools:checked="true" />
+        
+        <!-- Selection order badge -->
+        <TextView
+            android:id="@+id/textSelectionOrder"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/selection_order_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible"
+            tools:text="1" />
 
         <!-- Page number badge -->
         <TextView
@@ -34,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:background="@drawable/badge_bg"
-            android:paddingHorizontal="8dp"
+            android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
             android:textColor="@color/white"
             android:textSize="12sp"
@@ -46,12 +91,12 @@
         <!-- Drag handle - hold to reorder -->
         <ImageView
             android:id="@+id/dragHandle"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_margin="4dp"
-            android:background="@drawable/delete_button_bg"
+            android:background="@drawable/icon_button_bg"
             android:contentDescription="@string/drag_to_reorder"
-            android:padding="6dp"
+            android:padding="8dp"
             android:src="@drawable/ic_drag_handle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -60,15 +105,15 @@
         <!-- Delete button -->
         <ImageButton
             android:id="@+id/btnDelete"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_margin="4dp"
-            android:background="@drawable/delete_button_bg"
+            android:background="@drawable/icon_button_bg"
             android:contentDescription="@string/delete_page"
-            android:padding="6dp"
+            android:padding="8dp"
             android:src="@drawable/ic_delete"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,10 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_light"
+    android:background="@color/surface_variant"
     tools:context=".ui.PagesFragment">
 
-    <!-- Toolbar -->
+    <!-- Normal Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -22,21 +22,63 @@
         app:navigationIconTint="@color/white"
         app:title="@string/scanned_pages"
         app:titleTextColor="@color/white" />
+    
+    <!-- Selection Mode Toolbar (hidden by default) -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/selectionToolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary_dark"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_close"
+        app:navigationIconTint="@color/white"
+        app:titleTextColor="@color/white"
+        tools:title="3 selected"
+        tools:visibility="visible" />
 
     <!-- Empty state -->
-    <TextView
-        android:id="@+id/emptyText"
+    <LinearLayout
+        android:id="@+id/emptyState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_pages"
-        android:textColor="@color/gray"
-        android:textSize="16sp"
+        android:gravity="center"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        tools:visibility="visible" />
+        tools:visibility="visible">
+        
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_document"
+            android:alpha="0.4"
+            app:tint="@color/gray" />
+        
+        <TextView
+            android:id="@+id/emptyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/no_pages"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp" />
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/long_press_to_select"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            android:visibility="gone" />
+        
+    </LinearLayout>
 
     <!-- Pages RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -44,7 +86,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:padding="8dp"
+        android:padding="6dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,16 +96,17 @@
         tools:itemCount="4"
         tools:listitem="@layout/item_page" />
 
-    <!-- Action buttons -->
+    <!-- Normal Action buttons -->
     <LinearLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -84,6 +127,47 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/create_pdf" />
+
+    </LinearLayout>
+    
+    <!-- Selection Mode Action buttons (hidden by default) -->
+    <LinearLayout
+        android:id="@+id/selectionButtonsLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeleteSelected"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/delete_selected"
+            android:textColor="@color/error"
+            app:icon="@drawable/ic_delete"
+            app:iconTint="@color/error"
+            app:strokeColor="@color/error" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreatePdfSelected"
+            style="@style/ActionButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/create_pdf_selected"
+            app:icon="@drawable/ic_pdf" />
 
     </LinearLayout>
 
@@ -129,10 +213,11 @@
                 android:layout_height="48dp" />
 
             <TextView
+                android:id="@+id/loadingText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/creating_pdf"
+                android:text="@string/loading"
                 android:textColor="@color/gray_dark" />
 
         </LinearLayout>
