@@ -5,7 +5,7 @@
     DARK MODE THEME
     
     This theme inherits from Material3 Dark and overrides specific colors
-    for our app's dark mode.
+    for our app's dark mode with Studio Ghibli-inspired night palette.
     -->
 
     <!-- Main App Theme - Dark Mode -->
@@ -36,6 +36,10 @@
         <!-- Navigation bar - Dark -->
         <item name="android:navigationBarColor">@color/surface</item>
         <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- Modern Typography - Uses system's modern sans-serif -->
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
         
         <!-- Error color -->
         <item name="colorError">@color/error</item>

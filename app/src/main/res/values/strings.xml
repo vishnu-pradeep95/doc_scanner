@@ -126,6 +126,25 @@
     <string name="error_sharing_pdf">Error sharing PDF</string>
     <string name="view_history">History</string>
     
+    <!-- PDF Operations -->
+    <string name="merge_pdfs">Merge PDFs</string>
+    <string name="split_pdf">Split PDF</string>
+    <string name="compress_pdf">Compress PDF</string>
+    <string name="merging_pdfs">Merging PDFs…</string>
+    <string name="splitting_pdf">Splitting PDF…</string>
+    <string name="compressing_pdf">Compressing PDF…</string>
+    <string name="merge_success">PDFs merged successfully</string>
+    <string name="split_success">PDF split into %d files</string>
+    <string name="compress_success">PDF compressed</string>
+    <string name="select_pdfs_to_merge">Select 2 or more PDFs to merge</string>
+    <string name="select_pdf_to_split">Select a PDF to split</string>
+    <string name="select_pdf_to_compress">Select a PDF to compress</string>
+    <string name="compression_level">Compression Level</string>
+    <string name="compression_low">Low (best quality)</string>
+    <string name="compression_medium">Medium (balanced)</string>
+    <string name="compression_high">High (smallest file)</string>
+    <string name="long_press_to_select_pdfs">Long press to select PDFs</string>
+    
     <!-- Advanced Filters -->
     <string name="filter_magic">Magic</string>
     <string name="filter_sharpen">Sharpen</string>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Merge selected PDFs -->
+    <item
+        android:id="@+id/action_merge"
+        android:icon="@drawable/ic_merge"
+        android:title="@string/merge_pdfs"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <!-- Split PDF into pages -->
+    <item
+        android:id="@+id/action_split"
+        android:icon="@drawable/ic_split"
+        android:title="@string/split_pdf"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <!-- Compress selected PDF -->
+    <item
+        android:id="@+id/action_compress"
+        android:icon="@drawable/ic_compress"
+        android:title="@string/compress_pdf"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <!-- Select All -->
+    <item
+        android:id="@+id/action_select_all"
+        android:icon="@drawable/ic_select_all"
+        android:title="@string/select_all"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom" />
+
+</menu>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Main App Theme - Modern Material 3 Design -->
+    <!-- Main App Theme - Modern Material 3 Design with Inter-style typography -->
     <style name="Theme.PDFScanner" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand colors -->
         <item name="colorPrimary">@color/primary</item>
@@ -22,13 +22,26 @@
         <item name="android:colorBackground">@color/background</item>
         <item name="android:windowBackground">@color/background</item>
         
-        <!-- Status bar -->
-        <item name="android:statusBarColor">@color/primary_dark</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <!-- Status bar - light status bar with surface color -->
+        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:windowLightStatusBar">true</item>
         
         <!-- Navigation bar -->
         <item name="android:navigationBarColor">@color/surface</item>
         <item name="android:windowLightNavigationBar">true</item>
+        
+        <!-- Modern Typography - Uses system's modern sans-serif -->
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        
+        <!-- Text appearances with modern font -->
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.PDFScanner.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.PDFScanner.HeadlineMedium</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.PDFScanner.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.PDFScanner.TitleMedium</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.PDFScanner.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.PDFScanner.BodyMedium</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.PDFScanner.LabelLarge</item>
         
         <!-- Error color -->
         <item name="colorError">@color/error</item>
@@ -36,6 +49,50 @@
         <!-- Button styles -->
         <item name="materialButtonStyle">@style/Widget.PDFScanner.Button</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.PDFScanner.Button.Outlined</item>
+    </style>
+    
+    <!-- Modern Text Appearances -->
+    <style name="TextAppearance.PDFScanner.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    
+    <style name="TextAppearance.PDFScanner.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    
+    <style name="TextAppearance.PDFScanner.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+    
+    <style name="TextAppearance.PDFScanner.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+    
+    <style name="TextAppearance.PDFScanner.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+    
+    <style name="TextAppearance.PDFScanner.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    
+    <style name="TextAppearance.PDFScanner.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 
     <!-- Custom Button Style -->
