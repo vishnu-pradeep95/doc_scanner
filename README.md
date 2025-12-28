@@ -35,15 +35,26 @@ This isn't just another document scanner - it's a **joyful experience**! Every i
 - **Batch Mode** - Quickly capture multiple pages in sequence
 - **Document Filters** - Original, Magic, Enhanced, Sharpen, B&W modes
 - **Smart Cropping** - Precise edge adjustment with CanHub
-- **Import Images** - Add photos from gallery
+- **Import Images & PDFs** - Add photos from gallery OR import existing PDFs
+
+### ✏️ PDF Editor
+- **Built-in PDF Viewer** - Native Android PDF rendering
+- **Annotations** - Add text, shapes, stamps, signatures, and highlights
+- **Drawing Tools** - Freehand drawing with customizable colors/stroke
+- **Digital Signatures** - Create, save, and reuse signatures
+- **Highlight Tool** - Semi-transparent highlighting for marking text
+- **Resize & Delete** - Selection toolbar for managing annotations
+- **Undo/Redo** - Full editing history support
+- **Save & Share** - Export annotated PDFs
 
 ### 🎨 Beautiful Mascot UI
-- **Playful Mascot Icons** - 20+ custom sticker-style icons with googly eyes
+- **Playful Mascot Icons** - 30+ custom sticker-style icons with googly eyes
+- **Modern Pill Buttons** - Rounded 24dp radius with emoji decorations
 - **Bounce Animations** - Every card tap feels satisfying
 - **Sparkle Effects** - Camera capture button with animated ring
 - **Nunito Font** - Custom bundled fonts (4 weights)
 - **Soft Corners** - 28dp radius for friendly, approachable feel
-- **Cartoon Theme** - Coral Red (#FF6B6B), Turquoise (#4ECDC4), Yellow (#FFE66D)
+- **Studio Ghibli Theme** - Soft sky blues, warm earth tones, dreamy aesthetics
 - **Dark Mode Ready** - Full dark theme support
 
 ### 📋 Document Management
@@ -196,6 +207,16 @@ app/src/main/
 │   │   └── RecentDocumentsAdapter.kt      # Home screen recent docs
 │   ├── data/
 │   │   └── DocumentHistory.kt             # PDF history storage
+│   ├── editor/                            # PDF Editor module
+│   │   ├── PdfEditorFragment.kt           # Main editor screen
+│   │   ├── PdfViewerFragment.kt           # PDF viewing
+│   │   ├── NativePdfView.kt               # Native PDF renderer
+│   │   ├── AnnotationCanvasView.kt        # Drawing overlay
+│   │   ├── SignaturePadView.kt            # Signature capture
+│   │   ├── SignatureDialogFragment.kt     # Signature dialog
+│   │   ├── TextInputDialogFragment.kt     # Text annotation dialog
+│   │   ├── PdfAnnotation.kt               # Annotation data models
+│   │   └── PdfAnnotationRenderer.kt       # Render annotations to PDF
 │   ├── ocr/
 │   │   └── OcrProcessor.kt                # ML Kit OCR wrapper
 │   ├── ui/
@@ -208,30 +229,28 @@ app/src/main/
 │   ├── util/
 │   │   ├── ImageProcessor.kt              # Document filters
 │   │   ├── PdfUtils.kt                    # PDF operations
+│   │   ├── PdfPageExtractor.kt            # Extract pages from PDF
 │   │   └── DocumentScanner.kt             # ML Kit integration
 │   └── viewmodel/
 │       └── ScannerViewModel.kt            # Shared state
 │
 └── res/
     ├── drawable/
-    │   ├── ic_camera_mascot.xml           # Smiling camera icon
-    │   ├── ic_auto_scan_mascot.xml        # Magic wand icon
-    │   ├── ic_import_mascot.xml           # Gallery icon
-    │   ├── ic_merge_mascot.xml            # Hugging docs icon
-    │   ├── ic_split_mascot.xml            # Scissors icon
-    │   ├── ic_compress_mascot.xml         # Squeezed doc icon
-    │   ├── ic_capture_button_mascot.xml   # Capture button
-    │   ├── illustration_empty_folder.xml  # Empty state
-    │   ├── illustration_camera.xml        # Permission screen
-    │   └── illustration_success.xml       # Success dialog
+    │   ├── ic_*_mascot.xml                # 30+ mascot-styled icons
+    │   ├── illustration_*.xml             # Empty states & success
+    │   └── bg_*.xml                       # Backgrounds & shapes
     ├── font/
     │   ├── nunito_regular.ttf
     │   ├── nunito_semibold.ttf
     │   ├── nunito_bold.ttf
     │   └── nunito_extrabold.ttf
     ├── layout/
+    │   ├── fragment_*.xml                 # Screen layouts
+    │   └── dialog_*.xml                   # Dialog layouts
     ├── navigation/nav_graph.xml           # Navigation flow
-    └── values/themes_cartoon.xml          # Cartoon theme
+    └── values/
+        ├── colors.xml                     # Studio Ghibli palette
+        └── themes.xml                     # Material 3 themes
 ```
 
 ---

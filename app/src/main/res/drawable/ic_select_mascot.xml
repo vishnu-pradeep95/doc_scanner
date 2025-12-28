@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mascot-styled Select/Cursor Tool Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Cute cursor arrow with mascot styling -->
+    
+    <!-- Cursor body (arrow) -->
+    <path
+        android:pathData="M12,6 L12,36 L18,30 L24,40 L28,38 L22,28 L32,28 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="1.5"
+        android:strokeColor="#3BA99C"/>
+    
+    <!-- Googly eye on cursor -->
+    <path
+        android:pathData="M16,16 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <path
+        android:pathData="M17,16 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Eye highlight -->
+    <path
+        android:pathData="M15.5,14.5 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <!-- Little blush -->
+    <path
+        android:pathData="M14,21 m-2,0 a2,1.5 0 1,1 4,0 a2,1.5 0 1,1 -4,0"
+        android:fillColor="#FFB6C1"
+        android:fillAlpha="0.5"/>
+    
+    <!-- Sparkle -->
+    <path
+        android:pathData="M34,10 L36,14 L40,14 L37,17 L38,21 L34,18 L30,21 L31,17 L28,14 L32,14 Z"
+        android:fillColor="#FFE66D"/>
+    
+    <!-- Small sparkle -->
+    <path
+        android:pathData="M38,32 L39,34 L41,34 L39.5,35.5 L40,37 L38,36 L36,37 L36.5,35.5 L35,34 L37,34 Z"
+        android:fillColor="#4ECDC4"
+        android:fillAlpha="0.7"/>
+    
+</vector>

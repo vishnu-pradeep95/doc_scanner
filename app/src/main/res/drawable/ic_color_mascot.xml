@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mascot-styled Color Picker Tool Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Cute paint palette character -->
+    
+    <!-- Palette base -->
+    <path
+        android:pathData="M24,6 C10,6 4,18 4,28 C4,38 12,44 24,44 C36,44 44,36 44,24 C44,12 36,6 24,6 M24,20 C28,20 30,22 30,26 C30,30 28,32 24,32 C20,32 18,30 18,26 C18,22 20,20 24,20"
+        android:fillColor="#F5DEB3"
+        android:strokeWidth="1.5"
+        android:strokeColor="#DEB887"/>
+    
+    <!-- Red color blob -->
+    <path
+        android:pathData="M12,16 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0"
+        android:fillColor="#FF6B6B"/>
+    
+    <!-- Blue color blob -->
+    <path
+        android:pathData="M10,28 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0"
+        android:fillColor="#4ECDC4"/>
+    
+    <!-- Yellow color blob -->
+    <path
+        android:pathData="M16,38 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0"
+        android:fillColor="#FFE66D"/>
+    
+    <!-- Green color blob -->
+    <path
+        android:pathData="M30,38 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0"
+        android:fillColor="#27AE60"/>
+    
+    <!-- Purple color blob -->
+    <path
+        android:pathData="M38,28 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0"
+        android:fillColor="#9B59B6"/>
+    
+    <!-- Orange color blob -->
+    <path
+        android:pathData="M36,14 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0"
+        android:fillColor="#FF9F43"/>
+    
+    <!-- Googly eyes in thumb hole -->
+    <path
+        android:pathData="M21,24 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M21.5,24 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#333333"/>
+    
+    <path
+        android:pathData="M27,24 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M27.5,24 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Cute smile -->
+    <path
+        android:pathData="M22,28 Q24,30 26,28"
+        android:strokeColor="#333333"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Sparkle -->
+    <path
+        android:pathData="M42,6 L43,8 L45,8 L43.5,9.5 L44,11 L42,10 L40,11 L40.5,9.5 L39,8 L41,8 Z"
+        android:fillColor="#FFE66D"/>
+    
+</vector>

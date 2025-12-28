@@ -226,6 +226,7 @@ class HistoryFragment : Fragment() {
     private fun setupRecyclerView() {
         historyAdapter = HistoryAdapter(
             onItemClick = { document -> openDocument(document) },
+            onEditClick = { document -> editDocument(document) },
             onShareClick = { document -> shareDocument(document) },
             onDeleteClick = { document -> confirmDelete(document) },
             onLongClick = { _ -> /* Selection mode started */ }
@@ -237,6 +238,31 @@ class HistoryFragment : Fragment() {
         }
         
         binding.recyclerHistory.adapter = historyAdapter
+    }
+    
+    /**
+     * Open PDF editor for the document
+     */
+    private fun editDocument(document: DocumentEntry) {
+        val file = File(document.filePath)
+        if (!file.exists()) {
+            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        try {
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
+                file
+            )
+            
+            val action = HistoryFragmentDirections.actionHistoryToPdfEditor(uri.toString())
+            findNavController().navigate(action)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error opening editor", e)
+            Toast.makeText(requireContext(), "Error opening editor: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
     
     /**

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_clear.xml - Clear/Erase Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Eraser body -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:pathData="M16.24,3.56 L21.19,8.5 C21.97,9.29 21.97,10.55 21.19,11.34 L12,20.53 L4.47,13 L13.66,3.81 C14.45,3.03 15.71,3.03 16.24,3.56 Z" />
+    
+    <!-- Eraser tip -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#000000"
+        android:strokeWidth="1"
+        android:pathData="M4.47,13 L2.29,15.17 C1.9,15.56 1.9,16.19 2.29,16.58 L5.42,19.71 C5.81,20.1 6.44,20.1 6.83,19.71 L12,20.53 L4.47,13 Z" />
+    
+    <!-- Baseline -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M9,21 L21,21" />
+
+</vector>

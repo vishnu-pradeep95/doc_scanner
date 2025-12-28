@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mascot-styled Shapes Tool Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Cute shapes characters -->
+    
+    <!-- Circle character (back) -->
+    <path
+        android:pathData="M32,20 m-10,0 a10,10 0 1,1 20,0 a10,10 0 1,1 -20,0"
+        android:fillColor="#FF6B6B"
+        android:strokeWidth="1.5"
+        android:strokeColor="#E74C3C"/>
+    
+    <!-- Circle eyes -->
+    <path
+        android:pathData="M28,18 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M29,18 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#333333"/>
+    
+    <path
+        android:pathData="M36,18 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M37,18 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Circle smile -->
+    <path
+        android:pathData="M29,23 Q32,26 35,23"
+        android:strokeColor="#333333"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Square character (front) -->
+    <path
+        android:pathData="M6,22 L24,22 L24,40 L6,40 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="1.5"
+        android:strokeColor="#3BA99C"/>
+    
+    <!-- Square eyes -->
+    <path
+        android:pathData="M11,28 m-2.5,0 a2.5,2.5 0 1,1 5,0 a2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M12,28 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0"
+        android:fillColor="#333333"/>
+    
+    <path
+        android:pathData="M19,28 m-2.5,0 a2.5,2.5 0 1,1 5,0 a2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M20,28 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Square smile -->
+    <path
+        android:pathData="M12,34 Q15,37 18,34"
+        android:strokeColor="#333333"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Triangle character (top) -->
+    <path
+        android:pathData="M24,6 L34,22 L14,22 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="1.5"
+        android:strokeColor="#E6CF5C"/>
+    
+    <!-- Triangle eye -->
+    <path
+        android:pathData="M24,14 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M24.5,14 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Triangle smile -->
+    <path
+        android:pathData="M22,18 Q24,20 26,18"
+        android:strokeColor="#333333"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Sparkle -->
+    <path
+        android:pathData="M42,34 L43,36 L45,36 L43.5,37.5 L44,39 L42,38 L40,39 L40.5,37.5 L39,36 L41,36 Z"
+        android:fillColor="#FFE66D"/>
+    
+</vector>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_edit_mascot.xml - Mascot-styled Edit/Pencil Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Pencil body -->
+    <path
+        android:pathData="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="0"/>
+    
+    <!-- Pencil tip -->
+    <path
+        android:pathData="M3,17.25L6.75,21L3,21Z"
+        android:fillColor="#2C3E50"
+        android:strokeWidth="0"/>
+    
+    <!-- Pencil top (eraser) -->
+    <path
+        android:pathData="M20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83l3.75,3.75l1.83,-1.83z"
+        android:fillColor="#FF6B6B"
+        android:strokeWidth="0"/>
+    
+    <!-- Pencil stripe -->
+    <path
+        android:pathData="M14.06,6.19L6.5,13.75L7.91,15.16L15.47,7.60Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="0"/>
+    
+    <!-- Left eye -->
+    <path
+        android:pathData="M9,12m-0.8,0a0.8,0.8 0,1 1,1.6 0a0.8,0.8 0,1 1,-1.6 0"
+        android:fillColor="#2C3E50"
+        android:strokeWidth="0"/>
+    
+    <!-- Right eye -->
+    <path
+        android:pathData="M12,9m-0.8,0a0.8,0.8 0,1 1,1.6 0a0.8,0.8 0,1 1,-1.6 0"
+        android:fillColor="#2C3E50"
+        android:strokeWidth="0"/>
+    
+    <!-- Eye shine left -->
+    <path
+        android:pathData="M8.7,11.7m-0.25,0a0.25,0.25 0,1 1,0.5 0a0.25,0.25 0,1 1,-0.5 0"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"/>
+    
+    <!-- Eye shine right -->
+    <path
+        android:pathData="M11.7,8.7m-0.25,0a0.25,0.25 0,1 1,0.5 0a0.25,0.25 0,1 1,-0.5 0"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"/>
+    
+</vector>

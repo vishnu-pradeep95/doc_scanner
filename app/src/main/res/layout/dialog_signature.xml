@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dialog_signature.xml - Mascot-Styled Signature Dialog -->
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <!-- Header with Mascot -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="@color/primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_signature_mascot"
+            android:contentDescription="Signature mascot" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="✍️ Draw Your Signature"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="12dp" />
+
+    </LinearLayout>
+
+    <!-- Content Area -->
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Saved Signatures Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_history_mascot" />
+
+            <TextView
+                android:id="@+id/tvSavedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Saved Signatures"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSavedSignatures"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:orientation="horizontal"
+            android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <TextView
+            android:id="@+id/tvEmptySignatures"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:gravity="center"
+            android:text="No saved signatures yet ✨"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:background="@drawable/bg_dashed_border"
+            android:visibility="gone" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:layout_marginVertical="12dp" />
+
+        <!-- Draw New Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_draw_mascot" />
+
+            <TextView
+                android:id="@+id/tvDrawLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Draw New Signature"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Signature Pad -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <FrameLayout
+                android:id="@+id/signaturePadContainer"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:background="@drawable/bg_signature_pad_pro">
+
+                <com.pdfscanner.app.editor.SignaturePadView
+                    android:id="@+id/signaturePad"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/tvSignHere"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Sign here ✍️"
+                    android:textColor="#BBBBBB"
+                    android:textSize="14sp" />
+
+                <!-- Signature line -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="30dp"
+                    android:layout_marginHorizontal="20dp"
+                    android:background="#DDDDDD" />
+
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Quick Actions -->
+        <LinearLayout
+            android:id="@+id/actionButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="12dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClear"
+                style="@style/DialogButton.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginEnd="8dp"
+                android:text="🗑️ Clear"
+                android:textColor="@color/text_secondary" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUndo"
+                style="@style/DialogButton.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="↩️ Undo"
+                android:textColor="@color/primary" />
+
+        </LinearLayout>
+
+        <!-- Save Option -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbSaveSignature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="💾 Save for later"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            app:buttonTint="@color/primary" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSignatureName"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            android:hint="Name (e.g., My Initials)"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSignatureName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <!-- Bottom Actions -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:padding="16dp"
+        android:background="@color/surface"
+        app:layout_constraintTop_toBottomOf="@id/content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="@style/DialogButton.Outlined"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:text="Cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInsert"
+            style="@style/DialogButton.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginStart="12dp"
+            android:text="✓ Insert"
+            android:enabled="false"
+            app:cornerRadius="20dp"
+            android:backgroundTint="@color/primary" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- signature_write.xml - Pen writing flourish animation -->
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Slight tilt like holding a pen -->
+    <rotate
+        android:duration="0"
+        android:fromDegrees="-15"
+        android:toDegrees="-15"
+        android:pivotX="80%"
+        android:pivotY="80%" />
+    
+    <!-- Start from left -->
+    <translate
+        android:duration="0"
+        android:fromXDelta="-30%"
+        android:toXDelta="-30%" />
+    
+    <alpha
+        android:duration="0"
+        android:fromAlpha="0"
+        android:toAlpha="0" />
+    
+    <!-- Fade in -->
+    <alpha
+        android:duration="100"
+        android:fromAlpha="0"
+        android:toAlpha="1" />
+    
+    <!-- Writing motion - move across -->
+    <translate
+        android:duration="400"
+        android:fromXDelta="-30%"
+        android:toXDelta="0%"
+        android:interpolator="@android:anim/decelerate_interpolator" />
+    
+    <!-- Subtle up-down as if writing -->
+    <rotate
+        android:duration="200"
+        android:fromDegrees="-15"
+        android:toDegrees="-5"
+        android:pivotX="80%"
+        android:pivotY="80%"
+        android:repeatCount="1"
+        android:repeatMode="reverse" />
+
+</set>

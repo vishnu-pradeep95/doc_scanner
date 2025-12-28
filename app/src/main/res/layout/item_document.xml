@@ -58,6 +58,17 @@
 
         </LinearLayout>
 
+        <!-- Edit button with pencil icon -->
+        <ImageButton
+            android:id="@+id/btnEdit"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Edit PDF"
+            android:padding="8dp"
+            android:src="@drawable/ic_edit_small_mascot" />
+
         <!-- Share button with mascot icon -->
         <ImageButton
             android:id="@+id/btnShare"

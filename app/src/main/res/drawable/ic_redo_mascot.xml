@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_redo_mascot.xml - Mascot-styled Redo Arrow -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Arrow body circle -->
+    <path
+        android:pathData="M11.5,8c2.65,0 5.05,1.01 6.9,2.6L22,7v10H12l3.62,-3.62c-1.49,-1.24 -2.74,-1.88 -4.12,-1.88c-2.76,0 -5.02,2.07 -5.36,4.74l-3.01,-0.64C3.65,11.61 7.24,8 11.5,8z"
+        android:fillColor="#FF6B6B"
+        android:strokeWidth="0"/>
+    
+    <!-- Left eye on arrow -->
+    <path
+        android:pathData="M16,11m-0.7,0a0.7,0.7 0,1 1,1.4 0a0.7,0.7 0,1 1,-1.4 0"
+        android:fillColor="#2C3E50"
+        android:strokeWidth="0"/>
+    
+    <!-- Right eye on arrow -->
+    <path
+        android:pathData="M19,11m-0.7,0a0.7,0.7 0,1 1,1.4 0a0.7,0.7 0,1 1,-1.4 0"
+        android:fillColor="#2C3E50"
+        android:strokeWidth="0"/>
+    
+    <!-- Eye shine left -->
+    <path
+        android:pathData="M15.7,10.7m-0.2,0a0.2,0.2 0,1 1,0.4 0a0.2,0.2 0,1 1,-0.4 0"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"/>
+    
+    <!-- Eye shine right -->
+    <path
+        android:pathData="M18.7,10.7m-0.2,0a0.2,0.2 0,1 1,0.4 0a0.2,0.2 0,1 1,-0.4 0"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"/>
+    
+    <!-- Smile -->
+    <path
+        android:pathData="M16.2,12.5Q17.5,13.3 18.8,12.5"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="0.6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    
+</vector>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mascot-styled Checkmark Tool Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Cute checkmark character -->
+    
+    <!-- Circle background -->
+    <path
+        android:pathData="M24,24 m-18,0 a18,18 0 1,1 36,0 a18,18 0 1,1 -36,0"
+        android:fillColor="#27AE60"
+        android:fillAlpha="0.2"/>
+    
+    <!-- Checkmark body -->
+    <path
+        android:pathData="M12,24 L20,32 L36,16"
+        android:strokeWidth="6"
+        android:strokeColor="#27AE60"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Googly eye on checkmark -->
+    <path
+        android:pathData="M26,22 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <path
+        android:pathData="M27,22 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Eye highlight -->
+    <path
+        android:pathData="M25,20.5 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <!-- Happy face elements -->
+    <path
+        android:pathData="M17,28 m-2,0 a2,1.5 0 1,1 4,0 a2,1.5 0 1,1 -4,0"
+        android:fillColor="#FFB6C1"
+        android:fillAlpha="0.6"/>
+    
+    <!-- Sparkles -->
+    <path
+        android:pathData="M40,10 L41,12 L43,12 L41.5,13.5 L42,15 L40,14 L38,15 L38.5,13.5 L37,12 L39,12 Z"
+        android:fillColor="#FFE66D"/>
+    
+    <path
+        android:pathData="M8,36 L9,38 L11,38 L9.5,39.5 L10,41 L8,40 L6,41 L6.5,39.5 L5,38 L7,38 Z"
+        android:fillColor="#4ECDC4"/>
+    
+</vector>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bg_signature_pad.xml - Signature pad border background -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    
+    <solid android:color="#FAFAFA" />
+    <stroke 
+        android:width="2dp"
+        android:color="#BDC3C7" />
+    <corners android:radius="8dp" />
+    
+</shape>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_draw.xml - Draw/Pencil Mascot Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Pencil body -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:pathData="M4,20 L2,22 L6,18 L20,4 L22,6 L8,20 Z" />
+    
+    <!-- Pencil tip -->
+    <path
+        android:fillColor="#FFA07A"
+        android:strokeColor="#000000"
+        android:strokeWidth="1"
+        android:pathData="M2,22 L4,20 L6,18 L2,22 Z" />
+    
+    <!-- Pencil eraser -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#000000"
+        android:strokeWidth="1"
+        android:pathData="M18,6 L20,4 L22,6 L20,8 Z" />
+    
+    <!-- Pencil stripe -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#000000"
+        android:strokeWidth="0.8"
+        android:pathData="M10,14 L12,12 L14,14 L12,16 Z" />
+    
+    <!-- Googly eye -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M13,10 A1.5,1.5 0,1,1 16,10 A1.5,1.5 0,1,1 13,10" />
+    
+    <path
+        android:fillColor="#000000"
+        android:pathData="M14,10 A0.5,0.5 0,1,1 15,10 A0.5,0.5 0,1,1 14,10" />
+    
+    <!-- Drawing line -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M2,22 Q5,19 6,22 Q7,24 10,21" />
+
+</vector>

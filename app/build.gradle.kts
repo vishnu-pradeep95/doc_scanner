@@ -202,6 +202,14 @@ dependencies {
     implementation("com.google.mlkit:text-recognition:16.0.0")
     
     // ===========================================
+    // PDF VIEWER & EDITOR
+    // ===========================================
+    
+    // Using custom NativePdfView with Android's built-in PdfRenderer API
+    // No external library needed - see NativePdfView.kt in the editor package
+    // This avoids AndroidX compatibility issues with third-party PDF libraries
+    
+    // ===========================================
     // ML KIT - Document Scanner (Auto Edge Detection)
     // ===========================================
     

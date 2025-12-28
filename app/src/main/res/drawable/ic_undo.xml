@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_undo.xml - Time-traveling Arrow Mascot (going back!) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Circular time swirl background -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M12,3 A9,9 0,1,1 12,21 A9,9 0,1,1 12,3" />
+    
+    <!-- Inner circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,6 A6,6 0,1,1 12,18 A6,6 0,1,1 12,6" />
+    
+    <!-- Curved arrow going back -->
+    <path
+        android:strokeColor="#4ECDC4"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M15,9 C15,9 13,7 10,8 C7,9 7,12 7,12" />
+    
+    <!-- Arrow head pointing left (going back) -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M7,8 L5,12 L9,12 Z" />
+    
+    <!-- Googly eyes on the arrow curve -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="0.6"
+        android:pathData="M13,8 A1.2,1.2 0,1,1 15.4,8 A1.2,1.2 0,1,1 13,8" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M13.5,8.2 A0.4,0.4 0,1,1 14.3,8.2 A0.4,0.4 0,1,1 13.5,8.2" />
+    
+    <!-- Little time sparkles -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M17,14 L17.2,14.5 L17.7,14.6 L17.2,14.7 L17,15.2 L16.8,14.7 L16.3,14.6 L16.8,14.5 Z" />
+
+</vector>

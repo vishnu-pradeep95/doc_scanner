@@ -6,15 +6,15 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog_rounded">
 
     <!-- Success illustration -->
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:contentDescription="@null"
-        android:src="@drawable/illustration_success"
-        app:tint="?attr/colorPrimary" />
+        android:src="@drawable/illustration_success" />
 
     <!-- Title -->
     <TextView
@@ -41,11 +41,11 @@
     <!-- OK button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnOk"
-        style="@style/Widget.Material3.Button"
+        style="@style/DialogButton.Primary"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="24dp"
-        android:minWidth="120dp"
-        android:text="@android:string/ok" />
+        android:minWidth="140dp"
+        android:text="✨ Awesome!" />
 
 </LinearLayout>

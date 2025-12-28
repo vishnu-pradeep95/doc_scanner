@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bg_color_option.xml - Color picker option background -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    
+    <solid android:color="#000000" />
+    <stroke 
+        android:width="3dp"
+        android:color="@android:color/transparent" />
+    
+</shape>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_tip_mascot.xml - Helpful tip mascot with light bulb -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="60dp"
+    android:height="60dp"
+    android:viewportWidth="60"
+    android:viewportHeight="60">
+    
+    <!-- Body -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M30,18 A18,18 0,1,1 30,54 A18,18 0,1,1 30,18" />
+    
+    <!-- Inner highlight -->
+    <path
+        android:fillColor="#6EE7DE"
+        android:pathData="M30,23 A13,13 0,1,1 30,49 A13,13 0,1,1 30,23" />
+    
+    <!-- Smart/knowing eyes -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.2"
+        android:pathData="M22,32 A4,4 0,1,1 30,32 A4,4 0,1,1 22,32" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M25,32 A2,2 0,1,1 29,32 A2,2 0,1,1 25,32" />
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.2"
+        android:pathData="M30,32 A4,4 0,1,1 38,32 A4,4 0,1,1 30,32" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M33,32 A2,2 0,1,1 37,32 A2,2 0,1,1 33,32" />
+    
+    <!-- Knowing smile -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M25,42 Q30,46 35,42" />
+    
+    <!-- Light bulb above head (idea!) -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M30,3 A8,8 0,1,1 30,17 Q27,17 27,14 L33,14 Q33,17 30,17 A8,8 0,1,1 30,3" />
+    
+    <!-- Bulb base -->
+    <path
+        android:fillColor="#BDC3C7"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1"
+        android:pathData="M27,14 L33,14 L33,17 L27,17 Z" />
+    
+    <!-- Light rays -->
+    <path
+        android:strokeColor="#FFE66D"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M18,10 L22,10 M42,10 L38,10 M30,0 L30,2" />
+    
+    <!-- Small sparkles -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M48,25 L49,27 L51,28 L49,29 L48,31 L47,29 L45,28 L47,27 Z" />
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M10,38 L11,40 L13,41 L11,42 L10,44 L9,42 L7,41 L9,40 Z" />
+
+</vector>

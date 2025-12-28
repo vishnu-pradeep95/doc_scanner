@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_undo_mascot.xml - Mascot-styled Undo Arrow -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Arrow body circle -->
+    <path
+        android:pathData="M12.5,8C9.85,8 7.45,9.01 5.6,10.6L2,7v10h10l-3.62,-3.62C9.87,12.14 11.12,11.5 12.5,11.5c2.76,0 5.02,2.07 5.36,4.74l3.01,-0.64C20.35,11.61 16.76,8 12.5,8z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="0"/>
+    
+    <!-- Left eye on arrow -->
+    <path
+        android:pathData="M5,11m-0.7,0a0.7,0.7 0,1 1,1.4 0a0.7,0.7 0,1 1,-1.4 0"
+        android:fillColor="#2C3E50"
+        android:strokeWidth="0"/>
+    
+    <!-- Right eye on arrow -->
+    <path
+        android:pathData="M8,11m-0.7,0a0.7,0.7 0,1 1,1.4 0a0.7,0.7 0,1 1,-1.4 0"
+        android:fillColor="#2C3E50"
+        android:strokeWidth="0"/>
+    
+    <!-- Eye shine left -->
+    <path
+        android:pathData="M4.7,10.7m-0.2,0a0.2,0.2 0,1 1,0.4 0a0.2,0.2 0,1 1,-0.4 0"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"/>
+    
+    <!-- Eye shine right -->
+    <path
+        android:pathData="M7.7,10.7m-0.2,0a0.2,0.2 0,1 1,0.4 0a0.2,0.2 0,1 1,-0.4 0"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"/>
+    
+    <!-- Smile -->
+    <path
+        android:pathData="M5.2,12.5Q6.5,13.3 7.8,12.5"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="0.6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    
+</vector>

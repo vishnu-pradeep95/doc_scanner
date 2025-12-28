@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_saving_mascot.xml - Mascot working hard to save your document -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+    
+    <!-- Body - slightly tilted like working -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2.5"
+        android:pathData="M40,15 A25,25 0,1,1 40,65 A25,25 0,1,1 40,15" />
+    
+    <!-- Inner highlight -->
+    <path
+        android:fillColor="#6EE7DE"
+        android:pathData="M40,22 A18,18 0,1,1 40,58 A18,18 0,1,1 40,22" />
+    
+    <!-- Determined eyes (focused!) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M28,35 A5,5 0,1,1 38,35 A5,5 0,1,1 28,35" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M32,35 A2.5,2.5 0,1,1 37,35 A2.5,2.5 0,1,1 32,35" />
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M42,35 A5,5 0,1,1 52,35 A5,5 0,1,1 42,35" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M46,35 A2.5,2.5 0,1,1 51,35 A2.5,2.5 0,1,1 46,35" />
+    
+    <!-- Focused/working expression -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M32,48 L48,48" />
+    
+    <!-- Sweat drop (working hard!) -->
+    <path
+        android:fillColor="#87CEEB"
+        android:strokeColor="#5DADE2"
+        android:strokeWidth="1"
+        android:pathData="M55,25 Q58,30 55,35 Q52,30 55,25" />
+    
+    <!-- Arms holding floppy disk -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M15,45 Q10,50 15,58" />
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M65,45 Q70,50 65,58" />
+    
+    <!-- Floppy disk being saved -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M30,55 L50,55 L50,75 L30,75 Z" />
+    <path
+        android:fillColor="#BDC3C7"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1"
+        android:pathData="M33,55 L33,62 L47,62 L47,55 Z" />
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M33,66 L47,66 L47,73 L33,73 Z" />
+    
+    <!-- Motion lines (busy saving!) -->
+    <path
+        android:strokeColor="#FFE66D"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M5,35 L10,35 M5,40 L12,40 M5,45 L10,45" />
+    <path
+        android:strokeColor="#FFE66D"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M70,35 L75,35 M68,40 L75,40 M70,45 L75,45" />
+
+</vector>

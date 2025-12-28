@@ -33,12 +33,14 @@ import java.util.Locale
  * which items changed and animates only those.
  * 
  * @param onItemClick Called when user taps on a document (to open/view)
+ * @param onEditClick Called when user taps edit button
  * @param onShareClick Called when user taps share button
  * @param onDeleteClick Called when user taps delete button
  * @param onLongClick Called when user long-presses for selection
  */
 class HistoryAdapter(
     private val onItemClick: (DocumentEntry) -> Unit,
+    private val onEditClick: ((DocumentEntry) -> Unit)? = null,
     private val onShareClick: (DocumentEntry) -> Unit,
     private val onDeleteClick: (DocumentEntry) -> Unit,
     private val onLongClick: ((DocumentEntry) -> Unit)? = null
@@ -95,11 +97,13 @@ class HistoryAdapter(
                 binding.root.isActivated = isSelected
                 binding.root.alpha = if (isSelected) 1.0f else 0.7f
                 // Hide action buttons in selection mode
+                binding.btnEdit.visibility = View.GONE
                 binding.btnShare.visibility = View.GONE
                 binding.btnDelete.visibility = View.GONE
             } else {
                 binding.root.isActivated = false
                 binding.root.alpha = 1.0f
+                binding.btnEdit.visibility = View.VISIBLE
                 binding.btnShare.visibility = View.VISIBLE
                 binding.btnDelete.visibility = View.VISIBLE
             }
@@ -122,6 +126,7 @@ class HistoryAdapter(
                 true
             }
             
+            binding.btnEdit.setOnClickListener { onEditClick?.invoke(document) }
             binding.btnShare.setOnClickListener { onShareClick(document) }
             binding.btnDelete.setOnClickListener { onDeleteClick(document) }
         }

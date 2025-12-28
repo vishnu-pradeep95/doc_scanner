@@ -367,9 +367,31 @@ findNavController().navigate(action)
 #### Home Screen
 The new home screen provides quick access to:
 - **New Scan** - Jump directly to camera
+- **Import** - Import images AND PDFs from device
 - **Document History** - View all saved PDFs
 - **Recent Documents** - Quick access to last 3 PDFs
+- **PDF Tools** - Merge, Split, Compress PDFs
 - **Settings** - Theme and app preferences
+
+#### Import (Images & PDFs)
+Tap the import icon to pick files:
+- **Images**: Added directly to pages for editing
+- **PDFs**: Pages are extracted as images for editing
+- **Mixed**: Can select both images and PDFs at once
+- Extracted PDF pages can be cropped, filtered, and recombined
+
+#### PDF Editor
+Open any PDF from history and tap "Edit" to access:
+- **Annotations Toolbar**: Select, Sign, Text, Highlight, Stamp, Draw, Shapes
+- **Selection Tool**: Tap annotations to select, then resize or delete
+- **Signature Tool**: Draw signatures, save for reuse
+- **Text Tool**: Add text with customizable size and color
+- **Highlight Tool**: Semi-transparent rectangles for marking
+- **Stamp Tool**: Pre-made stamps (Approved, Confidential, etc.)
+- **Draw Tool**: Freehand drawing with color picker
+- **Shapes Tool**: Rectangles, ovals, lines, arrows, checkmarks
+- **Undo/Redo**: Full history of edits
+- **Save**: Export annotated PDF
 
 #### Auto-Scan (ML Kit Document Scanner)
 Tap the magic wand icon in the camera screen to launch ML Kit's built-in document scanner:

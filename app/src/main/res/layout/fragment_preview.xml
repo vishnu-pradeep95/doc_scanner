@@ -166,7 +166,7 @@
 
     </LinearLayout>
 
-    <!-- Playful action buttons - text only for clean layout -->
+    <!-- Modern action buttons with pill style -->
     <LinearLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="0dp"
@@ -175,8 +175,8 @@
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -185,30 +185,30 @@
             android:id="@+id/btnRetake"
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="Retake"
-            android:textSize="13sp" />
+            android:text="📷 Retake"
+            android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCrop"
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="Edit"
-            android:textSize="13sp" />
+            android:text="✂️ Edit"
+            android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddPage"
             style="@style/ActionButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Add Page"
-            android:textSize="13sp" />
+            android:layout_height="48dp"
+            android:layout_weight="1.2"
+            android:text="➕ Add Page"
+            android:textSize="14sp" />
 
     </LinearLayout>
 

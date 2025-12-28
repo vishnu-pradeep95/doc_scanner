@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mascot-styled Draw/Pencil Tool Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Cute pencil character -->
+    
+    <!-- Pencil body -->
+    <path
+        android:pathData="M10,38 L14,42 L38,18 L42,14 L38,10 L34,14 L10,38 Z"
+        android:fillColor="#FFE66D"
+        android:strokeWidth="1"
+        android:strokeColor="#E6CF5C"/>
+    
+    <!-- Pencil tip (wood) -->
+    <path
+        android:pathData="M6,42 L10,38 L14,42 Z"
+        android:fillColor="#DEB887"/>
+    
+    <!-- Pencil lead -->
+    <path
+        android:pathData="M6,42 L9,39 L11,41 Z"
+        android:fillColor="#333333"/>
+    
+    <!-- Pencil top (eraser) -->
+    <path
+        android:pathData="M38,10 L42,14 L46,10 L42,6 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <!-- Metal band -->
+    <path
+        android:pathData="M36,12 L40,16 L38,18 L34,14 Z"
+        android:fillColor="#C0C0C0"/>
+    
+    <!-- Pencil stripe -->
+    <path
+        android:pathData="M18,34 L34,18 L36,20 L20,36 Z"
+        android:fillColor="#4ECDC4"
+        android:fillAlpha="0.6"/>
+    
+    <!-- Googly eye -->
+    <path
+        android:pathData="M26,26 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <path
+        android:pathData="M27,26 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Eye highlight -->
+    <path
+        android:pathData="M25,24.5 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <!-- Cute smile -->
+    <path
+        android:pathData="M20,32 Q23,35 26,32"
+        android:strokeColor="#333333"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Blush -->
+    <path
+        android:pathData="M18,30 m-2,0 a2,1.5 0 1,1 4,0 a2,1.5 0 1,1 -4,0"
+        android:fillColor="#FFB6C1"
+        android:fillAlpha="0.5"/>
+    
+    <!-- Drawing line effect -->
+    <path
+        android:pathData="M2,46 Q6,44 10,46"
+        android:strokeColor="#4ECDC4"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+</vector>

@@ -40,9 +40,12 @@ import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.data.DocumentHistoryRepository
 import com.pdfscanner.app.databinding.FragmentHomeBinding
 import com.pdfscanner.app.util.DocumentScanner
+import com.pdfscanner.app.util.PdfPageExtractor
 import com.pdfscanner.app.util.PdfUtils
 import com.pdfscanner.app.viewmodel.ScannerViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // PDF operation modes
 private enum class PdfOperation {
@@ -85,6 +88,13 @@ class HomeFragment : Fragment() {
         ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
         handleGalleryResult(uris)
+    }
+    
+    // Activity result launcher for import (images + PDFs)
+    private val importLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris: List<Uri> ->
+        handleImportResult(uris)
     }
     
     // Activity result launcher for PDF picker (multiple)
@@ -152,10 +162,11 @@ class HomeFragment : Fragment() {
             startAutoScan()
         }
 
-        // Import - Open gallery picker with bounce animation
+        // Import - Open file picker for images and PDFs with bounce animation
         binding.cardImport.setOnClickListener {
             animateCardClick(it)
-            galleryLauncher.launch("image/*")
+            // Allow picking images and PDFs
+            importLauncher.launch(arrayOf("image/*", "application/pdf"))
         }
         
         // PDF Tools with bounce animations
@@ -343,6 +354,108 @@ class HomeFragment : Fragment() {
         } else {
             // Multiple images - go to pages
             findNavController().navigate(R.id.action_home_to_pages)
+        }
+    }
+    
+    /**
+     * Handle results from import (images + PDFs)
+     * Separates images and PDFs, extracts PDF pages as images
+     */
+    private fun handleImportResult(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        
+        // Separate images and PDFs
+        val imageUris = mutableListOf<Uri>()
+        val pdfUris = mutableListOf<Uri>()
+        
+        uris.forEach { uri ->
+            if (PdfPageExtractor.isPdfFile(requireContext(), uri)) {
+                pdfUris.add(uri)
+            } else {
+                imageUris.add(uri)
+            }
+        }
+        
+        // If no PDFs, handle as normal image import
+        if (pdfUris.isEmpty()) {
+            handleGalleryResult(imageUris)
+            return
+        }
+        
+        // Show loading and process PDFs
+        showImportProgress(true, "Importing files...")
+        
+        lifecycleScope.launch {
+            try {
+                // First add any images
+                imageUris.forEach { uri ->
+                    viewModel.addPage(uri)
+                }
+                
+                // Then extract pages from each PDF
+                var totalPagesExtracted = 0
+                for ((index, pdfUri) in pdfUris.withIndex()) {
+                    withContext(Dispatchers.Main) {
+                        showImportProgress(true, "Extracting PDF ${index + 1}/${pdfUris.size}...")
+                    }
+                    
+                    val result = PdfPageExtractor.extractPages(requireContext(), pdfUri)
+                    
+                    if (result.success) {
+                        result.pageUris.forEach { pageUri ->
+                            viewModel.addPage(pageUri)
+                        }
+                        totalPagesExtracted += result.pageUris.size
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Error importing PDF: ${result.errorMessage}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                
+                withContext(Dispatchers.Main) {
+                    showImportProgress(false)
+                    
+                    val totalPages = imageUris.size + totalPagesExtracted
+                    if (totalPages > 0) {
+                        Toast.makeText(
+                            requireContext(),
+                            "✅ Imported $totalPages pages",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        
+                        // Navigate to pages
+                        findNavController().navigate(R.id.action_home_to_pages)
+                    }
+                }
+                
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showImportProgress(false)
+                    Toast.makeText(
+                        requireContext(),
+                        "Error importing: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+    
+    /**
+     * Show/hide import progress indicator
+     */
+    private fun showImportProgress(show: Boolean, message: String = "") {
+        // Use the loading overlay if available, otherwise just show a toast
+        if (show) {
+            binding.root.isEnabled = false
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        } else {
+            binding.root.isEnabled = true
         }
     }
 

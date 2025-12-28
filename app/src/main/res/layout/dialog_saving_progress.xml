@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dialog_saving_progress.xml - Mascot-themed saving progress dialog -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <!-- Saving mascot -->
+    <ImageView
+        android:id="@+id/imgSavingMascot"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_saving_mascot"
+        android:contentDescription="Saving..." />
+
+    <!-- Progress text -->
+    <TextView
+        android:id="@+id/tvSavingMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Saving your masterpiece..."
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:fontFamily="@font/nunito_semibold" />
+
+    <!-- Progress bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:indeterminate="true"
+        android:progressTint="@color/primary" />
+
+    <!-- Fun tip text -->
+    <TextView
+        android:id="@+id/tvTip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="💡 Tip: You can add signatures to any page!"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:fontFamily="@font/nunito_regular" />
+
+</LinearLayout>

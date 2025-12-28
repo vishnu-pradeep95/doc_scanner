@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- success_celebration.xml - Full celebration animation for successful save -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+    
+    <!-- Pop in with overshoot -->
+    <scale
+        android:duration="300"
+        android:fromXScale="0.0"
+        android:fromYScale="0.0"
+        android:toXScale="1.1"
+        android:toYScale="1.1"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:interpolator="@android:anim/overshoot_interpolator" />
+    
+    <alpha
+        android:duration="150"
+        android:fromAlpha="0"
+        android:toAlpha="1" />
+    
+    <!-- Settle to normal size -->
+    <scale
+        android:startOffset="300"
+        android:duration="150"
+        android:fromXScale="1.1"
+        android:fromYScale="1.1"
+        android:toXScale="1.0"
+        android:toYScale="1.0"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:interpolator="@android:anim/decelerate_interpolator" />
+    
+    <!-- Happy wiggle -->
+    <rotate
+        android:startOffset="450"
+        android:duration="80"
+        android:fromDegrees="0"
+        android:toDegrees="5"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:repeatCount="5"
+        android:repeatMode="reverse" />
+
+</set>

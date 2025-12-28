@@ -144,6 +144,10 @@
         <action
             android:id="@+id/action_history_to_pdfViewer"
             app:destination="@id/pdfViewerFragment" />
+        
+        <action
+            android:id="@+id/action_history_to_pdfEditor"
+            app:destination="@id/pdfEditorFragment" />
     </fragment>
 
     <!-- PDF Viewer Fragment -->
@@ -163,6 +167,28 @@
         
         <action
             android:id="@+id/action_pdfViewer_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+        
+        <action
+            android:id="@+id/action_pdfViewer_to_editor"
+            app:destination="@id/pdfEditorFragment" />
+    </fragment>
+
+    <!-- PDF Editor Fragment -->
+    <fragment
+        android:id="@+id/pdfEditorFragment"
+        android:name="com.pdfscanner.app.editor.PdfEditorFragment"
+        android:label="Edit PDF"
+        tools:layout="@layout/fragment_pdf_editor">
+        
+        <argument
+            android:name="pdfUri"
+            app:argType="string" />
+        
+        <action
+            android:id="@+id/action_pdfEditor_to_home"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />

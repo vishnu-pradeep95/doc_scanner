@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_editor_mascot_welcome.xml - Friendly mascot greeting users to the editor -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- Body - round and friendly -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="3"
+        android:pathData="M60,25 A35,35 0,1,1 60,95 A35,35 0,1,1 60,25" />
+    
+    <!-- Inner belly highlight -->
+    <path
+        android:fillColor="#6EE7DE"
+        android:pathData="M60,35 A25,25 0,1,1 60,85 A25,25 0,1,1 60,35" />
+    
+    <!-- Left eye -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M42,50 A8,8 0,1,1 58,50 A8,8 0,1,1 42,50" />
+    <!-- Left pupil -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M48,50 A4,4 0,1,1 56,50 A4,4 0,1,1 48,50" />
+    <!-- Left eye sparkle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51,47 A1.5,1.5 0,1,1 54,47 A1.5,1.5 0,1,1 51,47" />
+    
+    <!-- Right eye -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M62,50 A8,8 0,1,1 78,50 A8,8 0,1,1 62,50" />
+    <!-- Right pupil -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M68,50 A4,4 0,1,1 76,50 A4,4 0,1,1 68,50" />
+    <!-- Right eye sparkle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M71,47 A1.5,1.5 0,1,1 74,47 A1.5,1.5 0,1,1 71,47" />
+    
+    <!-- Happy smile -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M45,65 Q60,80 75,65" />
+    
+    <!-- Rosy cheeks -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.4"
+        android:pathData="M35,58 A5,3 0,1,1 45,58 A5,3 0,1,1 35,58" />
+    <path
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.4"
+        android:pathData="M75,58 A5,3 0,1,1 85,58 A5,3 0,1,1 75,58" />
+    
+    <!-- Little pen accessory (editor theme) -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M85,20 L95,10 L100,15 L90,25 Z" />
+    <path
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M95,10 L100,15 L102,13 L97,8 Z" />
+    
+    <!-- Waving hand/arm -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2.5"
+        android:pathData="M92,50 Q105,40 100,25" />
+    
+    <!-- Hand -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M98,22 A5,5 0,1,1 102,28 A5,5 0,1,1 98,22" />
+    
+    <!-- Sparkles around mascot -->
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M20,30 L22,35 L27,36 L22,37 L20,42 L18,37 L13,36 L18,35 Z" />
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M105,70 L106,73 L109,74 L106,75 L105,78 L104,75 L101,74 L104,73 Z" />
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M25,85 L26,88 L29,89 L26,90 L25,93 L24,90 L21,89 L24,88 Z" />
+
+</vector>

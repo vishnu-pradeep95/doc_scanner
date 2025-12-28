@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_empty_annotations_mascot.xml - Mascot encouraging user to add annotations -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    
+    <!-- Document background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#BDC3C7"
+        android:strokeWidth="2"
+        android:pathData="M20,10 L70,10 L80,20 L80,90 L20,90 Z" />
+    
+    <!-- Folded corner -->
+    <path
+        android:fillColor="#ECF0F1"
+        android:strokeColor="#BDC3C7"
+        android:strokeWidth="1.5"
+        android:pathData="M70,10 L70,20 L80,20 Z" />
+    
+    <!-- Lines representing empty content (solid since strokeDashArray not supported) -->
+    <path
+        android:strokeColor="#BDC3C7"
+        android:strokeWidth="1.5"
+        android:pathData="M30,30 L40,30 M45,30 L55,30 M60,30 L70,30" />
+    <path
+        android:strokeColor="#BDC3C7"
+        android:strokeWidth="1.5"
+        android:pathData="M30,40 L38,40 M43,40 L51,40 M56,40 L60,40" />
+    <path
+        android:strokeColor="#BDC3C7"
+        android:strokeWidth="1.5"
+        android:pathData="M30,50 L39,50 M44,50 L53,50 M58,50 L65,50" />
+    
+    <!-- Mascot peeking from corner -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M75,55 A18,18 0,1,1 75,91 A18,18 0,1,1 75,55" />
+    
+    <!-- Inner highlight -->
+    <path
+        android:fillColor="#6EE7DE"
+        android:pathData="M75,60 A13,13 0,1,1 75,86 A13,13 0,1,1 75,60" />
+    
+    <!-- Curious eyes looking at document -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.2"
+        android:pathData="M66,68 A4,4 0,1,1 74,68 A4,4 0,1,1 66,68" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M68,68 A2,2 0,1,1 72,68 A2,2 0,1,1 68,68" />
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.2"
+        android:pathData="M76,68 A4,4 0,1,1 84,68 A4,4 0,1,1 76,68" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M78,68 A2,2 0,1,1 82,68 A2,2 0,1,1 78,68" />
+    
+    <!-- Encouraging smile -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M70,78 Q75,82 80,78" />
+    
+    <!-- Mascot holding a pen -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M58,75 L50,67 L48,69 L56,77 Z" />
+    <path
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1"
+        android:pathData="M50,67 L48,69 L46,67 L48,65 Z" />
+    
+    <!-- Plus/add indicator -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M15,70 A8,8 0,1,1 15,86 A8,8 0,1,1 15,70" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M15,74 L15,82 M11,78 L19,78" />
+    
+    <!-- Sparkles of possibility -->
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M40,60 L41,63 L44,64 L41,65 L40,68 L39,65 L36,64 L39,63 Z" />
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M55,75 L56,77 L58,78 L56,79 L55,81 L54,79 L52,78 L54,77 Z" />
+
+</vector>

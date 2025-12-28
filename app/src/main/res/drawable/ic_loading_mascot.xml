@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_loading_mascot.xml - Mascot working on loading/processing -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="60dp"
+    android:height="60dp"
+    android:viewportWidth="60"
+    android:viewportHeight="60">
+    
+    <!-- Main body -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:pathData="M30,10 A20,20 0,1,1 30,50 A20,20 0,1,1 30,10" />
+    
+    <!-- Inner highlight -->
+    <path
+        android:fillColor="#6EE7DE"
+        android:pathData="M30,15 A15,15 0,1,1 30,45 A15,15 0,1,1 30,15" />
+    
+    <!-- Eyes looking up (thinking/loading) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.2"
+        android:pathData="M22,26 A4,4 0,1,1 30,26 A4,4 0,1,1 22,26" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M25,24 A2,2 0,1,1 29,24 A2,2 0,1,1 25,24" />
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.2"
+        android:pathData="M30,26 A4,4 0,1,1 38,26 A4,4 0,1,1 30,26" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M33,24 A2,2 0,1,1 37,24 A2,2 0,1,1 33,24" />
+    
+    <!-- Waiting/thinking mouth -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M28,36 A2,2 0,1,1 32,36 A2,2 0,1,1 28,36" />
+    
+    <!-- Gear/loading indicator above head -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M30,2 L32,5 L35,4 L34,7 L37,8 L34,10 L35,13 L32,12 L30,15 L28,12 L25,13 L26,10 L23,8 L26,7 L25,4 L28,5 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M28,7 A2,2 0,1,1 32,7 A2,2 0,1,1 28,7" />
+    
+    <!-- Motion dots (loading) -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M8,30 A3,3 0,1,1 14,30 A3,3 0,1,1 8,30" />
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M46,30 A3,3 0,1,1 52,30 A3,3 0,1,1 46,30" />
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M27,55 A2,2 0,1,1 33,55 A2,2 0,1,1 27,55" />
+
+</vector>

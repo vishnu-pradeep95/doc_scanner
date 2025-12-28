@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mascot-styled Stroke Width Tool Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Cute stroke width indicator -->
+    
+    <!-- Thin line with face -->
+    <path
+        android:pathData="M6,12 L42,12"
+        android:strokeWidth="2"
+        android:strokeColor="#4ECDC4"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Medium line with face -->
+    <path
+        android:pathData="M6,24 L42,24"
+        android:strokeWidth="5"
+        android:strokeColor="#FFE66D"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Thick line with face -->
+    <path
+        android:pathData="M6,36 L42,36"
+        android:strokeWidth="10"
+        android:strokeColor="#FF6B6B"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Eyes on thin line -->
+    <path
+        android:pathData="M20,12 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M20.5,12 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#333333"/>
+    
+    <path
+        android:pathData="M28,12 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M28.5,12 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Eyes on medium line -->
+    <path
+        android:pathData="M20,24 m-2.5,0 a2.5,2.5 0 1,1 5,0 a2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M20.5,24 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0"
+        android:fillColor="#333333"/>
+    
+    <path
+        android:pathData="M28,24 m-2.5,0 a2.5,2.5 0 1,1 5,0 a2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M28.5,24 m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a1.2,1.2 0 1,1 -2.4,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Eyes on thick line -->
+    <path
+        android:pathData="M18,36 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M18.5,36 m-1.5,0 a1.5,1.5 0 1,1 3,0 a1.5,1.5 0 1,1 -3,0"
+        android:fillColor="#333333"/>
+    
+    <path
+        android:pathData="M30,36 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M30.5,36 m-1.5,0 a1.5,1.5 0 1,1 3,0 a1.5,1.5 0 1,1 -3,0"
+        android:fillColor="#333333"/>
+    
+</vector>

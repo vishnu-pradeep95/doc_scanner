@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mascot-styled Signature Tool Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Cute pen/quill character -->
+    
+    <!-- Pen body -->
+    <path
+        android:pathData="M8,40 L18,30 L30,18 L36,12 L38,14 L26,26 L14,38 Z"
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="1"
+        android:strokeColor="#3BA99C"/>
+    
+    <!-- Pen tip -->
+    <path
+        android:pathData="M36,12 L40,8 L44,12 L38,14 Z"
+        android:fillColor="#FF6B6B"/>
+    
+    <!-- Pen highlight -->
+    <path
+        android:pathData="M12,36 L20,28 L22,30 L14,38 Z"
+        android:fillColor="#5ED4CD"
+        android:fillAlpha="0.5"/>
+    
+    <!-- Googly eye -->
+    <path
+        android:pathData="M28,22 m-4,0 a4,4 0 1,1 8,0 a4,4 0 1,1 -8,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <path
+        android:pathData="M29,22 m-2,0 a2,2 0 1,1 4,0 a2,2 0 1,1 -4,0"
+        android:fillColor="#333333"/>
+    
+    <!-- Eye highlight -->
+    <path
+        android:pathData="M27,20 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0"
+        android:fillColor="#FFFFFF"/>
+    
+    <!-- Cute smile on pen -->
+    <path
+        android:pathData="M22,28 Q25,31 28,28"
+        android:strokeColor="#333333"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Writing line effect -->
+    <path
+        android:pathData="M4,44 Q8,40 12,42 Q16,44 20,42"
+        android:strokeColor="#4ECDC4"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"/>
+    
+    <!-- Sparkle -->
+    <path
+        android:pathData="M42,20 L43,22 L45,22 L43.5,23.5 L44,25 L42,24 L40,25 L40.5,23.5 L39,22 L41,22 Z"
+        android:fillColor="#FFE66D"/>
+    
+</vector>

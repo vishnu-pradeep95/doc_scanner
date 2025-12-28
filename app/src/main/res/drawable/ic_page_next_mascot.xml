@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_page_next_mascot.xml - Playful right arrow for page navigation -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Circle background -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M12,3 A9,9 0,1,1 12,21 A9,9 0,1,1 12,3" />
+    
+    <!-- Arrow pointing right -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1"
+        android:pathData="M10,7 L16,12 L10,17 Z" />
+    
+    <!-- Cute eye on arrow -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="0.5"
+        android:pathData="M10.6,10 A1.2,1.2 0,1,1 13,10 A1.2,1.2 0,1,1 10.6,10" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M11.5,10 A0.5,0.5 0,1,1 12.5,10 A0.5,0.5 0,1,1 11.5,10" />
+    
+    <!-- Speed lines showing motion -->
+    <path
+        android:strokeColor="#FFE66D"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M5,10 L7,10 M5,12 L8,12 M5,14 L7,14" />
+
+</vector>

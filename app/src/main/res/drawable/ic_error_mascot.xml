@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_error_mascot.xml - Oops! Something went wrong mascot -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+    
+    <!-- Body - slightly worried -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2.5"
+        android:pathData="M40,15 A25,25 0,1,1 40,65 A25,25 0,1,1 40,15" />
+    
+    <!-- Inner highlight -->
+    <path
+        android:fillColor="#FF8E8E"
+        android:pathData="M40,22 A18,18 0,1,1 40,58 A18,18 0,1,1 40,22" />
+    
+    <!-- Worried eyes (looking up) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M26,32 A6,6 0,1,1 38,32 A6,6 0,1,1 26,32" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M30,30 A3,3 0,1,1 36,30 A3,3 0,1,1 30,30" />
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M42,32 A6,6 0,1,1 54,32 A6,6 0,1,1 42,32" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M46,30 A3,3 0,1,1 52,30 A3,3 0,1,1 46,30" />
+    
+    <!-- Worried eyebrows -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M26,24 L36,27" />
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M54,24 L44,27" />
+    
+    <!-- Oops mouth -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M35,48 A5,5 0,1,1 45,48 A5,5 0,1,1 35,48" />
+    
+    <!-- Sweat drops -->
+    <path
+        android:fillColor="#87CEEB"
+        android:strokeColor="#5DADE2"
+        android:strokeWidth="1"
+        android:pathData="M58,25 Q62,32 58,38 Q54,32 58,25" />
+    <path
+        android:fillColor="#87CEEB"
+        android:strokeColor="#5DADE2"
+        android:strokeWidth="0.8"
+        android:pathData="M62,35 Q64,39 62,43 Q60,39 62,35" />
+    
+    <!-- Warning symbol -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M15,50 L25,30 L35,50 Z" />
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M25,36 L25,44" />
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M24,46 A1,1 0,1,1 26,46 A1,1 0,1,1 24,46" />
+    
+    <!-- Bandaid on head (oops!) -->
+    <path
+        android:fillColor="#FFDAB9"
+        android:strokeColor="#DEB887"
+        android:strokeWidth="1"
+        android:pathData="M50,12 L60,8 L62,14 L52,18 Z" />
+    <path
+        android:strokeColor="#DEB887"
+        android:strokeWidth="0.8"
+        android:pathData="M52,11 L58,13 M54,14 L60,10" />
+
+</vector>

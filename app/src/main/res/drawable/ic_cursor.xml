@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_cursor.xml - Select/Cursor Mascot Icon with personality -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Cursor arrow body - friendly teal -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="1.5"
+        android:pathData="M4,2 L20,11 L13,11 L13,20 L4,2 Z" />
+    
+    <!-- Inner highlight for depth -->
+    <path
+        android:fillColor="#6EE7DE"
+        android:pathData="M6,5 L14,10 L12,10 L12,14 L6,5 Z" />
+    
+    <!-- Googly eye on cursor -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="0.8"
+        android:pathData="M8,7 A2,2 0,1,1 12,7 A2,2 0,1,1 8,7" />
+    
+    <!-- Eye pupil - looking forward eagerly -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M9.5,7 A0.8,0.8 0,1,1 11.1,7 A0.8,0.8 0,1,1 9.5,7" />
+    
+    <!-- Happy blush -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:fillAlpha="0.4"
+        android:pathData="M11,9 A1,0.6 0,1,1 13,9 A1,0.6 0,1,1 11,9" />
+    
+    <!-- Little sparkle showing it's ready to select -->
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M18,5 L18.5,6 L19.5,6.3 L18.5,6.6 L18,7.6 L17.5,6.6 L16.5,6.3 L17.5,6 Z" />
+
+</vector>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ic_edit_small_mascot.xml - Small Edit Pencil Mascot Icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Pencil body -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:pathData="M3,21 L3,17 L14,6 L18,10 L7,21 L3,21 Z" />
+    
+    <!-- Pencil eraser -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:strokeColor="#000000"
+        android:strokeWidth="1"
+        android:pathData="M14,6 L18,10 L20,8 L16,4 Z" />
+    
+    <!-- Pencil tip -->
+    <path
+        android:fillColor="#FFE66D"
+        android:strokeColor="#000000"
+        android:strokeWidth="0.8"
+        android:pathData="M3,21 L3,17 L5,19 L3,21 Z" />
+    
+    <!-- Googly eye on pencil -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M9,13 A1.2,1.2 0,1,1 11.4,13 A1.2,1.2 0,1,1 9,13" />
+    
+    <path
+        android:fillColor="#000000"
+        android:pathData="M9.8,13 A0.4,0.4 0,1,1 10.6,13 A0.4,0.4 0,1,1 9.8,13" />
+
+</vector>
