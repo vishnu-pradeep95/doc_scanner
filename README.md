@@ -303,17 +303,19 @@ Edit `res/values/themes_cartoon.xml`:
 - [x] **Phase 6**: Dark mode support
 - [x] **Phase 7**: PDF merge, split, compress tools
 - [x] **Phase 8**: Cartoon theme with mascot icons 🎨
-- [x] **Phase 9**: Enhanced UI/UX polish ← **Current Release!** 🎉
+- [x] **Phase 9**: Enhanced UI/UX polish
+- [x] **Phase 10**: PDF Editor & Import ← **Current Release!** 🎉
+  - ✅ PDF Import - Import existing PDFs and extract pages
+  - ✅ Digital Signatures - Draw, save, and reuse signatures
+  - ✅ Annotations - Text, highlights, shapes, stamps, drawing
+  - ✅ Modern pill-style buttons with emoji decorations
 
 ### 🔜 Upcoming Features
 
-#### Phase 10: Smart Document Features
+#### Phase 11: Searchable PDFs & Cloud
 - [ ] **Searchable PDFs** - Embed OCR text layer for search
-- [ ] **PDF Import** - Import existing PDFs and add/edit pages
-- [ ] **Signature Support** - Draw or import signatures
-- [ ] **Annotations** - Add text, highlights, and stamps
-
-#### Phase 11: Organization & Management
+- [ ] **Google Drive Integration** - Auto-backup to cloud
+- [ ] **Dropbox Support** - Sync across devices
 - [ ] **Folders & Tags** - Organize documents by category
 - [ ] **Search Documents** - Find by name, date, or content
 - [ ] **Favorites** - Quick access to important documents
@@ -384,7 +386,14 @@ We'd love your help making this app even more delightful!
 
 ## 📄 License
 
-*[Add your license here - MIT, Apache 2.0, etc.]*
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Licenses
+- **Nunito Font** - SIL Open Font License 1.1
+- **CanHub Image Cropper** - Apache License 2.0
+- **AndroidX Libraries** - Apache License 2.0
+- **Google ML Kit** - Google APIs Terms of Service
+- **Kotlin Coroutines** - Apache License 2.0
 
 ---
 
