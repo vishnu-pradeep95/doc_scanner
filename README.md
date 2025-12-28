@@ -193,6 +193,8 @@ cd pdf_scanner_app
 
 **📖 For detailed setup instructions, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
 
+**🚀 Ready to publish? See [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md)**
+
 ---
 
 ## 📁 Project Structure

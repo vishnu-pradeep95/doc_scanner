@@ -36,6 +36,29 @@ android {
     // Use latest stable SDK for newest APIs and best tooling
     compileSdk = 34
 
+    /**
+     * Signing Configs - for release builds
+     * 
+     * IMPORTANT: For production, store these in local.properties or environment variables!
+     * Never commit your keystore password to version control.
+     * 
+     * To create a keystore, run:
+     * keytool -genkey -v -keystore release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias pdf-scanner
+     */
+    signingConfigs {
+        create("release") {
+            // These will be loaded from local.properties or command line
+            // See PUBLISHING_GUIDE.md for setup instructions
+            val keystoreFile = file("../release-key.jks")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = project.findProperty("RELEASE_STORE_PASSWORD") as String? ?: ""
+                keyAlias = project.findProperty("RELEASE_KEY_ALIAS") as String? ?: "pdf-scanner"
+                keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String? ?: ""
+            }
+        }
+    }
+
     defaultConfig {
         // Unique identifier for your app on Play Store
         // Cannot be changed after publishing!
@@ -70,13 +93,27 @@ android {
         release {
             // Minification (ProGuard/R8) - shrinks and obfuscates code
             // Set to true for release builds to reduce APK size
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             
             // ProGuard rules files
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            
+            // Use release signing config if keystore exists
+            val keystoreFile = file("../release-key.jks")
+            if (keystoreFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+        
+        // Debug build type (default)
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
     
