@@ -174,7 +174,9 @@
     <!-- Dialogs -->
     <string name="success">Success!</string>
     <string name="pdf_created_successfully">Your PDF has been created successfully</string>
-    
+    <!-- Dialog: Success button -->
+    <string name="awesome">Awesome!</string>
+
     <!-- PDF Viewer -->
     <string name="pdf_page">PDF page</string>
     <string name="page_of">Page %1$d of %2$d</string>
@@ -245,4 +247,18 @@
     <string name="content_desc_zoom_out">Zoom out</string>
     <string name="content_desc_make_smaller">Make smaller</string>
     <string name="content_desc_make_larger">Make larger</string>
+
+    <!-- PDF Editor Tool Labels -->
+    <string name="editor_tool_select">Select</string>
+    <string name="editor_tool_sign">Sign</string>
+    <string name="editor_tool_text">Text</string>
+    <string name="editor_tool_highlight">Highlight</string>
+    <string name="editor_tool_stamp">Stamp</string>
+    <string name="editor_tool_draw">Draw</string>
+    <string name="editor_tool_shapes">Shapes</string>
+    <string name="editor_tool_check">Check</string>
+    <string name="editor_tool_erase">Erase</string>
+    <string name="editor_tool_color">Color</string>
+    <string name="editor_tool_size">Size</string>
+    <string name="editor_tool_stroke">Stroke</string>
 </resources>
