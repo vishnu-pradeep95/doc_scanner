@@ -51,6 +51,7 @@ class NativePdfView @JvmOverloads constructor(
     private var fileDescriptor: ParcelFileDescriptor? = null
     private var currentPage: PdfRenderer.Page? = null
     private var pageBitmap: Bitmap? = null
+    private var tempFile: File? = null
     
     // View state
     private var currentPageIndex = 0
@@ -117,13 +118,14 @@ class NativePdfView @JvmOverloads constructor(
             
             // Copy to temp file for reliable access
             val tempFile = File(context.cacheDir, "pdf_view_temp_${System.currentTimeMillis()}.pdf")
-            
+            this.tempFile = tempFile  // Track for cleanup
+
             context.contentResolver.openInputStream(uri)?.use { input ->
                 FileOutputStream(tempFile).use { output ->
                     input.copyTo(output)
                 }
             }
-            
+
             if (tempFile.exists() && tempFile.length() > 0) {
                 loadPdf(tempFile)
             } else {
@@ -370,25 +372,23 @@ class NativePdfView @JvmOverloads constructor(
      * Close and clean up resources
      */
     fun close() {
-        try {
-            currentPage?.close()
-            currentPage = null
-            
-            pdfRenderer?.close()
-            pdfRenderer = null
-            
-            fileDescriptor?.close()
-            fileDescriptor = null
-            
-            pageBitmap?.recycle()
-            pageBitmap = null
-            
-            totalPages = 0
-            currentPageIndex = 0
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Error closing PDF", e)
-        }
+        try { currentPage?.close() } catch (e: Exception) { Log.e(TAG, "Error closing page", e) }
+        currentPage = null
+
+        try { pdfRenderer?.close() } catch (e: Exception) { Log.e(TAG, "Error closing renderer", e) }
+        pdfRenderer = null
+
+        try { fileDescriptor?.close() } catch (e: Exception) { Log.e(TAG, "Error closing fd", e) }
+        fileDescriptor = null
+
+        pageBitmap?.recycle()
+        pageBitmap = null
+
+        tempFile?.delete()
+        tempFile = null
+
+        totalPages = 0
+        currentPageIndex = 0
     }
     
     override fun onDetachedFromWindow() {

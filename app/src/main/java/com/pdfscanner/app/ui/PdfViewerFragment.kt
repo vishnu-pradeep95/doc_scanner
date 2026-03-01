@@ -178,8 +178,10 @@ class PdfViewerFragment : Fragment() {
     
     override fun onDestroyView() {
         super.onDestroyView()
-        pdfRenderer?.close()
-        fileDescriptor?.close()
+        try { pdfRenderer?.close() } catch (e: Exception) { android.util.Log.e("PdfViewerFragment", "Error closing renderer", e) }
+        pdfRenderer = null
+        try { fileDescriptor?.close() } catch (e: Exception) { android.util.Log.e("PdfViewerFragment", "Error closing fd", e) }
+        fileDescriptor = null
         _binding = null
     }
 }

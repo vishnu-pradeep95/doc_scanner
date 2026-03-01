@@ -24,6 +24,7 @@ import android.os.Bundle  // Bundle is like a dictionary/map for passing data
 import androidx.appcompat.app.AppCompatActivity  // Base class for Activities
 import androidx.appcompat.app.AppCompatDelegate  // For theme switching
 import androidx.navigation.fragment.NavHostFragment  // Handles Fragment navigation
+import java.io.File
 
 // View Binding - auto-generated class from activity_main.xml
 // Naming convention: ActivityMainBinding comes from activity_main.xml
@@ -92,6 +93,9 @@ class MainActivity : AppCompatActivity() {
          */
         setContentView(binding.root)
 
+        // Clean up stale temp files from previous sessions
+        cleanupStaleTempFiles()
+
         /**
          * Navigation Setup
          * 
@@ -120,8 +124,47 @@ class MainActivity : AppCompatActivity() {
     }
     
     /**
+     * Clean up stale temp files created by PDF viewing and editing operations.
+     * Removes files older than 1 hour that match known temp file prefixes.
+     * Runs on app startup as a best-effort cleanup (never crashes the app).
+     */
+    private fun cleanupStaleTempFiles() {
+        try {
+            val cacheDir = cacheDir
+            val oneHourAgo = System.currentTimeMillis() - (60 * 60 * 1000)
+
+            cacheDir.listFiles()?.forEach { file ->
+                if (file.isFile && file.lastModified() < oneHourAgo) {
+                    val name = file.name
+                    if (name.startsWith("pdf_view_temp_") ||
+                        name.startsWith("temp_edit_") ||
+                        name.startsWith("pdf_compress_temp")) {
+                        file.delete()
+                    }
+                }
+            }
+
+            // Also clean pdf_compress_temp directory
+            val compressTemp = File(cacheDir, "pdf_compress_temp")
+            if (compressTemp.exists() && compressTemp.isDirectory) {
+                compressTemp.listFiles()?.forEach { file ->
+                    if (file.lastModified() < oneHourAgo) {
+                        file.delete()
+                    }
+                }
+                if (compressTemp.listFiles()?.isEmpty() == true) {
+                    compressTemp.delete()
+                }
+            }
+        } catch (e: Exception) {
+            // Cleanup is best-effort, don't crash the app
+            android.util.Log.w("MainActivity", "Temp cleanup failed", e)
+        }
+    }
+
+    /**
      * Apply the selected app style theme
-     * 
+     *
      * This must be called BEFORE super.onCreate() to properly apply the theme.
      * The theme is set using setTheme() which changes the base theme for the Activity.
      */

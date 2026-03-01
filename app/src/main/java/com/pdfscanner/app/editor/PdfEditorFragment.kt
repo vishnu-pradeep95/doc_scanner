@@ -83,26 +83,15 @@ class PdfEditorFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             handleBackPress()
         }
-        
-        // Setup action bar buttons (new layout)
-        binding.btnUndo.setOnClickListener {
-            // TODO: Implement undo
-            Toast.makeText(context, "Undo coming soon!", Toast.LENGTH_SHORT).show()
-        }
-        
-        binding.btnRedo.setOnClickListener {
-            // TODO: Implement redo
-            Toast.makeText(context, "Redo coming soon!", Toast.LENGTH_SHORT).show()
-        }
-        
+
         binding.btnZoomIn.setOnClickListener {
             binding.pdfView.zoomIn()
         }
-        
+
         binding.btnZoomOut.setOnClickListener {
             binding.pdfView.zoomOut()
         }
-        
+
         binding.btnSave.setOnClickListener {
             saveAnnotatedPdf()
         }
@@ -461,14 +450,17 @@ class PdfEditorFragment : Fragment() {
         }
         
         saveCurrentPageAnnotations()
-        
+
         // Show mascot saving dialog
         showSavingDialog()
-        
+
+        val ctx = requireContext().applicationContext  // Capture BEFORE launch to avoid context leak
+        val pdfUriString = args.pdfUri
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val renderer = PdfAnnotationRenderer(requireContext())
-                val inputUri = Uri.parse(args.pdfUri)
+                val renderer = PdfAnnotationRenderer(ctx)
+                val inputUri = Uri.parse(pdfUriString)
                 val annotations = viewModel.getAllAnnotations()
                 
                 val outputFile = renderer.renderAnnotatedPdf(inputUri, annotations)
