@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T04:57:41Z"
+last_updated: "2026-03-01T16:36:38.179Z"
 progress:
-  total_phases: 5
+  total_phases: 2
   completed_phases: 2
-  total_plans: 9
-  completed_plans: 7
+  total_plans: 11
+  completed_plans: 11
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (Design System)
-Plan: 5 of 5 complete — Phase 2 fully complete
-Status: Phase 1 complete, Phase 2 complete — all 5 plans done; ready for Phase 3
-Last activity: 2026-03-01 — 02-05 complete (dark mode verification checkpoint approved; physical device verification deferred until build environment configured)
+Plan: 7 of 7 complete — Phase 2 fully complete (including gap closure plans 02-06 and 02-07)
+Status: Phase 1 complete, Phase 2 complete — all 7 plans done; DSYS-06 closed; ready for Phase 3
+Last activity: 2026-03-01 — 02-07 complete (19 android:text/contentDescription attributes in 4 layout files converted to @string/ references; DSYS-06 fully closed)
 
-Progress: [████████░░] 78% (7/9 plans — Phase 2 complete)
+Progress: [██████████] 100% (9/9 plans — Phases 1-2 complete)
 
 ## Performance Metrics
 
@@ -41,7 +41,7 @@ Progress: [████████░░] 78% (7/9 plans — Phase 2 complete)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-stability | 4 | 18 min | 5 min |
-| 02-design-system | 5 | 8 min | 2 min |
+| 02-design-system | 6 | 9 min | 2 min |
 
 **Recent Trend:**
 - Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min, 6 min
@@ -90,6 +90,10 @@ Recent decisions affecting current work:
 - 02-03: Anonymous object callbacks (e.g., OnImageSavedCallback) need this@Fragment.showSnackbar() qualification — anonymous objects don't capture Fragment receiver
 - 02-03: Dynamic messages use getString(R.string.format_str, arg) before showSnackbar() call — keeps extension API clean with only String and @StringRes overloads
 - 02-05: Physical device dark mode verification deferred — build environment (Android Studio + JDK) not configured in WSL2; code-side fix (?attr/colorOnSurface* in TextAppearance) confirmed correct via static review of 02-01 changes
+- 02-06: Use tools:text (not android:text) for tvPageInfo page indicator — value is set programmatically by PdfEditorFragment; tools:text is design-time only and stripped at build time
+- 02-06: No string resource for "1 / 1" placeholder — tools:text exists for this pattern; the value is always overwritten by fragment code
+- [Phase 02-design-system]: 02-07: app:title emoji in fragment_pages.xml MaterialToolbar left as-is — app:title not covered by android:text DSYS-06 scope
+- [Phase 02-design-system]: 02-07: Unicode checkmark U+2713 in dialog_signature.xml btnInsert replaced with @string/sig_insert for localization hygiene even though not technically emoji
 
 ### Pending Todos
 
@@ -103,5 +107,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: 02-05-PLAN.md complete — dark mode verification checkpoint approved; Phase 2 fully complete; next is Phase 3 (Performance & Polish)
+Stopped at: Completed 02-06-PLAN.md (DSYS-05 closed — fragment_pdf_editor.xml now has zero hardcoded android:text)
 Resume file: None
