@@ -25,6 +25,7 @@
 package com.pdfscanner.app.ui
 
 // Android core imports
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory  // Decode image files
 import android.net.Uri  // Universal Resource Identifier for files
@@ -187,8 +188,9 @@ class PreviewFragment : Fragment() {
         } else {
             // Crop failed - show error
             val error = result.error
+            val ctx = context ?: return@registerForActivityResult
             Toast.makeText(
-                requireContext(),
+                ctx,
                 "Crop failed: ${error?.message}",
                 Toast.LENGTH_SHORT
             ).show()
@@ -358,6 +360,7 @@ class PreviewFragment : Fragment() {
      */
     private fun saveFilteredImageAndAddPage() {
         val originalUri = originalImageUri ?: return
+        val appContext = context?.applicationContext ?: return  // Capture before launch
 
         // Show loading
         binding.loadingOverlay.visibility = View.VISIBLE
@@ -365,15 +368,15 @@ class PreviewFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val processedUri = withContext(Dispatchers.IO) {
-                    // Load full resolution bitmap for final output
-                    val fullResBitmap = loadFullResBitmap(originalUri)
+                    // Load full resolution bitmap for final output (uses captured appContext)
+                    val fullResBitmap = loadFullResBitmap(appContext, originalUri)
                         ?: throw Exception("Failed to load image")
 
                     // Apply the selected filter
                     val processedBitmap = ImageProcessor.applyFilter(fullResBitmap, currentFilterType)
 
-                    // Save to processed directory
-                    val processedFile = createProcessedFile()
+                    // Save to processed directory (uses captured appContext)
+                    val processedFile = createProcessedFile(appContext)
                     val success = ImageProcessor.saveBitmapToFile(processedBitmap, processedFile)
 
                     // Clean up bitmaps
@@ -391,14 +394,17 @@ class PreviewFragment : Fragment() {
 
                 // Hide loading and add page
                 withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    addPageAndNavigate(processedUri)
+                    _binding?.loadingOverlay?.visibility = View.GONE
+                    if (context != null) {
+                        addPageAndNavigate(processedUri)
+                    }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
+                    _binding?.loadingOverlay?.visibility = View.GONE
+                    val ctx = context ?: return@withContext
                     Toast.makeText(
-                        requireContext(),
+                        ctx,
                         "Error processing image: ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -408,28 +414,80 @@ class PreviewFragment : Fragment() {
     }
 
     /**
-     * Load full resolution bitmap from URI
-     * 
-     * For final PDF output, we need the full resolution image.
-     * We still limit to a reasonable max size to avoid OOM on very large images.
+     * Load full resolution bitmap from URI, capped to 2x A4 PDF size to prevent OOM
+     * on high-megapixel cameras (e.g., 48MP = 8000x6000 = 192MB uncapped).
+     *
+     * Max 2380x3368 = 2x A4 at 144dpi — sufficient for PDF output quality.
+     *
+     * @param ctx Application context (safe to use on IO thread)
+     * @param uri URI of the image to decode
      */
-    private fun loadFullResBitmap(uri: Uri): Bitmap? {
+    private fun loadFullResBitmap(ctx: Context, uri: Uri): Bitmap? {
         return try {
-            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
-                BitmapFactory.decodeStream(inputStream)
-            }
+            decodeCappedBitmap(ctx, uri)
         } catch (e: Exception) {
             null
         }
     }
 
     /**
-     * Create a file for the processed/filtered image
-     * 
-     * Saves to filesDir/processed/ directory to keep organized.
+     * Decode a bitmap from URI, capping dimensions to maxWidth x maxHeight
+     * using BitmapFactory inSampleSize to avoid OOM on high-resolution cameras.
      */
-    private fun createProcessedFile(): File {
-        val processedDir = File(requireContext().filesDir, "processed").apply { mkdirs() }
+    private fun decodeCappedBitmap(
+        ctx: Context,
+        uri: Uri,
+        maxWidth: Int = 2380,
+        maxHeight: Int = 3368
+    ): Bitmap? {
+        // First pass: decode bounds only (no pixel allocation)
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        ctx.contentResolver.openInputStream(uri)?.use { stream ->
+            BitmapFactory.decodeStream(stream, null, options)
+        }
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateDecodeSampleSize(
+            options.outWidth, options.outHeight, maxWidth, maxHeight
+        )
+        options.inJustDecodeBounds = false
+
+        // Second pass: decode with downsampling applied
+        return ctx.contentResolver.openInputStream(uri)?.use { stream ->
+            BitmapFactory.decodeStream(stream, null, options)
+        }
+    }
+
+    /**
+     * Calculate the largest power-of-2 inSampleSize such that the decoded image
+     * remains at or above the target dimensions.
+     */
+    private fun calculateDecodeSampleSize(
+        rawWidth: Int,
+        rawHeight: Int,
+        maxWidth: Int,
+        maxHeight: Int
+    ): Int {
+        var inSampleSize = 1
+        if (rawWidth > maxWidth || rawHeight > maxHeight) {
+            val halfWidth = rawWidth / 2
+            val halfHeight = rawHeight / 2
+            while ((halfWidth / inSampleSize) >= maxWidth && (halfHeight / inSampleSize) >= maxHeight) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
+    }
+
+    /**
+     * Create a file for the processed/filtered image
+     *
+     * Saves to filesDir/processed/ directory to keep organized.
+     *
+     * @param ctx Application context (safe to use on IO thread)
+     */
+    private fun createProcessedFile(ctx: Context): File {
+        val processedDir = File(ctx.filesDir, "processed").apply { mkdirs() }
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US)
             .format(System.currentTimeMillis())
         return File(processedDir, "PROC_$timestamp.jpg")
@@ -493,8 +551,8 @@ class PreviewFragment : Fragment() {
             }
 
             withContext(Dispatchers.Main) {
-                binding.loadingOverlay.visibility = View.GONE
-                binding.imagePreview.setImageBitmap(filteredBitmap)
+                _binding?.loadingOverlay?.visibility = View.GONE
+                _binding?.imagePreview?.setImageBitmap(filteredBitmap)
             }
         }
     }
@@ -562,7 +620,8 @@ class PreviewFragment : Fragment() {
             }
         } catch (e: Exception) {
             // Handle file not found, permission denied, etc.
-            Toast.makeText(requireContext(), "Failed to load image", Toast.LENGTH_SHORT).show()
+            val ctx = context ?: return
+            Toast.makeText(ctx, "Failed to load image", Toast.LENGTH_SHORT).show()
         }
     }
 

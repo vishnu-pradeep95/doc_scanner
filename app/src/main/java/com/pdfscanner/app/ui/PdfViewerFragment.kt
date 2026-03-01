@@ -113,18 +113,22 @@ class PdfViewerFragment : Fragment() {
                     pageCount = pdfRenderer?.pageCount ?: 0
                 }
                 
+                // Guard against fragment detachment during IO
+                if (_binding == null) return@launch
+
                 if (pageCount > 0) {
                     renderPage(0)
                     updateNavigationState()
                 } else {
                     showError(getString(R.string.pdf_empty))
                 }
-                
+
             } catch (e: Exception) {
+                if (_binding == null) return@launch
                 showError(getString(R.string.error_opening_pdf))
             }
-            
-            binding.progressBar.visibility = View.GONE
+
+            _binding?.progressBar?.visibility = View.GONE
         }
     }
     
@@ -149,13 +153,16 @@ class PdfViewerFragment : Fragment() {
                 }
                 
                 bitmap?.let {
-                    binding.pdfImage.setImageBitmap(it)
+                    _binding?.pdfImage?.setImageBitmap(it)
+                }
+
+                if (_binding != null) {
+                    updateNavigationState()
                 }
                 
-                updateNavigationState()
-                
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), R.string.error_rendering_page, Toast.LENGTH_SHORT).show()
+                val ctx = context ?: return@launch
+                Toast.makeText(ctx, R.string.error_rendering_page, Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -260,7 +260,8 @@ class PdfEditorFragment : Fragment() {
         
         binding.pdfView.onErrorListener = { exception ->
             android.util.Log.e("PdfEditor", "PDF load error", exception)
-            Toast.makeText(context, "Error loading PDF: ${exception.message}", Toast.LENGTH_LONG).show()
+            val ctx = context ?: return@onErrorListener
+            Toast.makeText(ctx, "Error loading PDF: ${exception.message}", Toast.LENGTH_LONG).show()
         }
         
         // Load the PDF
@@ -317,23 +318,24 @@ class PdfEditorFragment : Fragment() {
     }
     
     private fun updateToolSelection(tool: EditorTool) {
-        val primaryColor = ContextCompat.getColor(requireContext(), R.color.primary)
-        val grayColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
-        
+        val ctx = context ?: return
+        val primaryColor = ContextCompat.getColor(ctx, R.color.primary)
+        val grayColor = ContextCompat.getColor(ctx, R.color.text_secondary)
+
         toolIcons.forEach { (iconTool, imageView) ->
-            val isSelected = iconTool == tool || 
+            val isSelected = iconTool == tool ||
                 (tool in listOf(EditorTool.RECTANGLE, EditorTool.CIRCLE, EditorTool.LINE, EditorTool.ARROW) && iconTool == EditorTool.RECTANGLE)
-            
+
             val color = if (isSelected) primaryColor else grayColor
             imageView.setColorFilter(color)
-            
+
             // Animate the selected tool with a bounce effect
             if (isSelected && iconTool != lastSelectedTool) {
-                val bounceAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.tool_select_bounce)
+                val bounceAnim = AnimationUtils.loadAnimation(ctx, R.anim.tool_select_bounce)
                 imageView.startAnimation(bounceAnim)
             }
         }
-        
+
         lastSelectedTool = tool
     }
     

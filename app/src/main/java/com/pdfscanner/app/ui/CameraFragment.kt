@@ -367,36 +367,38 @@ class CameraFragment : Fragment() {
      */
     private fun handleScannerResult(result: ActivityResult) {
         val scanResult = DocumentScanner.parseResult(result.resultCode, result.data)
-        
+
         if (scanResult == null) {
             // User cancelled or scan failed
             Log.d(TAG, "Document scanning cancelled or failed")
             return
         }
-        
+
         val pageUris = scanResult.pageUris
         if (pageUris.isEmpty()) {
+            val ctx = context ?: return
             Toast.makeText(
-                requireContext(),
+                ctx,
                 "No pages scanned",
                 Toast.LENGTH_SHORT
             ).show()
             return
         }
-        
+
         // Add all scanned pages to the ViewModel
         pageUris.forEach { uri ->
             viewModel.addPage(uri)
         }
-        
+
         // Show success message
         val message = if (pageUris.size == 1) {
             "1 page scanned"
         } else {
             "${pageUris.size} pages scanned"
         }
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-        
+        val ctx = context ?: return
+        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show()
+
         // Navigate to pages view to show the scanned pages
         findNavController().navigate(R.id.action_camera_to_pages)
     }
@@ -603,8 +605,9 @@ class CameraFragment : Fragment() {
             } catch (e: Exception) {
                 // Show error if camera setup fails
                 // Common causes: No camera, camera in use by another app
+                val ctx = context ?: return@addListener
                 Toast.makeText(
-                    requireContext(),
+                    ctx,
                     "Failed to start camera: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -669,14 +672,16 @@ class CameraFragment : Fragment() {
                  * Called when image is saved successfully
                  */
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    // Guard against fragment detachment during async save
+                    val b = _binding ?: return
                     // Hide loading, re-enable button
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnCapture.isEnabled = true
+                    b.progressBar.visibility = View.GONE
+                    b.btnCapture.isEnabled = true
 
                     // Convert File to Uri using extension function
                     // Uri is Android's standard way to reference files/resources
                     val savedUri = photoFile.toUri()
-                    
+
                     if (isBatchMode) {
                         // BATCH MODE: Add directly to pages, stay on camera
                         viewModel.addPage(savedUri)
@@ -689,10 +694,10 @@ class CameraFragment : Fragment() {
 
                         /**
                          * Navigate to preview screen
-                         * 
+                         *
                          * CameraFragmentDirections is auto-generated from nav_graph.xml
                          * actionCameraToPreview() creates an action with the required argument
-                         * 
+                         *
                          * Safe Args plugin ensures type-safe navigation arguments
                          */
                         val action = CameraFragmentDirections
@@ -705,13 +710,15 @@ class CameraFragment : Fragment() {
                  * Called when capture fails
                  */
                 override fun onError(exception: ImageCaptureException) {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnCapture.isEnabled = true
+                    val b = _binding ?: return
+                    b.progressBar.visibility = View.GONE
+                    b.btnCapture.isEnabled = true
 
                     // Show error message to user
                     // ${} is Kotlin's string interpolation (like f-strings in Python)
+                    val ctx = context ?: return
                     Toast.makeText(
-                        requireContext(),
+                        ctx,
                         "Failed to capture: ${exception.message}",
                         Toast.LENGTH_SHORT
                     ).show()
