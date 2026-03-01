@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T20:14:37Z"
+last_updated: "2026-03-01T20:19:51.528Z"
 progress:
-  total_phases: 5
+  total_phases: 3
   completed_phases: 2
   total_plans: 15
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 3 of 5 (Performance and Polish)
-Plan: 2 of 3 complete — 03-01 (bulk-delete Snackbar undo) and 03-02 (haptic feedback + PDF page cache) done
-Status: Phase 1 complete, Phase 2 complete, Phase 3 in progress — 2/3 plans done
-Last activity: 2026-03-01 — 03-02 complete (haptic feedback on camera capture; SparseArray bitmap cache + serialized pdfIoDispatcher in PDF viewer; PERF-02 and PERF-06 satisfied)
+Plan: 1 of 3 complete — 03-01 (edge-to-edge + Snackbar undo) done; PERF-03 and PERF-05 satisfied
+Status: Phase 1 complete, Phase 2 complete, Phase 3 in progress — 1/3 plans done
+Last activity: 2026-03-01 — 03-01 complete (enableEdgeToEdge + 8-fragment WindowInsets + Snackbar undo for single+bulk page delete; PERF-03 and PERF-05 satisfied)
 
-Progress: [████████░░] 13/15 plans (Phases 1-2 complete; Phase 3: 2/3 done)
+Progress: [████████░░] 13/15 plans (Phases 1-2 complete; Phase 3: 1/3 done)
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Progress: [████████░░] 13/15 plans (Phases 1-2 complete; Pha
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 03-performance-polish P01 | 5 | 4 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Recent decisions affecting current work:
 - [Phase 03-performance-polish]: 03-02: Use Build.VERSION_CODES.R conditional for haptic — CONFIRM (API 30+) gives semantic "success" vibration vs VIRTUAL_KEY (API 24-29) fallback; no VIBRATE permission needed
 - [Phase 03-performance-polish]: 03-02: Use limitedParallelism(1) not a Mutex for PdfRenderer serialization — creates single-threaded dispatcher, naturally serializes openPage() calls without explicit lock management
 - [Phase 03-performance-polish]: 03-02: setImageDrawable(null) before bitmap recycling in onDestroyView — prevents Canvas recycled-bitmap crash if ImageView is still drawing on main thread
+- [Phase 03-performance-polish]: enableEdgeToEdge() called after super.onCreate() before binding — required window flag order
+- [Phase 03-performance-polish]: Remove android:statusBarColor and navigationBarColor from theme; keep windowLight* items for icon tint control
+- [Phase 03-performance-polish]: Snackbar undo pattern: commit deletion immediately, restore on undo tap — no confirmation dialog for recoverable actions
 
 ### Pending Todos
 
@@ -113,5 +117,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-02-PLAN.md — haptic feedback on camera capture + SparseArray bitmap cache in PDF viewer; PERF-02 and PERF-06 satisfied; ready for 03-03
+Stopped at: Completed 03-01-PLAN.md — edge-to-edge enabled across all 8 fragments + Snackbar undo for both page delete flows; PERF-03 and PERF-05 satisfied; ready for 03-02
 Resume file: None
