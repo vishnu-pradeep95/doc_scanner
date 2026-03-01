@@ -13,7 +13,7 @@ This is a systematic quality pass on a feature-complete Android document scanner
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Stability** - Fix crashes, resource leaks, data integrity, and process death recovery
-- [x] **Phase 2: Design System** - Establish and apply consistent typography, spacing, feedback patterns, and image loading (completed 2026-03-01)
+- [ ] **Phase 2: Design System** - Establish and apply consistent typography, spacing, feedback patterns, and image loading (gap closure round 3 in progress)
 - [ ] **Phase 3: Performance & Polish** - Navigation transitions, haptic feedback, edge-to-edge display, and smooth rendering
 - [ ] **Phase 4: Test Coverage** - Unit tests, integration tests, and navigation flow tests locking in correct behavior
 - [ ] **Phase 5: Release Readiness** - Static analysis, ProGuard rules, device compatibility, leak detection, and final QA
@@ -48,7 +48,7 @@ Plans:
   3. All images and thumbnails load smoothly via Coil with proper placeholders — no blank frames or recycled bitmap artifacts in lists
   4. Dark mode renders correctly on every screen — no unreadable text, invisible icons, or wrong background colors
   5. All user-facing strings (including content descriptions) come from strings.xml — no hardcoded English text in code or layouts
-**Plans**: 7 plans
+**Plans**: 8 plans
 
 Plans:
 - [x] 02-01-PLAN.md — Manifest theme switch + dimens.xml + TextAppearance dark mode fix + typography enforcement (DSYS-01, DSYS-02)
@@ -56,8 +56,9 @@ Plans:
 - [x] 02-03-PLAN.md — Toast-to-Snackbar migration across all 7 fragments (68 call sites) (DSYS-04)
 - [x] 02-04-PLAN.md — Hardcoded strings + emoji moved to strings.xml across layouts (DSYS-05, DSYS-06)
 - [x] 02-05-PLAN.md — Dark mode visual verification checkpoint on all 7 screens (DSYS-07)
-- [ ] 02-06-PLAN.md — Gap closure: fragment_pdf_editor.xml 12 tool labels + page indicator extracted to strings.xml (DSYS-05)
-- [ ] 02-07-PLAN.md — Gap closure: emoji removed from fragment_pages.xml + dialog_signature.xml + dialog_success.xml + dialog_ocr_result.xml (DSYS-06)
+- [x] 02-06-PLAN.md — Gap closure: fragment_pdf_editor.xml 12 tool labels + page indicator extracted to strings.xml (DSYS-05)
+- [x] 02-07-PLAN.md — Gap closure: emoji removed from fragment_pages.xml + dialog_signature.xml + dialog_success.xml + dialog_ocr_result.xml (DSYS-06)
+- [ ] 02-08-PLAN.md — Gap closure (round 3): dialog_stamp_picker.xml + dialog_text_input.xml + 2 minor contentDescriptions fully extracted to strings.xml (DSYS-05, DSYS-06)
 
 ### Phase 3: Performance & Polish
 **Goal**: The app feels responsive and delightful — smooth transitions, tactile feedback, modern edge-to-edge display, and clear progress indicators
@@ -115,7 +116,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Stability | 4/4 | Complete    | 2026-03-01 |
-| 2. Design System | 7/7 | Complete   | 2026-03-01 |
+| 2. Design System | 7/8 | In progress (gap closure round 3) | - |
 | 3. Performance & Polish | 0/? | Not started | - |
 | 4. Test Coverage | 0/? | Not started | - |
 | 5. Release Readiness | 0/? | Not started | - |
