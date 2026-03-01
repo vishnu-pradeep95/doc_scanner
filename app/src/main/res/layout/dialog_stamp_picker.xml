@@ -24,14 +24,14 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:src="@drawable/ic_stamp_mascot"
-            android:contentDescription="Stamp mascot" />
+            android:contentDescription="@string/content_desc_stamp_mascot" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="👍 Select Stamp"
+            android:text="@string/stamp_picker_title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -69,7 +69,7 @@
             style="@style/DialogButton.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
     </LinearLayout>
 

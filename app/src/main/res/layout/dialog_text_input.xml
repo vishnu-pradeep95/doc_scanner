@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- dialog_text_input.xml - Modern Text Annotation Input Dialog -->
-<androidx.constraintlayout.widget.ConstraintLayout 
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_rounded">
@@ -24,14 +25,14 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:src="@drawable/ic_text_mascot"
-            android:contentDescription="Text mascot" />
+            android:contentDescription="@string/content_desc_text_mascot" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="✏️ Add Text"
+            android:text="@string/text_annotation_title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -92,7 +93,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Text Size"
+                android:text="@string/text_size_label"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
@@ -102,7 +103,7 @@
                 android:id="@+id/tvSizeValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="24"
+                tools:text="24"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -141,7 +142,7 @@
                 android:id="@+id/tvColorLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Color"
+                android:text="@string/color_label"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
@@ -232,7 +233,7 @@
                 android:id="@+id/tvPreviewLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="👁️ Preview"
+                android:text="@string/preview_label"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary" />
@@ -252,7 +253,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Sample Text"
+                tools:text="Sample Text"
                 android:textColor="#000000"
                 android:textSize="24sp"
                 android:gravity="center"
@@ -280,7 +281,7 @@
             style="@style/DialogButton.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnInsert"
@@ -288,7 +289,7 @@
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:layout_marginStart="12dp"
-            android:text="✓ Insert" />
+            android:text="@string/text_insert" />
 
     </LinearLayout>
 

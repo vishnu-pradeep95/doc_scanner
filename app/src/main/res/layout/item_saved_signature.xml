@@ -34,7 +34,7 @@
             android:scaleType="centerInside"
             android:padding="4dp"
             app:tint="@android:color/white"
-            android:contentDescription="Delete signature" />
+            android:contentDescription="@string/content_desc_delete_signature" />
 
     </FrameLayout>
 
