@@ -53,7 +53,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Manifest theme switch + dimens.xml + TextAppearance dark mode fix + typography enforcement (DSYS-01, DSYS-02)
 - [x] 02-02-PLAN.md — Coil integration: PagesAdapter manual loading replaced, HistoryAdapter thumbnail added (DSYS-03)
-- [ ] 02-03-PLAN.md — Toast-to-Snackbar migration across all 7 fragments (68 call sites) (DSYS-04)
+- [x] 02-03-PLAN.md — Toast-to-Snackbar migration across all 7 fragments (68 call sites) (DSYS-04)
 - [x] 02-04-PLAN.md — Hardcoded strings + emoji moved to strings.xml across layouts (DSYS-05, DSYS-06)
 - [ ] 02-05-PLAN.md — Dark mode visual verification checkpoint on all 7 screens (DSYS-07)
 

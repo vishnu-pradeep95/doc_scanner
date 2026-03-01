@@ -21,7 +21,7 @@
 - [x] **DSYS-01**: Material type scale defined in `styles.xml` (heading, title, body, caption sizes using Nunito) and applied consistently across all screens
 - [x] **DSYS-02**: Spacing constants based on 8dp grid defined in `dimens.xml` and applied consistently across all layouts
 - [ ] **DSYS-03**: Coil library integrated for all image/thumbnail loading — replaces manual bitmap loading in RecyclerViews and history screens
-- [ ] **DSYS-04**: All 70 Toast calls replaced with Snackbar (transient feedback) or inline messages (persistent feedback) — no Toast used as a loading indicator
+- [x] **DSYS-04**: All 70 Toast calls replaced with Snackbar (transient feedback) or inline messages (persistent feedback) — no Toast used as a loading indicator
 - [x] **DSYS-05**: All hardcoded `contentDescription` strings and UI text moved to `strings.xml` — no hardcoded English strings in code or layouts
 - [x] **DSYS-06**: Emoji removed from programmatic strings — emoji only in drawables/resources, not in code strings
 - [ ] **DSYS-07**: Dark mode visually verified on all 7 screens — no unreadable text, invisible icons, or wrong backgrounds
@@ -101,7 +101,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSYS-01 | Phase 2 | Complete (02-01) |
 | DSYS-02 | Phase 2 | Complete (02-01) |
 | DSYS-03 | Phase 2 | Pending |
-| DSYS-04 | Phase 2 | Pending |
+| DSYS-04 | Phase 2 | Complete (02-03) |
 | DSYS-05 | Phase 2 | Complete (02-04) |
 | DSYS-06 | Phase 2 | Complete (02-04) |
 | DSYS-07 | Phase 2 | Pending |

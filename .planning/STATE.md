@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T03:57:00Z"
+last_updated: "2026-03-01T04:02:15Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 9
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -23,9 +23,9 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (Design System)
-Plan: 4 of 5 in current phase — 02-04 complete, 02-05 next
-Status: Phase 1 complete, Phase 2 in progress (4 of 5 plans done)
-Last activity: 2026-03-01 — 02-04 complete (string externalization and emoji cleanup)
+Plan: 5 of 5 in current phase — 02-03 complete, 02-05 next (02-03 executed after 02-04)
+Status: Phase 1 complete, Phase 2 in progress (5 of 5 plans code-complete, 02-05 remaining)
+Last activity: 2026-03-01 — 02-03 complete (Toast-to-Snackbar migration, 68 calls replaced)
 
 Progress: [████░░░░░░] 20%
 
@@ -41,10 +41,10 @@ Progress: [████░░░░░░] 20%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-stability | 4 | 18 min | 5 min |
-| 02-design-system | 2 | 2 min | 1 min |
+| 02-design-system | 5 | 8 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min
+- Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min, 6 min
 - Trend: -
 
 *Updated after each plan completion*
@@ -85,6 +85,10 @@ Recent decisions affecting current work:
 - 02-04: app:title emoji in fragment_preview.xml toolbar left as-is — app:title is MaterialToolbar attribute, not android:text; deferred to future cleanup
 - 02-04: fragment_pdf_editor.xml Save button mapped to @string/save_changes — existing "Save" string reused, emoji removed
 - 02-04: "Edit PDF" toolbar title in fragment_pdf_editor.xml replaced with @string/content_desc_edit_pdf — string reuse preferred over creating new title-specific entry
+- 02-03: showSnackbar extension on Fragment uses view?.let{} guard — safe when fragment is detached (view == null)
+- 02-03: PdfEditorFragment (editor package) needs explicit import: import com.pdfscanner.app.ui.showSnackbar
+- 02-03: Anonymous object callbacks (e.g., OnImageSavedCallback) need this@Fragment.showSnackbar() qualification — anonymous objects don't capture Fragment receiver
+- 02-03: Dynamic messages use getString(R.string.format_str, arg) before showSnackbar() call — keeps extension API clean with only String and @StringRes overloads
 
 ### Pending Todos
 
@@ -98,5 +102,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: 02-01-PLAN.md complete — design system foundation (Cartoon theme, dimens.xml, dark mode fixes, textAppearance on all layouts); 02-05 still next
+Stopped at: 02-03-PLAN.md complete — Toast-to-Snackbar migration (68 calls replaced, Extensions.kt created); 02-05 next
 Resume file: None
