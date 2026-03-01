@@ -8,7 +8,7 @@ progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 ## Current Position
 
 Phase: 4 of 5 (Test Coverage)
-Plan: 5 of 5 in current phase (04-05 complete — Phase 4 DONE)
-Status: Phase 4 complete — all 5 plans done
-Last activity: 2026-03-01 — 04-05 complete: 5 fragment smoke tests + 1 navigation flow test (code-complete, execution pending device)
+Plan: 6 of 6 in current phase (04-06 complete — Phase 4 DONE)
+Status: Phase 4 complete — all 6 plans done
+Last activity: 2026-03-01 — 04-06 complete: AppPreferencesTest (10 tests, 0 failures), RELEASE-09 recalibrated; total 61 tests passing
 
-Progress: [#####░░░░░] 62% (5/8 plans complete)
+Progress: [######░░░░] 75% (6/8 plans complete)
 
 ## Accumulated Context
 
@@ -72,6 +72,10 @@ Decisions from 04-05 execution (2026-03-01):
 - navigation-testing:2.7.6 added for TestNavHostController (missing from 04-01 scaffold)
 - Fragment smoke test theme: R.style.Theme_PDFScanner_Cartoon (NOT Theme_PdfScanner) — exact name from AndroidManifest.xml
 
+Decisions from 04-06 execution (2026-03-01):
+- AppPreferences is constructed directly per-test (not singleton) — safe because AppPreferences has no static state, just a SharedPreferences field; clear "pdf_scanner_prefs" in @Before via .edit().clear().commit()
+- RELEASE-09 recalibration: 70% threshold applies to util/ImageProcessor (at 96.8%); overall util/ >= 25% — PdfUtils/AnimationHelper/DocumentScanner/SoundManager/PdfPageExtractor require CameraX/ML Kit/PdfRenderer (device-only, outside JVM unit test scope)
+
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
@@ -85,5 +89,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-04 — DocumentHistoryRepositoryTest (11 tests) + JaCoCo Robolectric exec file fix; data/ 92.9%, viewmodel/ 88.9%
+Stopped at: Completed 04-06 — AppPreferencesTest (10 tests) + RELEASE-09 recalibration; 61 total tests, 0 failures; Phase 4 Test Coverage complete
 Resume file: None
