@@ -207,13 +207,27 @@ object ImageProcessor {
      * @param bitmap Input bitmap (not modified)
      * @return New bitmap with magic document enhancement
      */
-    fun applyMagicFilter(bitmap: Bitmap): Bitmap {
+    fun applyMagicFilter(inputBitmap: Bitmap): Bitmap {
+        // Cap dimensions to prevent OOM on high-megapixel cameras.
+        // A 48MP image would allocate 2 × 48M × 4 bytes = 384MB for pixel arrays alone.
+        // 3368px = 2x A4 height at 144dpi — sufficient quality for PDF output.
+        val maxDim = 3368
+        var bitmap = inputBitmap
+        if (bitmap.width > maxDim || bitmap.height > maxDim) {
+            val scale = minOf(maxDim.toFloat() / bitmap.width, maxDim.toFloat() / bitmap.height)
+            val newWidth = (bitmap.width * scale).toInt()
+            val newHeight = (bitmap.height * scale).toInt()
+            val scaled = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+            if (scaled != bitmap) bitmap.recycle()
+            bitmap = scaled
+        }
+
         val width = bitmap.width
         val height = bitmap.height
-        
+
         // Create output bitmap
         val outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        
+
         // Get all pixels
         val pixels = IntArray(width * height)
         bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
@@ -315,13 +329,22 @@ object ImageProcessor {
      * @param bitmap Input bitmap (not modified)
      * @return New bitmap with sharpened edges
      */
-    fun applySharpen(bitmap: Bitmap): Bitmap {
-        val width = bitmap.width
-        val height = bitmap.height
-        
+    fun applySharpen(inputBitmap: Bitmap): Bitmap {
+        // Cap dimensions to prevent OOM from large pixel arrays in convolution.
+        val maxDim = 3368
+        var bitmap = inputBitmap
+        if (bitmap.width > maxDim || bitmap.height > maxDim) {
+            val scale = minOf(maxDim.toFloat() / bitmap.width, maxDim.toFloat() / bitmap.height)
+            val newWidth = (bitmap.width * scale).toInt()
+            val newHeight = (bitmap.height * scale).toInt()
+            val scaled = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+            if (scaled != bitmap) bitmap.recycle()
+            bitmap = scaled
+        }
+
         // First apply slight enhancement
         val enhanced = applyContrastBrightness(bitmap, 1.15f, 5f)
-        
+
         // Then apply sharpen
         return applyConvolutionKernel(enhanced, SHARPEN_KERNEL, 1.0f)
     }
