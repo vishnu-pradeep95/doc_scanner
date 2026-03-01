@@ -76,7 +76,8 @@ class MainActivity : AppCompatActivity() {
 
         // Enable edge-to-edge display: content draws behind system bars
         // Must be called AFTER super.onCreate() and BEFORE setContentView()
-        WindowCompat.enableEdgeToEdge(window)
+        // WindowCompat.enableEdgeToEdge() does not exist; use setDecorFitsSystemWindows(false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         /**
          * View Binding inflation

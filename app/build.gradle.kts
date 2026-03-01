@@ -1,15 +1,17 @@
 /**
  * app/build.gradle.kts - Module-level Build Configuration
- * 
+ *
  * This file configures:
  * 1. Plugins to apply (Android, Kotlin, etc.)
  * 2. Android-specific settings (SDK versions, build types)
  * 3. Dependencies (libraries your app uses)
- * 
+ *
  * KOTLIN DSL:
  * This uses Kotlin syntax (build.gradle.kts) instead of Groovy (build.gradle)
  * Kotlin DSL provides better IDE support and type checking
  */
+
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 plugins {
     // Android Application Plugin - required for Android apps
@@ -114,12 +116,20 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
     
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
     /**
      * Java compatibility options
-     * 
+     *
      * Android uses a subset of Java. Java 17 is current standard.
      */
     compileOptions {
@@ -291,12 +301,72 @@ dependencies {
     // TESTING
     // ===========================================
     
-    // JUnit - unit testing framework (runs on JVM, not device)
-    testImplementation("junit:junit:4.13.2")
-    
-    // AndroidX Test - unit testing with Android components
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    
-    // Espresso - UI testing framework (runs on device/emulator)
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    // ===== UNIT TESTS (src/test/) =====
+    testImplementation("junit:junit:4.13.2")                                         // already present
+    testImplementation("io.mockk:mockk:1.14.7")                                      // ADD
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")        // ADD — matches coroutines-android:1.7.3
+    testImplementation("androidx.arch.core:core-testing:2.2.0")                      // ADD — InstantTaskExecutorRule
+    testImplementation("org.robolectric:robolectric:4.16")                           // ADD
+    testImplementation("androidx.test:core-ktx:1.6.1")                              // ADD
+    testImplementation("com.google.truth:truth:1.4.4")                               // ADD
+
+    // ===== INSTRUMENTED TESTS (src/androidTest/) =====
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.3.0")                  // UPDATE from junit:1.1.5
+    androidTestImplementation("androidx.test:runner:1.6.2")                         // ADD
+    androidTestImplementation("androidx.test:core-ktx:1.6.1")                       // ADD
+    androidTestImplementation("androidx.test:rules:1.6.1")                          // ADD
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")         // UPDATE from 3.5.1
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")      // ADD
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.7.0")      // ADD
+    androidTestImplementation("io.mockk:mockk-android:1.14.7")                      // ADD
+    androidTestImplementation("io.mockk:mockk-agent:1.14.7")                        // ADD
+    androidTestImplementation("com.google.truth:truth:1.4.4")                       // ADD
+
+    // ===== FRAGMENT TESTING (stretch — TEST-07) =====
+    debugImplementation("androidx.fragment:fragment-testing:1.8.9")                 // ADD
+}
+
+// ===== JACOCO COVERAGE REPORT (RELEASE-09) =====
+// Requires: ./gradlew testDebugUnitTest jacocoTestReport
+// Output:   app/build/reports/jacoco/jacocoTestReport/html/index.html
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    // COUNTER TYPE: LINE (not BRANCH — Kotlin coroutines inflate BRANCH by 15-25%)
+    // EXCLUSIONS: generated classes that inflate coverage numbers negatively
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R\$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        // Navigation SafeArgs generated classes
+        "**/*Args.*",
+        "**/*Directions.*",
+        // View Binding generated classes
+        "**/*Binding.*",
+        "**/*Binding\$*.*",
+        // Databinding (not used, but defensive)
+        "**/databinding/**",
+        "**/android/databinding/**",
+    )
+
+    val debugTree = fileTree("${layout.buildDirectory.get()}/intermediates/javac/debug") {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    sourceDirectories.setFrom(files("${projectDir}/src/main/java"))
+    executionData.setFrom(fileTree(layout.buildDirectory.get()) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
 }
