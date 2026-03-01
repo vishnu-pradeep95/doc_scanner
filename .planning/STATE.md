@@ -8,7 +8,7 @@ progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 ## Current Position
 
 Phase: 4 of 5 (Test Coverage)
-Plan: 1 of 5 in current phase (04-01 complete)
-Status: In progress — 04-01 complete, test scaffold ready
-Last activity: 2026-03-01 — 04-01 complete: test infra scaffold with JaCoCo, MainDispatcherRule, 15 test deps
+Plan: 2 of 5 in current phase (04-02 complete)
+Status: In progress — 04-02 complete, ScannerViewModel tests written (22 tests)
+Last activity: 2026-03-01 — 04-02 complete: 22 JVM unit tests for ScannerViewModel (page CRUD, filter state, PDF naming)
 
-Progress: [#░░░░░░░░░] 12% (1/8 plans complete)
+Progress: [##░░░░░░░░] 25% (2/8 plans complete)
 
 ## Accumulated Context
 
@@ -52,6 +52,10 @@ Decisions from 04-01 execution (2026-03-01):
 - Also force kotlin-stdlib to 1.9.21 to prevent Kotlin 2.x stdlib from entering classpath
 - WindowCompat.enableEdgeToEdge() does not exist; correct API is setDecorFitsSystemWindows(window, false) — this pre-existing bug was fixed
 
+Decisions from 04-02 execution (2026-03-01):
+- Uri.parse() NOT available on plain JVM (JUnit4 runner without Robolectric) — use mockk(name = "label") for Uri instances in JVM unit tests; reference equality is sufficient for ViewModel list operations
+- Derived LiveData (Transformations.map) requires observeForever to activate — attach in @Before, remove in @After. Direct SavedStateHandle.getLiveData() does not need this.
+
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
@@ -65,5 +69,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-01 — Test infrastructure scaffold complete (JaCoCo, MainDispatcherRule, 15 test deps)
+Stopped at: Completed 04-02 — ScannerViewModel unit tests (22 tests, page CRUD + filter state + PDF naming)
 Resume file: None
