@@ -22,8 +22,8 @@
 - [ ] **DSYS-02**: Spacing constants based on 8dp grid defined in `dimens.xml` and applied consistently across all layouts
 - [ ] **DSYS-03**: Coil library integrated for all image/thumbnail loading — replaces manual bitmap loading in RecyclerViews and history screens
 - [ ] **DSYS-04**: All 70 Toast calls replaced with Snackbar (transient feedback) or inline messages (persistent feedback) — no Toast used as a loading indicator
-- [ ] **DSYS-05**: All hardcoded `contentDescription` strings and UI text moved to `strings.xml` — no hardcoded English strings in code or layouts
-- [ ] **DSYS-06**: Emoji removed from programmatic strings — emoji only in drawables/resources, not in code strings
+- [x] **DSYS-05**: All hardcoded `contentDescription` strings and UI text moved to `strings.xml` — no hardcoded English strings in code or layouts
+- [x] **DSYS-06**: Emoji removed from programmatic strings — emoji only in drawables/resources, not in code strings
 - [ ] **DSYS-07**: Dark mode visually verified on all 7 screens — no unreadable text, invisible icons, or wrong backgrounds
 
 ### Performance & Polish (PERF)
@@ -102,8 +102,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSYS-02 | Phase 2 | Pending |
 | DSYS-03 | Phase 2 | Pending |
 | DSYS-04 | Phase 2 | Pending |
-| DSYS-05 | Phase 2 | Pending |
-| DSYS-06 | Phase 2 | Pending |
+| DSYS-05 | Phase 2 | Complete (02-04) |
+| DSYS-06 | Phase 2 | Complete (02-04) |
 | DSYS-07 | Phase 2 | Pending |
 | PERF-01 | Phase 3 | Pending |
 | PERF-02 | Phase 3 | Pending |
@@ -136,4 +136,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-03-01 after 01-04 plan completion (Phase 1 complete — all BUG-* requirements satisfied)*
+*Last updated: 2026-03-01 after 02-04 plan completion (DSYS-05, DSYS-06 complete — string externalization and emoji cleanup done)*

@@ -23,9 +23,9 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (Design System)
-Plan: 2 of 5 in current phase — 02-02 complete, 02-03 next
-Status: Phase 1 complete, Phase 2 in progress (2 of 5 plans done)
-Last activity: 2026-03-01 — 02-02 complete (Coil image loading integration)
+Plan: 4 of 5 in current phase — 02-04 complete, 02-05 next
+Status: Phase 1 complete, Phase 2 in progress (4 of 5 plans done)
+Last activity: 2026-03-01 — 02-04 complete (string externalization and emoji cleanup)
 
 Progress: [████░░░░░░] 20%
 
@@ -78,6 +78,9 @@ Recent decisions affecting current work:
 - 02-02: Use Coil 3.4.0 base artifact only — no coil-compose or coil-network (View-based app, local file URIs only)
 - 02-02: HistoryAdapter PDF thumbnail loads file URI with error drawable fallback — Coil cannot render PDF pages (PdfRenderer thumbnail is Phase 3 scope)
 - 02-02: Remove adapterScope CoroutineScope from PagesAdapter — Coil manages its own coroutines and auto-cancels on ImageView detach
+- 02-04: app:title emoji in fragment_preview.xml toolbar left as-is — app:title is MaterialToolbar attribute, not android:text; deferred to future cleanup
+- 02-04: fragment_pdf_editor.xml Save button mapped to @string/save_changes — existing "Save" string reused, emoji removed
+- 02-04: "Edit PDF" toolbar title in fragment_pdf_editor.xml replaced with @string/content_desc_edit_pdf — string reuse preferred over creating new title-specific entry
 
 ### Pending Todos
 
@@ -91,5 +94,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: 02-02-PLAN.md complete — Coil integration done, 02-03 (Toast-to-Snackbar) next
+Stopped at: 02-04-PLAN.md complete — string externalization done, 02-05 next
 Resume file: None
