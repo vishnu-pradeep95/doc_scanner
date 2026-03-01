@@ -122,7 +122,7 @@
         <item name="android:fontFamily">@font/nunito_extrabold</item>
         <item name="fontFamily">@font/nunito_extrabold</item>
         <item name="android:textSize">32sp</item>
-        <item name="android:textColor">@color/cartoon_text_primary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:letterSpacing">-0.02</item>
     </style>
     
@@ -130,7 +130,7 @@
         <item name="android:fontFamily">@font/nunito_bold</item>
         <item name="fontFamily">@font/nunito_bold</item>
         <item name="android:textSize">26sp</item>
-        <item name="android:textColor">@color/cartoon_text_primary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
     
@@ -138,7 +138,7 @@
         <item name="android:fontFamily">@font/nunito_bold</item>
         <item name="fontFamily">@font/nunito_bold</item>
         <item name="android:textSize">22sp</item>
-        <item name="android:textColor">@color/cartoon_text_primary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
     
     <!-- Titles - Clear and readable -->
@@ -146,21 +146,21 @@
         <item name="android:fontFamily">@font/nunito_bold</item>
         <item name="fontFamily">@font/nunito_bold</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/cartoon_text_primary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
     
     <style name="TextAppearance.Cartoon.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:fontFamily">@font/nunito_semibold</item>
         <item name="fontFamily">@font/nunito_semibold</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/cartoon_text_primary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
     
     <style name="TextAppearance.Cartoon.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
         <item name="android:fontFamily">@font/nunito_semibold</item>
         <item name="fontFamily">@font/nunito_semibold</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/cartoon_text_primary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
     
     <!-- Body Text - Comfortable reading -->
@@ -168,7 +168,7 @@
         <item name="android:fontFamily">@font/nunito_regular</item>
         <item name="fontFamily">@font/nunito_regular</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/cartoon_text_primary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:lineSpacingMultiplier">1.4</item>
     </style>
     
@@ -176,7 +176,7 @@
         <item name="android:fontFamily">@font/nunito_regular</item>
         <item name="fontFamily">@font/nunito_regular</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/cartoon_text_secondary</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
         <item name="android:lineSpacingMultiplier">1.4</item>
     </style>
     
@@ -184,7 +184,7 @@
         <item name="android:fontFamily">@font/nunito_regular</item>
         <item name="fontFamily">@font/nunito_regular</item>
         <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/cartoon_text_secondary</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
     
     <!-- Labels - Button text, chips -->
