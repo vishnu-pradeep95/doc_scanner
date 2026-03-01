@@ -210,7 +210,7 @@
             android:id="@+id/tvPageInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1 / 1"
+            tools:text="1 / 1"
             android:textColor="@android:color/white"
             android:textSize="14sp"
             android:paddingStart="12dp"
@@ -266,7 +266,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Select"
+                    android:text="@string/editor_tool_select"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -290,7 +290,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sign"
+                    android:text="@string/editor_tool_sign"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -314,7 +314,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Text"
+                    android:text="@string/editor_tool_text"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -338,7 +338,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Highlight"
+                    android:text="@string/editor_tool_highlight"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -362,7 +362,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Stamp"
+                    android:text="@string/editor_tool_stamp"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -386,7 +386,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Draw"
+                    android:text="@string/editor_tool_draw"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -410,7 +410,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Shapes"
+                    android:text="@string/editor_tool_shapes"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -434,7 +434,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Check"
+                    android:text="@string/editor_tool_check"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -458,7 +458,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Erase"
+                    android:text="@string/editor_tool_erase"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -501,7 +501,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Color"
+                    android:text="@string/editor_tool_color"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -525,7 +525,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Size"
+                    android:text="@string/editor_tool_size"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -549,7 +549,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Stroke"
+                    android:text="@string/editor_tool_stroke"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
