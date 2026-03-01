@@ -12,6 +12,7 @@ import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,14 @@ class PdfViewerFragment : Fragment() {
     private var fileDescriptor: ParcelFileDescriptor? = null
     private var currentPage = 0
     private var pageCount = 0
+
+    // Single-threaded dispatcher — serializes all pdfRenderer.openPage() calls
+    // PdfRenderer is NOT thread-safe; only one page may be open at a time
+    private val pdfIoDispatcher = Dispatchers.IO.limitedParallelism(1)
+
+    // Bitmap cache: up to 3 slots (prev/current/next)
+    // Key = page index, Value = rendered Bitmap
+    private val pageCache = SparseArray<Bitmap>(3)
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -132,37 +141,72 @@ class PdfViewerFragment : Fragment() {
         }
     }
     
-    private fun renderPage(pageIndex: Int) {
-        lifecycleScope.launch {
+    // Render a single page to a Bitmap. Uses pdfIoDispatcher to serialize openPage() calls.
+    // Returns null if renderer is null or an exception occurs.
+    private suspend fun renderPageToBitmap(pageIndex: Int): Bitmap? =
+        withContext(pdfIoDispatcher) {
             try {
-                val bitmap = withContext(Dispatchers.IO) {
-                    val page = pdfRenderer?.openPage(pageIndex)
-                    page?.let {
-                        // Calculate dimensions for high quality rendering
-                        val scale = 2f // 2x for sharper text
-                        val width = (it.width * scale).toInt()
-                        val height = (it.height * scale).toInt()
-                        
-                        val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                        // White background
-                        bmp.eraseColor(android.graphics.Color.WHITE)
-                        it.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                        it.close()
-                        bmp
-                    }
-                }
-                
-                bitmap?.let {
-                    _binding?.pdfImage?.setImageBitmap(it)
-                }
-
-                if (_binding != null) {
-                    updateNavigationState()
-                }
-                
+                val page = pdfRenderer?.openPage(pageIndex) ?: return@withContext null
+                val scale = 2f
+                val bmp = Bitmap.createBitmap(
+                    (page.width * scale).toInt(),
+                    (page.height * scale).toInt(),
+                    Bitmap.Config.ARGB_8888
+                )
+                bmp.eraseColor(android.graphics.Color.WHITE)
+                page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                page.close()
+                bmp
             } catch (e: Exception) {
-                showSnackbar(R.string.error_rendering_page)
+                null
             }
+        }
+
+    // Pre-renders prev and next pages into the cache. Evicts pages outside the 3-slot window.
+    // Must be called after renderPage() updates currentPage.
+    private fun prefetchAdjacentPages(currentIndex: Int) {
+        val pagesToPrefetch = listOf(currentIndex - 1, currentIndex + 1)
+            .filter { it in 0 until pageCount }
+            .filter { pageCache[it] == null }   // Skip already-cached pages
+
+        pagesToPrefetch.forEach { index ->
+            lifecycleScope.launch {
+                val bmp = renderPageToBitmap(index)
+                if (bmp != null) pageCache.put(index, bmp)
+            }
+        }
+
+        // Evict pages outside the [currentIndex-1, currentIndex+1] window
+        val keysToEvict = mutableListOf<Int>()
+        for (i in 0 until pageCache.size()) {
+            val key = pageCache.keyAt(i)
+            if (key < currentIndex - 1 || key > currentIndex + 1) keysToEvict.add(key)
+        }
+        keysToEvict.forEach { key ->
+            pageCache[key]?.recycle()
+            pageCache.remove(key)
+        }
+    }
+
+    private fun renderPage(pageIndex: Int) {
+        // Cache hit: serve immediately, update nav state, prefetch neighbors
+        val cached = pageCache[pageIndex]
+        if (cached != null) {
+            binding.pdfImage.setImageBitmap(cached)
+            updateNavigationState()
+            prefetchAdjacentPages(pageIndex)
+            return
+        }
+
+        // Cache miss: render on background thread, store in cache, update UI
+        lifecycleScope.launch {
+            val bitmap = renderPageToBitmap(pageIndex)
+            if (bitmap != null) {
+                pageCache.put(pageIndex, bitmap)
+                _binding?.pdfImage?.setImageBitmap(bitmap)
+            }
+            if (_binding != null) updateNavigationState()
+            prefetchAdjacentPages(pageIndex)
         }
     }
     
@@ -184,6 +228,17 @@ class PdfViewerFragment : Fragment() {
     
     override fun onDestroyView() {
         super.onDestroyView()
+
+        // Detach current bitmap from ImageView before recycling to prevent
+        // "Canvas: trying to use a recycled bitmap" if ImageView is still drawing
+        _binding?.pdfImage?.setImageDrawable(null)
+
+        // Recycle all cached bitmaps to release heap immediately
+        for (i in 0 until pageCache.size()) {
+            pageCache.valueAt(i)?.recycle()
+        }
+        pageCache.clear()
+
         try { pdfRenderer?.close() } catch (e: Exception) { android.util.Log.e("PdfViewerFragment", "Error closing renderer", e) }
         pdfRenderer = null
         try { fileDescriptor?.close() } catch (e: Exception) { android.util.Log.e("PdfViewerFragment", "Error closing fd", e) }
