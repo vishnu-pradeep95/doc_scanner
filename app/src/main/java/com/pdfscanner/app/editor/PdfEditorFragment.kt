@@ -60,6 +60,13 @@ class PdfEditorFragment : Fragment() {
     private var pendingAnnotationX: Float = 0f
     private var pendingAnnotationY: Float = 0f
     
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+        enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }
+        returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,7 +75,7 @@ class PdfEditorFragment : Fragment() {
         _binding = FragmentPdfEditorBinding.inflate(inflater, container, false)
         return binding.root
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         

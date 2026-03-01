@@ -227,11 +227,18 @@ class CameraFragment : Fragment() {
     // LIFECYCLE METHODS
     // ============================================================
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+        enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }
+        returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }
+    }
+
     /**
      * onCreateView - Inflate the UI layout
-     * 
+     *
      * "Inflation" = Converting XML layout to actual View objects in memory
-     * 
+     *
      * @param inflater System service that does the XML parsing
      * @param container Parent ViewGroup this Fragment will be added to
      * @param savedInstanceState Previous state (null if fresh)
@@ -318,6 +325,9 @@ class CameraFragment : Fragment() {
             }
             // findNavController() gets the NavController from the NavHostFragment
             // navigate() changes to another Fragment using the action ID from nav_graph.xml
+            val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+            exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
+            reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
             findNavController().navigate(R.id.action_camera_to_pages)
         }
 
@@ -401,9 +411,12 @@ class CameraFragment : Fragment() {
         showSnackbar(message)
 
         // Navigate to pages view to show the scanned pages
+        val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+        exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
+        reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
         findNavController().navigate(R.id.action_camera_to_pages)
     }
-    
+
     companion object {
         private const val TAG = "CameraFragment"
     }
@@ -706,6 +719,9 @@ class CameraFragment : Fragment() {
                          */
                         val action = CameraFragmentDirections
                             .actionCameraToPreview(savedUri.toString())
+                        val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+                        exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
+                        reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
                         findNavController().navigate(action)
                     }
                 }

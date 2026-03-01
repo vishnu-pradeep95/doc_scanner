@@ -114,6 +114,17 @@ class HomeFragment : Fragment() {
         uri?.let { handlePdfPickerResult(listOf(it)) }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+        enterTransition = com.google.android.material.transition.MaterialFadeThrough().apply {
+            this.duration = duration
+        }
+        returnTransition = com.google.android.material.transition.MaterialFadeThrough().apply {
+            this.duration = duration
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -169,6 +180,9 @@ class HomeFragment : Fragment() {
         // New Scan - Navigate to camera with bounce animation
         binding.cardNewScan.setOnClickListener {
             animateCardClick(it)
+            val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+            exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
+            reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
             findNavController().navigate(R.id.action_home_to_camera)
         }
 
@@ -250,6 +264,9 @@ class HomeFragment : Fragment() {
 
         // View all button
         binding.btnViewAll.setOnClickListener {
+            val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+            exitTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }
+            reenterTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }
             findNavController().navigate(R.id.action_home_to_history)
         }
     }
@@ -259,6 +276,9 @@ class HomeFragment : Fragment() {
      */
     private fun setupSettings() {
         binding.btnSettings.setOnClickListener {
+            val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+            exitTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }
+            reenterTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }
             findNavController().navigate(R.id.action_home_to_settings)
         }
     }

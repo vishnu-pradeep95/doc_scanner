@@ -199,6 +199,13 @@ class PreviewFragment : Fragment() {
     // LIFECYCLE
     // ============================================================
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+        enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }
+        returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

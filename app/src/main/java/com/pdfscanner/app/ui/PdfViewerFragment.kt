@@ -54,6 +54,13 @@ class PdfViewerFragment : Fragment() {
     // Key = page index, Value = rendered Bitmap
     private val pageCache = SparseArray<Bitmap>(3)
     
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+        enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }
+        returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,7 +69,7 @@ class PdfViewerFragment : Fragment() {
         _binding = FragmentPdfViewerBinding.inflate(inflater, container, false)
         return binding.root
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         

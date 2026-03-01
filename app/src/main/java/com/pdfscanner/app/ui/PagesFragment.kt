@@ -113,6 +113,13 @@ class PagesFragment : Fragment() {
     // LIFECYCLE
     // ============================================================
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+        enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }
+        returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -176,7 +183,10 @@ class PagesFragment : Fragment() {
                     true
                 }
                 R.id.action_history -> {
-                    // Navigate to document history
+                    // Navigate to document history (lateral peer — FadeThrough)
+                    val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+                    exitTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }
+                    reenterTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }
                     findNavController().navigate(R.id.action_pages_to_history)
                     true
                 }
@@ -454,6 +464,9 @@ class PagesFragment : Fragment() {
                 imageUri = uri.toString(),
                 editIndex = position
             )
+            val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+            exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
+            reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
             findNavController().navigate(action)
         }
     }
@@ -464,6 +477,9 @@ class PagesFragment : Fragment() {
     private fun setupButtons() {
         // Add more pages - go back to camera
         binding.btnAddMore.setOnClickListener {
+            val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+            exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
+            reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
             findNavController().navigate(R.id.action_pages_to_camera)
         }
 

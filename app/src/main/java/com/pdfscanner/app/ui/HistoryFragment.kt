@@ -56,6 +56,13 @@ class HistoryFragment : Fragment() {
     // RecyclerView adapter
     private lateinit var historyAdapter: HistoryAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val duration = resources.getInteger(R.integer.motion_duration_large).toLong()
+        enterTransition = com.google.android.material.transition.MaterialFadeThrough().apply { this.duration = duration }
+        returnTransition = com.google.android.material.transition.MaterialFadeThrough().apply { this.duration = duration }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -67,7 +74,7 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         // Initialize repository
         repository = DocumentHistoryRepository.getInstance(requireContext())
         
@@ -273,6 +280,9 @@ class HistoryFragment : Fragment() {
             )
 
             val action = HistoryFragmentDirections.actionHistoryToPdfEditor(uri.toString())
+            val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+            exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
+            reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
             findNavController().navigate(action)
         } catch (e: Exception) {
             Log.e(TAG, "Error opening editor", e)
@@ -610,6 +620,9 @@ class HistoryFragment : Fragment() {
             pdfPath = document.filePath,
             pdfName = document.name
         )
+        val dur = resources.getInteger(R.integer.motion_duration_large).toLong()
+        exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }
+        reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }
         findNavController().navigate(action)
     }
     
