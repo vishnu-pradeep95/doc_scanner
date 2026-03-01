@@ -32,7 +32,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 
 // AlertDialog for confirmation prompts
 import androidx.appcompat.app.AlertDialog
@@ -48,6 +48,7 @@ import androidx.recyclerview.widget.ItemTouchHelper  // Drag & drop support
 
 // Material design components
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -188,7 +189,7 @@ class PagesFragment : Fragment() {
     private fun performOcrOnSelectedPages() {
         val selectedUris = pagesAdapter.getSelectedUrisInOrder()
         if (selectedUris.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.no_pages_selected, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.no_pages_selected)
             return
         }
         
@@ -204,7 +205,7 @@ class PagesFragment : Fragment() {
     private fun performOcrOnAllPages() {
         val pages = viewModel.pages.value
         if (pages.isNullOrEmpty()) {
-            Toast.makeText(requireContext(), R.string.no_pages, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.no_pages)
             return
         }
         
@@ -250,7 +251,7 @@ class PagesFragment : Fragment() {
                     }
 
                     if (allText.isEmpty()) {
-                        Toast.makeText(currentCtx, R.string.ocr_no_text, Toast.LENGTH_SHORT).show()
+                        showSnackbar(R.string.ocr_no_text)
                     } else {
                         showOcrResultDialog(allText.toString())
                     }
@@ -258,17 +259,13 @@ class PagesFragment : Fragment() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _binding?.loadingOverlay?.visibility = View.GONE
-                    val currentCtx = context ?: return@withContext
+                    if (_binding == null) return@withContext
 
                     if (isSelectedMode) {
                         pagesAdapter.exitSelectionMode()
                     }
 
-                    Toast.makeText(
-                        currentCtx,
-                        "${getString(R.string.ocr_error)}: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showSnackbar(getString(R.string.error_loading_pdf, e.message ?: ""), Snackbar.LENGTH_LONG)
                 }
             }
         }
@@ -314,9 +311,9 @@ class PagesFragment : Fragment() {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clip = android.content.ClipData.newPlainText("OCR Text", text)
         clipboard.setPrimaryClip(clip)
-        Toast.makeText(requireContext(), R.string.text_copied, Toast.LENGTH_SHORT).show()
+        showSnackbar(R.string.text_copied)
     }
-    
+
     /**
      * Share text via Android share sheet
      */
@@ -499,11 +496,9 @@ class PagesFragment : Fragment() {
             viewModel.removePage(position)
         }
         pagesAdapter.exitSelectionMode()
-        Toast.makeText(requireContext(), 
-            getString(R.string.selected_count, positions.size) + " deleted", 
-            Toast.LENGTH_SHORT).show()
+        showSnackbar(getString(R.string.pages_deleted_count, positions.size))
     }
-    
+
     /**
      * Show PDF name dialog for selected pages
      */
@@ -549,7 +544,7 @@ class PagesFragment : Fragment() {
                 val currentCtx = context ?: return@launch
                 currentBinding.loadingOverlay.visibility = View.GONE
                 currentBinding.fabShare.visibility = View.VISIBLE
-                Toast.makeText(currentCtx, R.string.pdf_created, Toast.LENGTH_SHORT).show()
+                showSnackbar(R.string.pdf_created)
 
                 // Save to history
                 DocumentHistoryRepository.getInstance(currentCtx)
@@ -559,13 +554,8 @@ class PagesFragment : Fragment() {
                 pagesAdapter.exitSelectionMode()
             } catch (e: Exception) {
                 val currentBinding = _binding ?: return@launch
-                val currentCtx = context ?: return@launch
                 currentBinding.loadingOverlay.visibility = View.GONE
-                Toast.makeText(
-                    currentCtx,
-                    "${getString(R.string.pdf_error)}: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                showSnackbar(getString(R.string.error_loading_pdf, e.message ?: ""), Snackbar.LENGTH_LONG)
             }
         }
     }
@@ -694,13 +684,12 @@ class PagesFragment : Fragment() {
                     viewModel.updatePage(position, rotatedUri)
                     pagesAdapter.notifyItemChanged(position)
                 } else {
-                    Toast.makeText(currentCtx, R.string.rotate_error, Toast.LENGTH_SHORT).show()
+                    showSnackbar(R.string.rotate_error)
                 }
             } catch (e: Exception) {
                 val currentBinding = _binding ?: return@launch
-                val currentCtx = context ?: return@launch
                 currentBinding.loadingOverlay.visibility = View.GONE
-                Toast.makeText(currentCtx, R.string.rotate_error, Toast.LENGTH_SHORT).show()
+                showSnackbar(R.string.rotate_error)
             }
         }
     }
@@ -772,9 +761,9 @@ class PagesFragment : Fragment() {
      */
     private fun createPdf() {
         val pages = viewModel.pages.value ?: return
-        
+
         if (pages.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.no_pages, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.no_pages)
             return
         }
 
@@ -808,20 +797,15 @@ class PagesFragment : Fragment() {
                 val currentCtx = context ?: return@launch
                 currentBinding.loadingOverlay.visibility = View.GONE
                 currentBinding.fabShare.visibility = View.VISIBLE
-                Toast.makeText(currentCtx, R.string.pdf_created, Toast.LENGTH_SHORT).show()
+                showSnackbar(R.string.pdf_created)
 
                 // Save to document history
                 saveToHistory(currentCtx, pdfFile, pages.size)
             } catch (e: Exception) {
                 // Handle errors (file I/O, out of memory, etc.)
                 val currentBinding = _binding ?: return@launch
-                val currentCtx = context ?: return@launch
                 currentBinding.loadingOverlay.visibility = View.GONE
-                Toast.makeText(
-                    currentCtx,
-                    "${getString(R.string.pdf_error)}: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                showSnackbar(getString(R.string.error_loading_pdf, e.message ?: ""), Snackbar.LENGTH_LONG)
             }
         }
     }
@@ -1110,11 +1094,7 @@ class PagesFragment : Fragment() {
              */
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_pdf)))
         } catch (e: Exception) {
-            Toast.makeText(
-                requireContext(),
-                "Failed to share: ${e.message}",
-                Toast.LENGTH_SHORT
-            ).show()
+            showSnackbar(getString(R.string.error_failed_to_share, e.message ?: ""))
         }
     }
 

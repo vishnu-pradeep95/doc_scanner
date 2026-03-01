@@ -33,7 +33,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 
 // Activity Result API for handling crop result
 import androidx.activity.result.contract.ActivityResultContracts
@@ -188,12 +188,7 @@ class PreviewFragment : Fragment() {
         } else {
             // Crop failed - show error
             val error = result.error
-            val ctx = context ?: return@registerForActivityResult
-            Toast.makeText(
-                ctx,
-                "Crop failed: ${error?.message}",
-                Toast.LENGTH_SHORT
-            ).show()
+            showSnackbar(getString(R.string.error_crop_failed, error?.message ?: ""))
         }
     }
 
@@ -402,12 +397,8 @@ class PreviewFragment : Fragment() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _binding?.loadingOverlay?.visibility = View.GONE
-                    val ctx = context ?: return@withContext
-                    Toast.makeText(
-                        ctx,
-                        "Error processing image: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (_binding == null) return@withContext
+                    showSnackbar(getString(R.string.error_processing_image, e.message ?: ""))
                 }
             }
         }
@@ -620,8 +611,7 @@ class PreviewFragment : Fragment() {
             }
         } catch (e: Exception) {
             // Handle file not found, permission denied, etc.
-            val ctx = context ?: return
-            Toast.makeText(ctx, "Failed to load image", Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_failed_to_load_image)
         }
     }
 

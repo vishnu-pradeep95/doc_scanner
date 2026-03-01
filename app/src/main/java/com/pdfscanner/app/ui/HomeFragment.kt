@@ -23,7 +23,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -307,11 +307,7 @@ class HomeFragment : Fragment() {
                 launcher = scannerLauncher
             )
         } catch (e: Exception) {
-            Toast.makeText(
-                requireContext(),
-                R.string.auto_scan_unavailable,
-                Toast.LENGTH_SHORT
-            ).show()
+            showSnackbar(R.string.auto_scan_unavailable)
         }
     }
 
@@ -411,14 +407,7 @@ class HomeFragment : Fragment() {
                         }
                         totalPagesExtracted += result.pageUris.size
                     } else {
-                        val currentCtx = context
-                        if (currentCtx != null) {
-                            Toast.makeText(
-                                currentCtx,
-                                "Error importing PDF: ${result.errorMessage}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                        showSnackbar(getString(R.string.error_import_pdf, result.errorMessage ?: ""))
                     }
                 }
 
@@ -428,11 +417,7 @@ class HomeFragment : Fragment() {
 
                 val totalPages = imageUris.size + totalPagesExtracted
                 if (totalPages > 0) {
-                    Toast.makeText(
-                        currentCtx,
-                        "Imported $totalPages pages",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showSnackbar(getString(R.string.imported_pages_count, totalPages))
 
                     // Navigate to pages
                     findNavController().navigate(R.id.action_home_to_pages)
@@ -440,13 +425,8 @@ class HomeFragment : Fragment() {
 
             } catch (e: Exception) {
                 _binding ?: return@launch
-                val currentCtx = context ?: return@launch
                 showImportProgress(false)
-                Toast.makeText(
-                    currentCtx,
-                    "Error importing: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showSnackbar(getString(R.string.error_importing, e.message ?: ""))
             }
         }
     }
@@ -455,12 +435,11 @@ class HomeFragment : Fragment() {
      * Show/hide import progress indicator
      */
     private fun showImportProgress(show: Boolean, message: String = "") {
-        // Use the loading overlay if available, otherwise just show a toast
+        // Use the loading overlay if available, otherwise just show a snackbar
         val currentBinding = _binding ?: return
-        val currentCtx = context ?: return
         if (show) {
             currentBinding.root.isEnabled = false
-            Toast.makeText(currentCtx, message, Toast.LENGTH_SHORT).show()
+            if (message.isNotEmpty()) showSnackbar(message)
         } else {
             currentBinding.root.isEnabled = true
         }
@@ -471,7 +450,7 @@ class HomeFragment : Fragment() {
      */
     private fun openDocument(document: DocumentEntry) {
         if (!document.exists()) {
-            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.file_not_found)
             loadRecentDocuments()  // Refresh list
             return
         }
@@ -490,28 +469,28 @@ class HomeFragment : Fragment() {
     private fun shareDocument(document: DocumentEntry) {
         val file = java.io.File(document.filePath)
         if (!file.exists()) {
-            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.file_not_found)
             loadRecentDocuments()
             return
         }
-        
+
         try {
             val uri = androidx.core.content.FileProvider.getUriForFile(
                 requireContext(),
                 "${requireContext().packageName}.fileprovider",
                 file
             )
-            
+
             val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                 type = "application/pdf"
                 putExtra(android.content.Intent.EXTRA_STREAM, uri)
                 putExtra(android.content.Intent.EXTRA_SUBJECT, document.name)
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            
+
             startActivity(android.content.Intent.createChooser(shareIntent, getString(R.string.share_pdf)))
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), R.string.error_sharing_pdf, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_sharing_pdf)
         }
     }
     
@@ -535,7 +514,7 @@ class HomeFragment : Fragment() {
     private fun deleteDocument(document: DocumentEntry) {
         historyRepository.removeDocument(document.id, deleteFile = true)
         loadRecentDocuments()
-        Toast.makeText(requireContext(), R.string.document_deleted, Toast.LENGTH_SHORT).show()
+        showSnackbar(R.string.document_deleted)
     }
     
     /**
@@ -574,7 +553,7 @@ class HomeFragment : Fragment() {
      */
     private fun performMerge(uris: List<Uri>) {
         if (uris.size < 2) {
-            Toast.makeText(requireContext(), R.string.select_pdfs_to_merge, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.select_pdfs_to_merge)
             return
         }
 
@@ -607,13 +586,13 @@ class HomeFragment : Fragment() {
                 )
 
                 loadRecentDocuments()
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_LONG).show()
+                showSnackbar(result.message, Snackbar.LENGTH_LONG)
             } else {
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
+                showSnackbar(result.message)
             }
         }
     }
-    
+
     /**
      * Split a PDF into pages
      */
@@ -649,13 +628,9 @@ class HomeFragment : Fragment() {
                 }
 
                 loadRecentDocuments()
-                Toast.makeText(
-                    currentCtx,
-                    getString(R.string.split_success, result.outputUris.size),
-                    Toast.LENGTH_LONG
-                ).show()
+                showSnackbar(getString(R.string.split_success, result.outputUris.size), Snackbar.LENGTH_LONG)
             } else {
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
+                showSnackbar(result.message)
             }
         }
     }
@@ -718,9 +693,9 @@ class HomeFragment : Fragment() {
                 )
 
                 loadRecentDocuments()
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_LONG).show()
+                showSnackbar(result.message, Snackbar.LENGTH_LONG)
             } else {
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
+                showSnackbar(result.message)
             }
         }
     }

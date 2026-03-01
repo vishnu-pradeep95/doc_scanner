@@ -15,7 +15,7 @@ import android.os.ParcelFileDescriptor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import com.pdfscanner.app.ui.showSnackbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -161,8 +161,7 @@ class PdfViewerFragment : Fragment() {
                 }
                 
             } catch (e: Exception) {
-                val ctx = context ?: return@launch
-                Toast.makeText(ctx, R.string.error_rendering_page, Toast.LENGTH_SHORT).show()
+                showSnackbar(R.string.error_rendering_page)
             }
         }
     }

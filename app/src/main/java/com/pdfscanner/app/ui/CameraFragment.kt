@@ -36,7 +36,7 @@ import android.util.Log
 import android.view.LayoutInflater  // Converts XML to View objects
 import android.view.View
 import android.view.ViewGroup  // Base class for UI containers
-import android.widget.Toast  // Simple popup messages
+import com.google.android.material.snackbar.Snackbar
 
 // Activity Result API - modern way to handle permission requests and activity results
 import androidx.activity.result.ActivityResult
@@ -352,11 +352,7 @@ class CameraFragment : Fragment() {
             )
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start auto-scan", e)
-            Toast.makeText(
-                requireContext(),
-                R.string.auto_scan_unavailable,
-                Toast.LENGTH_SHORT
-            ).show()
+            showSnackbar(R.string.auto_scan_unavailable)
         }
     }
     
@@ -376,12 +372,7 @@ class CameraFragment : Fragment() {
 
         val pageUris = scanResult.pageUris
         if (pageUris.isEmpty()) {
-            val ctx = context ?: return
-            Toast.makeText(
-                ctx,
-                "No pages scanned",
-                Toast.LENGTH_SHORT
-            ).show()
+            showSnackbar(R.string.error_no_pages_scanned)
             return
         }
 
@@ -392,12 +383,11 @@ class CameraFragment : Fragment() {
 
         // Show success message
         val message = if (pageUris.size == 1) {
-            "1 page scanned"
+            getString(R.string.one_page_scanned)
         } else {
-            "${pageUris.size} pages scanned"
+            getString(R.string.pages_scanned_count, pageUris.size)
         }
-        val ctx = context ?: return
-        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show()
+        showSnackbar(message)
 
         // Navigate to pages view to show the scanned pages
         findNavController().navigate(R.id.action_camera_to_pages)
@@ -423,7 +413,7 @@ class CameraFragment : Fragment() {
             binding.batchModeIndicator.visibility = View.VISIBLE
             // Tint the button to indicate active state
             binding.btnBatchMode.alpha = 1.0f
-            Toast.makeText(requireContext(), R.string.batch_mode_on, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.batch_mode_on)
         } else {
             exitBatchMode()
         }
@@ -437,7 +427,7 @@ class CameraFragment : Fragment() {
         batchCaptureCount = 0
         binding.batchModeIndicator.visibility = View.GONE
         binding.btnBatchMode.alpha = 0.6f
-        Toast.makeText(requireContext(), R.string.batch_mode_off, Toast.LENGTH_SHORT).show()
+        showSnackbar(R.string.batch_mode_off)
     }
     
     /**
@@ -605,12 +595,7 @@ class CameraFragment : Fragment() {
             } catch (e: Exception) {
                 // Show error if camera setup fails
                 // Common causes: No camera, camera in use by another app
-                val ctx = context ?: return@addListener
-                Toast.makeText(
-                    ctx,
-                    "Failed to start camera: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showSnackbar(getString(R.string.error_failed_to_start_camera, e.message ?: ""))
             }
         }, ContextCompat.getMainExecutor(requireContext()))
         // ^ getMainExecutor returns the main/UI thread executor
@@ -716,12 +701,7 @@ class CameraFragment : Fragment() {
 
                     // Show error message to user
                     // ${} is Kotlin's string interpolation (like f-strings in Python)
-                    val ctx = context ?: return
-                    Toast.makeText(
-                        ctx,
-                        "Failed to capture: ${exception.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    this@CameraFragment.showSnackbar(getString(R.string.error_failed_to_capture, exception.message ?: ""))
                 }
             }
         )

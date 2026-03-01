@@ -20,7 +20,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -139,10 +139,10 @@ class HistoryFragment : Fragment() {
     private fun shareSelectedDocuments() {
         val selected = historyAdapter.getSelectedDocuments()
         if (selected.isEmpty()) {
-            Toast.makeText(requireContext(), "No documents selected", Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_no_documents_selected)
             return
         }
-        
+
         try {
             val uris = ArrayList<Uri>()
             for (doc in selected) {
@@ -156,9 +156,9 @@ class HistoryFragment : Fragment() {
                     uris.add(uri)
                 }
             }
-            
+
             if (uris.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+                showSnackbar(R.string.file_not_found)
                 return
             }
             
@@ -181,17 +181,17 @@ class HistoryFragment : Fragment() {
             
         } catch (e: Exception) {
             Log.e(TAG, "Error sharing documents", e)
-            Toast.makeText(requireContext(), R.string.error_sharing_pdf, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_sharing_pdf)
         }
     }
-    
+
     /**
      * Confirm deletion of selected documents
      */
     private fun confirmDeleteSelected() {
         val selected = historyAdapter.getSelectedDocuments()
         if (selected.isEmpty()) {
-            Toast.makeText(requireContext(), "No documents selected", Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_no_documents_selected)
             return
         }
         
@@ -217,7 +217,7 @@ class HistoryFragment : Fragment() {
         
         historyAdapter.exitSelectionMode()
         loadDocuments()
-        Toast.makeText(requireContext(), "Deleted $deletedCount document(s)", Toast.LENGTH_SHORT).show()
+        showSnackbar(getString(R.string.deleted_documents, deletedCount))
     }
     
     /**
@@ -246,22 +246,22 @@ class HistoryFragment : Fragment() {
     private fun editDocument(document: DocumentEntry) {
         val file = File(document.filePath)
         if (!file.exists()) {
-            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.file_not_found)
             return
         }
-        
+
         try {
             val uri = androidx.core.content.FileProvider.getUriForFile(
                 requireContext(),
                 "${requireContext().packageName}.fileprovider",
                 file
             )
-            
+
             val action = HistoryFragmentDirections.actionHistoryToPdfEditor(uri.toString())
             findNavController().navigate(action)
         } catch (e: Exception) {
             Log.e(TAG, "Error opening editor", e)
-            Toast.makeText(requireContext(), "Error opening editor: ${e.message}", Toast.LENGTH_SHORT).show()
+            showSnackbar(getString(R.string.error_opening_editor, e.message ?: ""))
         }
     }
     
@@ -287,7 +287,7 @@ class HistoryFragment : Fragment() {
     private fun performMerge() {
         val selected = historyAdapter.getSelectedDocuments()
         if (selected.size < 2) {
-            Toast.makeText(requireContext(), R.string.select_pdfs_to_merge, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.select_pdfs_to_merge)
             return
         }
         
@@ -342,31 +342,31 @@ class HistoryFragment : Fragment() {
                 historyAdapter.exitSelectionMode()
                 loadDocuments()
 
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_LONG).show()
+                showSnackbar(result.message, Snackbar.LENGTH_LONG)
             } else {
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
+                showSnackbar(result.message)
             }
         }
     }
-    
+
     /**
      * Split selected PDF into individual pages
      */
     private fun performSplit() {
         val selected = historyAdapter.getSelectedDocuments()
         if (selected.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.select_pdf_to_split, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.select_pdf_to_split)
             return
         }
-        
+
         if (selected.size > 1) {
-            Toast.makeText(requireContext(), "Select only one PDF to split", Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_select_one_pdf_to_split)
             return
         }
-        
+
         val doc = selected.first()
         if (doc.pageCount <= 1) {
-            Toast.makeText(requireContext(), "PDF has only one page", Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_pdf_has_one_page)
             return
         }
         
@@ -397,7 +397,7 @@ class HistoryFragment : Fragment() {
             val file = File(document.filePath)
             if (!file.exists()) {
                 _binding?.loadingOverlay?.visibility = View.GONE
-                Toast.makeText(ctx, R.string.file_not_found, Toast.LENGTH_SHORT).show()
+                showSnackbar(R.string.file_not_found)
                 return@launch
             }
 
@@ -425,24 +425,20 @@ class HistoryFragment : Fragment() {
                 historyAdapter.exitSelectionMode()
                 loadDocuments()
 
-                Toast.makeText(
-                    currentCtx,
-                    getString(R.string.split_success, result.outputUris.size),
-                    Toast.LENGTH_LONG
-                ).show()
+                showSnackbar(getString(R.string.split_success, result.outputUris.size), Snackbar.LENGTH_LONG)
             } else {
-                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
+                showSnackbar(result.message)
             }
         }
     }
-    
+
     /**
      * Compress selected PDF(s)
      */
     private fun performCompress() {
         val selected = historyAdapter.getSelectedDocuments()
         if (selected.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.select_pdf_to_compress, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.select_pdf_to_compress)
             return
         }
         
@@ -517,9 +513,9 @@ class HistoryFragment : Fragment() {
             if (successCount > 0) {
                 val message = if (documents.size == 1) lastMessage
                     else "Compressed $successCount files"
-                Toast.makeText(currentCtx, message, Toast.LENGTH_LONG).show()
+                showSnackbar(message, Snackbar.LENGTH_LONG)
             } else {
-                Toast.makeText(currentCtx, "Compression failed", Toast.LENGTH_SHORT).show()
+                showSnackbar(R.string.error_compression_failed)
             }
         }
     }
@@ -548,7 +544,7 @@ class HistoryFragment : Fragment() {
     private fun openDocument(document: DocumentEntry) {
         val file = File(document.filePath)
         if (!file.exists()) {
-            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.file_not_found)
             loadDocuments()
             return
         }
@@ -608,11 +604,11 @@ class HistoryFragment : Fragment() {
     private fun shareDocument(document: DocumentEntry) {
         val file = File(document.filePath)
         if (!file.exists()) {
-            Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.file_not_found)
             loadDocuments()
             return
         }
-        
+
         try {
             // Get content URI via FileProvider
             val uri = FileProvider.getUriForFile(
@@ -620,9 +616,9 @@ class HistoryFragment : Fragment() {
                 "${requireContext().packageName}.fileprovider",
                 file
             )
-            
+
             Log.d(TAG, "Sharing PDF: ${document.name}, URI: $uri")
-            
+
             // Create share intent
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "application/pdf"
@@ -630,12 +626,12 @@ class HistoryFragment : Fragment() {
                 putExtra(Intent.EXTRA_SUBJECT, document.name)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            
+
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_pdf)))
-            
+
         } catch (e: Exception) {
             Log.e(TAG, "Error sharing PDF", e)
-            Toast.makeText(requireContext(), R.string.error_sharing_pdf, Toast.LENGTH_SHORT).show()
+            showSnackbar(R.string.error_sharing_pdf)
         }
     }
     
@@ -659,7 +655,7 @@ class HistoryFragment : Fragment() {
     private fun deleteDocument(document: DocumentEntry) {
         repository.removeDocument(document.id, deleteFile = true)
         loadDocuments()  // Refresh list
-        Toast.makeText(requireContext(), R.string.document_deleted, Toast.LENGTH_SHORT).show()
+        showSnackbar(R.string.document_deleted)
     }
 
     override fun onDestroyView() {

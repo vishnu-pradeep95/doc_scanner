@@ -190,6 +190,27 @@
     <string name="error_could_not_access_pdf">Could not access PDF file</string>
     <string name="error_loading_pdf">Error loading PDF: %s</string>
 
+    <!-- Snackbar feedback strings (extracted from hardcoded Toast messages) -->
+    <string name="error_no_pages_scanned">No pages scanned</string>
+    <string name="error_failed_to_start_camera">Failed to start camera: %s</string>
+    <string name="error_failed_to_capture">Failed to capture: %s</string>
+    <string name="error_crop_failed">Crop failed: %s</string>
+    <string name="error_processing_image">Error processing image: %s</string>
+    <string name="error_failed_to_load_image">Failed to load image</string>
+    <string name="error_no_documents_selected">No documents selected</string>
+    <string name="deleted_documents">Deleted %d document(s)</string>
+    <string name="error_opening_editor">Error opening editor: %s</string>
+    <string name="error_select_one_pdf_to_split">Select only one PDF to split</string>
+    <string name="error_pdf_has_one_page">PDF has only one page</string>
+    <string name="error_compression_failed">Compression failed</string>
+    <string name="error_failed_to_share">Failed to share: %s</string>
+    <string name="pages_scanned_count">%d pages scanned</string>
+    <string name="one_page_scanned">1 page scanned</string>
+    <string name="pages_deleted_count">%d pages deleted</string>
+    <string name="error_import_pdf">Error importing PDF: %s</string>
+    <string name="imported_pages_count">Imported %d pages</string>
+    <string name="error_importing">Error importing: %s</string>
+
     <!-- Dialog: Save Success -->
     <string name="save_success_title">Woohoo!</string>
     <string name="save_success_body">Your PDF has been saved!</string>

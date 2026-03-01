@@ -23,7 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.Toast
+import com.pdfscanner.app.ui.showSnackbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -230,15 +230,15 @@ class PdfEditorFragment : Fragment() {
                 if (tempFile.exists() && tempFile.length() > 0) {
                     loadPdfFromFile(tempFile)
                 } else {
-                    Toast.makeText(context, "Failed to load PDF file", Toast.LENGTH_LONG).show()
+                    showSnackbar(R.string.error_failed_to_load_pdf, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
                 }
             } ?: run {
                 android.util.Log.e("PdfEditor", "Could not open input stream for URI")
-                Toast.makeText(context, "Could not access PDF file", Toast.LENGTH_LONG).show()
+                showSnackbar(R.string.error_could_not_access_pdf, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
             }
         } catch (e: Exception) {
             android.util.Log.e("PdfEditor", "Exception loading PDF", e)
-            Toast.makeText(context, "Error loading PDF: ${e.message}", Toast.LENGTH_LONG).show()
+            showSnackbar(getString(R.string.error_loading_pdf, e.message ?: ""), com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
         }
     }
     
@@ -260,8 +260,7 @@ class PdfEditorFragment : Fragment() {
         
         binding.pdfView.onErrorListener = { exception ->
             android.util.Log.e("PdfEditor", "PDF load error", exception)
-            val ctx = context ?: return@onErrorListener
-            Toast.makeText(ctx, "Error loading PDF: ${exception.message}", Toast.LENGTH_LONG).show()
+            showSnackbar(getString(R.string.error_loading_pdf, exception.message ?: ""), com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
         }
         
         // Load the PDF
