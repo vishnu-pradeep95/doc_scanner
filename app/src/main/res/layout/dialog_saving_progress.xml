@@ -15,7 +15,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:src="@drawable/ic_saving_mascot"
-        android:contentDescription="Saving..." />
+        android:contentDescription="@string/content_desc_saving" />
 
     <!-- Progress text -->
     <TextView
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Saving your masterpiece..."
+        android:text="@string/saving_progress_message"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
         android:fontFamily="@font/nunito_semibold" />
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="💡 Tip: You can add signatures to any page!"
+        android:text="@string/saving_tip"
         android:textColor="@color/text_secondary"
         android:textSize="12sp"
         android:fontFamily="@font/nunito_regular" />

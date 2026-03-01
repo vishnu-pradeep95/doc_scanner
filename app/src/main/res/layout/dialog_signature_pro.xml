@@ -24,7 +24,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_signature_mascot"
-            android:contentDescription="Signature mascot" />
+            android:contentDescription="@string/content_desc_sig_mascot" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -37,7 +37,7 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="✨ Draw Your Signature"
+                android:text="@string/sig_draw_title"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white" />
@@ -45,7 +45,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Make it personal!"
+                android:text="@string/sig_draw_subtitle"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
                 android:alpha="0.8" />
@@ -58,7 +58,7 @@
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_close"
-            android:contentDescription="Close"
+            android:contentDescription="@string/close"
             app:tint="@android:color/white" />
 
     </LinearLayout>
@@ -97,7 +97,7 @@
                     android:id="@+id/tvSavedLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Saved Signatures"
+                    android:text="@string/sig_saved_title"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
@@ -134,7 +134,7 @@
                     android:id="@+id/tvEmptySignatures"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No saved signatures yet"
+                    android:text="@string/sig_no_saved"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
@@ -166,7 +166,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Draw New Signature"
+                    android:text="@string/sig_draw_new"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
@@ -231,7 +231,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="Sign here ✍️"
+                        android:text="@string/sig_hint"
                         android:textColor="#BBBBBB"
                         android:textSize="16sp" />
 
@@ -262,7 +262,7 @@
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Clear"
+                    android:text="@string/clear"
                     android:textColor="@color/text_secondary"
                     app:icon="@drawable/ic_clear"
                     app:iconTint="@color/text_secondary"
@@ -273,7 +273,7 @@
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Undo"
+                    android:text="@string/undo"
                     android:textColor="@color/primary"
                     app:icon="@drawable/ic_undo"
                     app:iconTint="@color/primary"
@@ -286,7 +286,7 @@
                 android:id="@+id/cbSaveSignature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="💾 Save this signature for later"
+                android:text="@string/sig_save_for_later"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="8dp"
                 app:buttonTint="@color/primary" />
@@ -336,7 +336,7 @@
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cancel"
+            android:text="@string/cancel"
             app:strokeColor="@color/text_secondary"
             android:textColor="@color/text_secondary"
             app:cornerRadius="24dp" />
@@ -346,7 +346,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="✓ Insert Signature"
+            android:text="@string/sig_insert"
             android:enabled="false"
             app:cornerRadius="24dp"
             android:backgroundTint="@color/primary" />
