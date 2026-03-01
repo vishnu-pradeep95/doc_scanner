@@ -8,7 +8,7 @@ progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 8
-  completed_plans: 3
+  completed_plans: 5
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 ## Current Position
 
 Phase: 4 of 5 (Test Coverage)
-Plan: 3 of 5 in current phase (04-03 complete)
-Status: In progress — 04-03 complete, DocumentEntry and ImageProcessor tests written (9+9 tests)
-Last activity: 2026-03-01 — 04-03 complete: 9 Robolectric tests for DocumentEntry JSON + formattedSize; 9 Robolectric tests for ImageProcessor filters (all 5 FilterTypes, dimension capping, file write)
+Plan: 5 of 5 in current phase (04-05 complete — Phase 4 DONE)
+Status: Phase 4 complete — all 5 plans done
+Last activity: 2026-03-01 — 04-05 complete: 5 fragment smoke tests + 1 navigation flow test (code-complete, execution pending device)
 
-Progress: [###░░░░░░░] 37% (3/8 plans complete)
+Progress: [#####░░░░░] 62% (5/8 plans complete)
 
 ## Accumulated Context
 
@@ -60,6 +60,13 @@ Decisions from 04-03 execution (2026-03-01):
 - org.json.JSONObject requires RobolectricTestRunner — plain JVM Android stubs throw RuntimeException on put/getString; DocumentEntryTest uses @RunWith(RobolectricTestRunner::class) instead of JUnit4
 - ImageProcessor does NOT call OcrProcessor — no ML Kit interface refactor needed; confirmed via test run with 0 UnsatisfiedLinkError
 
+Decisions from 04-05 execution (2026-03-01):
+- CRITICAL: mockk-android:1.14.7 and mockk-agent:1.14.7 compiled with Kotlin 2.1.0 binary — incompatible with Kotlin 1.9.21 project; removed from androidTestImplementation (no androidTest file uses MockK)
+- androidTest/AndroidManifest.xml required with tools:overrideLibrary for mockk minSdk 26 vs app minSdk 24 conflict
+- PreviewFragment requires imageUri navArg — must pass Bundle with putString("imageUri", ...) to launchFragmentInContainer
+- navigation-testing:2.7.6 added for TestNavHostController (missing from 04-01 scaffold)
+- Fragment smoke test theme: R.style.Theme_PDFScanner_Cartoon (NOT Theme_PdfScanner) — exact name from AndroidManifest.xml
+
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
@@ -73,5 +80,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-03 — DocumentEntry and ImageProcessor unit tests (9+9 Robolectric tests)
+Stopped at: Completed 04-05 — Fragment smoke tests (5) and NavigationFlowTest (1), Phase 4 complete
 Resume file: None
