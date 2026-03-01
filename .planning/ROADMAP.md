@@ -30,11 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can force-kill the app during a batch scan and resume with pages intact on relaunch
   4. User can import images from gallery with correct orientation regardless of EXIF data
   5. PDF Editor undo/redo either works end-to-end or buttons are not visible
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — ScannerViewModel immutable collections + SavedStateHandle (BUG-04, BUG-05)
+- [ ] 01-02-PLAN.md — Resource leak fixes, temp cleanup, undo/redo removal (BUG-02, BUG-03, BUG-07)
+- [ ] 01-03-PLAN.md — Fragment crash safety (high-risk) + EXIF import fix (BUG-01, BUG-08)
+- [ ] 01-04-PLAN.md — Fragment crash safety (remaining) + bitmap memory caps (BUG-01, BUG-06)
 
 ### Phase 2: Design System
 **Goal**: Every screen follows the same typography scale, spacing grid, and feedback patterns — the cartoon theme feels intentional, not ad-hoc
@@ -107,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Stability | 0/? | Not started | - |
+| 1. Stability | 0/4 | Planning complete | - |
 | 2. Design System | 0/? | Not started | - |
 | 3. Performance & Polish | 0/? | Not started | - |
 | 4. Test Coverage | 0/? | Not started | - |
