@@ -32,19 +32,20 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 **Depends on**: Phase 3 (stable, feature-complete codebase)
 **Requirements**: TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-07, TEST-08, RELEASE-09
 **Success Criteria** (what must be TRUE):
-  1. Developer can run `./gradlew test` and see a passing test suite with 37+ tests across ViewModel, JSON, ImageProcessor, and Repository classes
+  1. Developer can run `./gradlew testDebugUnitTest` and see a passing test suite with 37+ tests across ViewModel, JSON, ImageProcessor, and Repository classes
   2. Developer can run `./gradlew jacocoTestReport` and open the HTML report showing LINE coverage at or above 70% for `util/` and 50% for `viewmodel/`
   3. ScannerViewModel tests exercise page add/remove/reorder, filter state transitions, and PDF naming with no mocked Android framework required (pure JVM)
-  4. Robolectric tests run without a device — ImageProcessor filter tests use FakeOcrProcessor and never invoke ML Kit native code; DocumentHistoryRepository tests exercise all CRUD operations via SharedPreferences stubs
-  5. (Stretch) Fragment smoke tests launch 5+ non-camera fragments via FragmentScenario and verify layout inflation completes without crash; navigation flow test confirms Camera → Preview → Pages → PDF path fires correct nav actions
-**Plans**: TBD
+  4. Robolectric tests run without a device — ImageProcessor filter tests use Robolectric Bitmap (ImageProcessor does NOT call OcrProcessor, so no fake OCR needed); DocumentHistoryRepository tests exercise all CRUD operations via Robolectric SharedPreferences
+  5. (Stretch) Fragment smoke tests launch 5+ non-camera fragments via FragmentScenario and verify layout inflation completes without crash; navigation flow test confirms Home → Camera nav action fires correctly
+
+**Plans**: 5 plans
 
 Plans:
-- [ ] 04-01: Test dependency scaffold (build.gradle.kts deps + JaCoCo task + MainDispatcherRule)
-- [ ] 04-02: ScannerViewModel unit tests (15+ tests — page CRUD, filter state, PDF naming)
-- [ ] 04-03: DocumentEntry JSON round-trip tests (pure JVM) + ImageProcessor Robolectric tests (8+ tests, FakeOcrProcessor boundary)
-- [ ] 04-04: DocumentHistoryRepository Robolectric CRUD tests (8+ tests) + JaCoCo report baseline verification
-- [ ] 04-05: (Stretch) Fragment smoke tests + Navigation flow test
+- [ ] 04-01-PLAN.md — Test dependency scaffold (build.gradle.kts + JaCoCo task + MainDispatcherRule) [Wave 1]
+- [ ] 04-02-PLAN.md — ScannerViewModel unit tests (15+ tests: page CRUD, filter state, PDF naming) [Wave 2]
+- [ ] 04-03-PLAN.md — DocumentEntry JSON round-trip (6+ tests) + ImageProcessor Robolectric (9+ tests) [Wave 2]
+- [ ] 04-04-PLAN.md — DocumentHistoryRepository Robolectric CRUD (10+ tests) + JaCoCo coverage verification [Wave 3]
+- [ ] 04-05-PLAN.md — (Stretch) 5 fragment smoke tests + Navigation flow test (instrumented, device required) [Wave 2]
 
 ### Phase 5: Release Readiness
 **Goal**: The app passes all static analysis checks, has correct manifest configuration for Play Store distribution, ProGuard rules verified against a real release APK, and zero memory leaks confirmed on device
