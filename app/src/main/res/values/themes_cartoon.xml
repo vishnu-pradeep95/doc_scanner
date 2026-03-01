@@ -58,12 +58,12 @@
         <item name="colorOutline">@color/cartoon_outline</item>
         <item name="colorOutlineVariant">@color/cartoon_outline_variant</item>
         
-        <!-- Status Bar - Matches background for immersive feel -->
-        <item name="android:statusBarColor">@color/cartoon_background</item>
+        <!-- Status Bar icon tint (dark icons on light background) -->
+        <!-- android:statusBarColor removed — managed by WindowCompat.enableEdgeToEdge() -->
         <item name="android:windowLightStatusBar">true</item>
-        
-        <!-- Navigation Bar -->
-        <item name="android:navigationBarColor">@color/cartoon_background</item>
+
+        <!-- Navigation Bar icon tint (dark icons on light background) -->
+        <!-- android:navigationBarColor removed — managed by WindowCompat.enableEdgeToEdge() -->
         <item name="android:windowLightNavigationBar">true</item>
         
         <!-- Typography - Playful Nunito Font (bundled TTF) -->

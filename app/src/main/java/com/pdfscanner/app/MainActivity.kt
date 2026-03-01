@@ -23,6 +23,7 @@ package com.pdfscanner.app
 import android.os.Bundle  // Bundle is like a dictionary/map for passing data
 import androidx.appcompat.app.AppCompatActivity  // Base class for Activities
 import androidx.appcompat.app.AppCompatDelegate  // For theme switching
+import androidx.core.view.WindowCompat  // For edge-to-edge display
 import androidx.navigation.fragment.NavHostFragment  // Handles Fragment navigation
 import java.io.File
 
@@ -72,7 +73,11 @@ class MainActivity : AppCompatActivity() {
         // ALWAYS call super first - this runs the parent class's onCreate
         // Failing to do this will crash your app!
         super.onCreate(savedInstanceState)
-        
+
+        // Enable edge-to-edge display: content draws behind system bars
+        // Must be called AFTER super.onCreate() and BEFORE setContentView()
+        WindowCompat.enableEdgeToEdge(window)
+
         /**
          * View Binding inflation
          * 
