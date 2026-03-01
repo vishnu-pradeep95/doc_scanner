@@ -308,21 +308,28 @@ class HistoryFragment : Fragment() {
     private fun executeMerge(documents: List<DocumentEntry>) {
         binding.loadingText.text = getString(R.string.merging_pdfs)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
+            val ctx = context ?: run {
+                _binding?.loadingOverlay?.visibility = View.GONE
+                return@launch
+            }
+
             val uris = documents.mapNotNull { doc ->
                 val file = File(doc.filePath)
                 if (file.exists()) Uri.fromFile(file) else null
             }
-            
+
             val result = PdfUtils.mergePdfs(
-                context = requireContext(),
+                context = ctx,
                 pdfUris = uris,
                 outputName = "Merged"
             )
-            
-            binding.loadingOverlay.visibility = View.GONE
-            
+
+            val currentBinding = _binding ?: return@launch
+            val currentCtx = context ?: return@launch
+            currentBinding.loadingOverlay.visibility = View.GONE
+
             if (result.success && result.outputUri != null) {
                 // Add to history
                 val file = File(result.outputUri.path!!)
@@ -331,13 +338,13 @@ class HistoryFragment : Fragment() {
                     filePath = file.absolutePath,
                     pageCount = documents.sumOf { it.pageCount }
                 )
-                
+
                 historyAdapter.exitSelectionMode()
                 loadDocuments()
-                
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
+
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -380,26 +387,33 @@ class HistoryFragment : Fragment() {
     private fun executeSplit(document: DocumentEntry) {
         binding.loadingText.text = getString(R.string.splitting_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
-            val file = File(document.filePath)
-            if (!file.exists()) {
-                binding.loadingOverlay.visibility = View.GONE
-                Toast.makeText(requireContext(), R.string.file_not_found, Toast.LENGTH_SHORT).show()
+            val ctx = context ?: run {
+                _binding?.loadingOverlay?.visibility = View.GONE
                 return@launch
             }
-            
+
+            val file = File(document.filePath)
+            if (!file.exists()) {
+                _binding?.loadingOverlay?.visibility = View.GONE
+                Toast.makeText(ctx, R.string.file_not_found, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
             val result = PdfUtils.splitPdf(
-                context = requireContext(),
+                context = ctx,
                 pdfUri = Uri.fromFile(file),
                 baseName = document.name
             )
-            
-            binding.loadingOverlay.visibility = View.GONE
-            
+
+            val currentBinding = _binding ?: return@launch
+            val currentCtx = context ?: return@launch
+            currentBinding.loadingOverlay.visibility = View.GONE
+
             if (result.success && !result.outputUris.isNullOrEmpty()) {
                 // Add each split page to history
-                result.outputUris.forEachIndexed { index, uri ->
+                result.outputUris.forEachIndexed { _, uri ->
                     val splitFile = File(uri.path!!)
                     repository.addDocument(
                         name = splitFile.nameWithoutExtension,
@@ -407,17 +421,17 @@ class HistoryFragment : Fragment() {
                         pageCount = 1
                     )
                 }
-                
+
                 historyAdapter.exitSelectionMode()
                 loadDocuments()
-                
+
                 Toast.makeText(
-                    requireContext(), 
-                    getString(R.string.split_success, result.outputUris.size), 
+                    currentCtx,
+                    getString(R.string.split_success, result.outputUris.size),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -459,26 +473,31 @@ class HistoryFragment : Fragment() {
     private fun executeCompress(documents: List<DocumentEntry>, level: PdfUtils.CompressionLevel) {
         binding.loadingText.text = getString(R.string.compressing_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
+            val ctx = context ?: run {
+                _binding?.loadingOverlay?.visibility = View.GONE
+                return@launch
+            }
+
             var successCount = 0
             var lastMessage = ""
-            
+
             for (doc in documents) {
                 val file = File(doc.filePath)
                 if (!file.exists()) continue
-                
+
                 val result = PdfUtils.compressPdf(
-                    context = requireContext(),
+                    context = ctx,
                     pdfUri = Uri.fromFile(file),
                     level = level,
                     outputName = "${doc.name}_compressed"
                 )
-                
+
                 if (result.success && result.outputUri != null) {
                     successCount++
                     lastMessage = result.message
-                    
+
                     // Add compressed version to history
                     val compressedFile = File(result.outputUri.path!!)
                     repository.addDocument(
@@ -488,17 +507,19 @@ class HistoryFragment : Fragment() {
                     )
                 }
             }
-            
-            binding.loadingOverlay.visibility = View.GONE
+
+            val currentBinding = _binding ?: return@launch
+            val currentCtx = context ?: return@launch
+            currentBinding.loadingOverlay.visibility = View.GONE
             historyAdapter.exitSelectionMode()
             loadDocuments()
-            
+
             if (successCount > 0) {
-                val message = if (documents.size == 1) lastMessage 
+                val message = if (documents.size == 1) lastMessage
                     else "Compressed $successCount files"
-                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                Toast.makeText(currentCtx, message, Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(requireContext(), "Compression failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(currentCtx, "Compression failed", Toast.LENGTH_SHORT).show()
             }
         }
     }

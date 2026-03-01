@@ -339,17 +339,20 @@ class HomeFragment : Fragment() {
      */
     private fun handleGalleryResult(uris: List<Uri>) {
         if (uris.isEmpty()) return
+        val ctx = context ?: return
 
-        // Add imported images to ViewModel
+        // Add imported images to ViewModel with EXIF correction
         uris.forEach { uri ->
-            viewModel.addPage(uri)
+            val correctedUri = com.pdfscanner.app.util.ImageUtils.correctExifOrientation(ctx, uri)
+            viewModel.addPage(correctedUri)
         }
 
         // Navigate to pages screen to crop/edit
         if (uris.size == 1) {
             // Single image - go to preview for cropping
-            viewModel.setCurrentCapture(uris.first())
-            val action = HomeFragmentDirections.actionHomeToPreview(uris.first().toString())
+            val correctedFirst = viewModel.pages.value?.lastOrNull() ?: uris.first()
+            viewModel.setCurrentCapture(correctedFirst)
+            val action = HomeFragmentDirections.actionHomeToPreview(correctedFirst.toString())
             findNavController().navigate(action)
         } else {
             // Multiple images - go to pages
@@ -363,85 +366,87 @@ class HomeFragment : Fragment() {
      */
     private fun handleImportResult(uris: List<Uri>) {
         if (uris.isEmpty()) return
-        
+
+        val ctx = context ?: return
+
         // Separate images and PDFs
         val imageUris = mutableListOf<Uri>()
         val pdfUris = mutableListOf<Uri>()
-        
+
         uris.forEach { uri ->
-            if (PdfPageExtractor.isPdfFile(requireContext(), uri)) {
+            if (PdfPageExtractor.isPdfFile(ctx, uri)) {
                 pdfUris.add(uri)
             } else {
                 imageUris.add(uri)
             }
         }
-        
+
         // If no PDFs, handle as normal image import
         if (pdfUris.isEmpty()) {
             handleGalleryResult(imageUris)
             return
         }
-        
+
         // Show loading and process PDFs
         showImportProgress(true, "Importing files...")
-        
+
         lifecycleScope.launch {
             try {
-                // First add any images
+                // First add any images (with EXIF correction)
                 imageUris.forEach { uri ->
-                    viewModel.addPage(uri)
+                    val correctedUri = com.pdfscanner.app.util.ImageUtils.correctExifOrientation(ctx, uri)
+                    viewModel.addPage(correctedUri)
                 }
-                
+
                 // Then extract pages from each PDF
                 var totalPagesExtracted = 0
                 for ((index, pdfUri) in pdfUris.withIndex()) {
-                    withContext(Dispatchers.Main) {
-                        showImportProgress(true, "Extracting PDF ${index + 1}/${pdfUris.size}...")
-                    }
-                    
-                    val result = PdfPageExtractor.extractPages(requireContext(), pdfUri)
-                    
+                    showImportProgress(true, "Extracting PDF ${index + 1}/${pdfUris.size}...")
+
+                    val result = PdfPageExtractor.extractPages(ctx, pdfUri)
+
                     if (result.success) {
                         result.pageUris.forEach { pageUri ->
                             viewModel.addPage(pageUri)
                         }
                         totalPagesExtracted += result.pageUris.size
                     } else {
-                        withContext(Dispatchers.Main) {
+                        val currentCtx = context
+                        if (currentCtx != null) {
                             Toast.makeText(
-                                requireContext(),
+                                currentCtx,
                                 "Error importing PDF: ${result.errorMessage}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                     }
                 }
-                
-                withContext(Dispatchers.Main) {
-                    showImportProgress(false)
-                    
-                    val totalPages = imageUris.size + totalPagesExtracted
-                    if (totalPages > 0) {
-                        Toast.makeText(
-                            requireContext(),
-                            "✅ Imported $totalPages pages",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        
-                        // Navigate to pages
-                        findNavController().navigate(R.id.action_home_to_pages)
-                    }
-                }
-                
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    showImportProgress(false)
+
+                _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                showImportProgress(false)
+
+                val totalPages = imageUris.size + totalPagesExtracted
+                if (totalPages > 0) {
                     Toast.makeText(
-                        requireContext(),
-                        "Error importing: ${e.message}",
+                        currentCtx,
+                        "Imported $totalPages pages",
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    // Navigate to pages
+                    findNavController().navigate(R.id.action_home_to_pages)
                 }
+
+            } catch (e: Exception) {
+                _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                showImportProgress(false)
+                Toast.makeText(
+                    currentCtx,
+                    "Error importing: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -451,11 +456,13 @@ class HomeFragment : Fragment() {
      */
     private fun showImportProgress(show: Boolean, message: String = "") {
         // Use the loading overlay if available, otherwise just show a toast
+        val currentBinding = _binding ?: return
+        val currentCtx = context ?: return
         if (show) {
-            binding.root.isEnabled = false
-            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            currentBinding.root.isEnabled = false
+            Toast.makeText(currentCtx, message, Toast.LENGTH_SHORT).show()
         } else {
-            binding.root.isEnabled = true
+            currentBinding.root.isEnabled = true
         }
     }
 
@@ -570,19 +577,26 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), R.string.select_pdfs_to_merge, Toast.LENGTH_SHORT).show()
             return
         }
-        
+
         binding.loadingText.text = getString(R.string.merging_pdfs)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
+            val ctx = context ?: run {
+                _binding?.loadingOverlay?.visibility = View.GONE
+                return@launch
+            }
+
             val result = PdfUtils.mergePdfs(
-                context = requireContext(),
+                context = ctx,
                 pdfUris = uris,
                 outputName = "Merged"
             )
-            
-            binding.loadingOverlay.visibility = View.GONE
-            
+
+            val currentBinding = _binding ?: return@launch
+            val currentCtx = context ?: return@launch
+            currentBinding.loadingOverlay.visibility = View.GONE
+
             if (result.success && result.outputUri != null) {
                 // Add to history
                 val file = java.io.File(result.outputUri.path!!)
@@ -591,11 +605,11 @@ class HomeFragment : Fragment() {
                     filePath = file.absolutePath,
                     pageCount = uris.size  // Approximate
                 )
-                
+
                 loadRecentDocuments()
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -606,16 +620,23 @@ class HomeFragment : Fragment() {
     private fun performSplit(uri: Uri) {
         binding.loadingText.text = getString(R.string.splitting_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
+            val ctx = context ?: run {
+                _binding?.loadingOverlay?.visibility = View.GONE
+                return@launch
+            }
+
             val result = PdfUtils.splitPdf(
-                context = requireContext(),
+                context = ctx,
                 pdfUri = uri,
                 baseName = "Page"
             )
-            
-            binding.loadingOverlay.visibility = View.GONE
-            
+
+            val currentBinding = _binding ?: return@launch
+            val currentCtx = context ?: return@launch
+            currentBinding.loadingOverlay.visibility = View.GONE
+
             if (result.success && !result.outputUris.isNullOrEmpty()) {
                 // Add each split page to history
                 result.outputUris.forEach { pageUri ->
@@ -626,15 +647,15 @@ class HomeFragment : Fragment() {
                         pageCount = 1
                     )
                 }
-                
+
                 loadRecentDocuments()
                 Toast.makeText(
-                    requireContext(),
+                    currentCtx,
                     getString(R.string.split_success, result.outputUris.size),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -670,17 +691,24 @@ class HomeFragment : Fragment() {
     private fun executeCompress(uri: Uri, level: PdfUtils.CompressionLevel) {
         binding.loadingText.text = getString(R.string.compressing_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
+            val ctx = context ?: run {
+                _binding?.loadingOverlay?.visibility = View.GONE
+                return@launch
+            }
+
             val result = PdfUtils.compressPdf(
-                context = requireContext(),
+                context = ctx,
                 pdfUri = uri,
                 level = level,
                 outputName = "Compressed"
             )
-            
-            binding.loadingOverlay.visibility = View.GONE
-            
+
+            val currentBinding = _binding ?: return@launch
+            val currentCtx = context ?: return@launch
+            currentBinding.loadingOverlay.visibility = View.GONE
+
             if (result.success && result.outputUri != null) {
                 val file = java.io.File(result.outputUri.path!!)
                 historyRepository.addDocument(
@@ -688,11 +716,11 @@ class HomeFragment : Fragment() {
                     filePath = file.absolutePath,
                     pageCount = 1  // Unknown
                 )
-                
+
                 loadRecentDocuments()
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(currentCtx, result.message, Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -213,7 +213,7 @@ class PagesFragment : Fragment() {
     
     /**
      * Perform OCR on a list of page URIs
-     * 
+     *
      * @param uris List of page URIs to process
      * @param isSelectedMode Whether this is from selection mode (affects exit behavior)
      */
@@ -221,14 +221,15 @@ class PagesFragment : Fragment() {
         // Show loading with OCR-specific message
         binding.loadingText.text = getString(R.string.ocr_processing)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
+            val ctx = context ?: return@launch
             try {
                 val allText = StringBuilder()
-                
+
                 // Process each page
                 uris.forEachIndexed { index, uri ->
-                    val result = OcrProcessor.recognizeText(requireContext(), uri)
+                    val result = OcrProcessor.recognizeText(ctx, uri)
                     if (result.success && result.fullText.isNotEmpty()) {
                         if (allText.isNotEmpty()) {
                             allText.append("\n\n--- Page ${index + 2} ---\n\n")
@@ -238,31 +239,33 @@ class PagesFragment : Fragment() {
                         allText.append(result.fullText)
                     }
                 }
-                
+
                 withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    
+                    _binding?.loadingOverlay?.visibility = View.GONE
+                    val currentCtx = context ?: return@withContext
+
                     // Exit selection mode after OCR if in selection mode
                     if (isSelectedMode) {
                         pagesAdapter.exitSelectionMode()
                     }
-                    
+
                     if (allText.isEmpty()) {
-                        Toast.makeText(requireContext(), R.string.ocr_no_text, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(currentCtx, R.string.ocr_no_text, Toast.LENGTH_SHORT).show()
                     } else {
                         showOcrResultDialog(allText.toString())
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    
+                    _binding?.loadingOverlay?.visibility = View.GONE
+                    val currentCtx = context ?: return@withContext
+
                     if (isSelectedMode) {
                         pagesAdapter.exitSelectionMode()
                     }
-                    
+
                     Toast.makeText(
-                        requireContext(),
+                        currentCtx,
                         "${getString(R.string.ocr_error)}: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
@@ -532,34 +535,37 @@ class PagesFragment : Fragment() {
     private fun createPdfFromSelection(selectedUris: List<Uri>, baseName: String?) {
         binding.loadingText.text = getString(R.string.creating_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
+            val ctx = context ?: return@launch
             try {
                 val pdfFile = withContext(Dispatchers.IO) {
-                    generatePdf(selectedUris, baseName)
+                    generatePdf(ctx, selectedUris, baseName)
                 }
-                
+
                 generatedPdfFile = pdfFile
-                
-                withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    binding.fabShare.visibility = View.VISIBLE
-                    Toast.makeText(requireContext(), R.string.pdf_created, Toast.LENGTH_SHORT).show()
-                    
-                    // Save to history
-                    DocumentHistoryRepository.getInstance(requireContext())
-                        .addDocument(pdfFile.name, pdfFile.absolutePath, selectedUris.size)
-                    
-                    // Exit selection mode
-                    pagesAdapter.exitSelectionMode()
-                }
+
+                val currentBinding = _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                currentBinding.loadingOverlay.visibility = View.GONE
+                currentBinding.fabShare.visibility = View.VISIBLE
+                Toast.makeText(currentCtx, R.string.pdf_created, Toast.LENGTH_SHORT).show()
+
+                // Save to history
+                DocumentHistoryRepository.getInstance(currentCtx)
+                    .addDocument(pdfFile.name, pdfFile.absolutePath, selectedUris.size)
+
+                // Exit selection mode
+                pagesAdapter.exitSelectionMode()
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    Toast.makeText(requireContext(), 
-                        "${getString(R.string.pdf_error)}: ${e.message}", 
-                        Toast.LENGTH_LONG).show()
-                }
+                val currentBinding = _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                currentBinding.loadingOverlay.visibility = View.GONE
+                Toast.makeText(
+                    currentCtx,
+                    "${getString(R.string.pdf_error)}: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -673,71 +679,73 @@ class PagesFragment : Fragment() {
         binding.loadingOverlay.visibility = View.VISIBLE
         
         lifecycleScope.launch {
+            val ctx = context ?: return@launch
             try {
                 val rotatedUri = withContext(Dispatchers.IO) {
-                    rotateImage(uri)
+                    rotateImage(ctx, uri)
                 }
-                
-                withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    
-                    if (rotatedUri != null) {
-                        // Update the page with the rotated image
-                        viewModel.updatePage(position, rotatedUri)
-                        pagesAdapter.notifyItemChanged(position)
-                    } else {
-                        Toast.makeText(requireContext(), R.string.rotate_error, Toast.LENGTH_SHORT).show()
-                    }
+
+                val currentBinding = _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                currentBinding.loadingOverlay.visibility = View.GONE
+
+                if (rotatedUri != null) {
+                    // Update the page with the rotated image
+                    viewModel.updatePage(position, rotatedUri)
+                    pagesAdapter.notifyItemChanged(position)
+                } else {
+                    Toast.makeText(currentCtx, R.string.rotate_error, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    Toast.makeText(requireContext(), R.string.rotate_error, Toast.LENGTH_SHORT).show()
-                }
+                val currentBinding = _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                currentBinding.loadingOverlay.visibility = View.GONE
+                Toast.makeText(currentCtx, R.string.rotate_error, Toast.LENGTH_SHORT).show()
             }
         }
     }
     
     /**
      * Rotate an image 90 degrees clockwise and save to a new file
-     * 
+     *
+     * @param ctx Application or activity context (captured before IO switch)
      * @param uri Original image URI
      * @return New URI of rotated image, or null on error
      */
-    private fun rotateImage(uri: Uri): Uri? {
+    private fun rotateImage(ctx: android.content.Context, uri: Uri): Uri? {
         return try {
             // Load the bitmap
-            val inputStream = requireContext().contentResolver.openInputStream(uri) ?: return null
+            val inputStream = ctx.contentResolver.openInputStream(uri) ?: return null
             val bitmap = BitmapFactory.decodeStream(inputStream)
             inputStream.close()
-            
+
             // Create rotation matrix (90 degrees clockwise)
             val matrix = android.graphics.Matrix()
             matrix.postRotate(90f)
-            
+
             // Create rotated bitmap
             val rotatedBitmap = Bitmap.createBitmap(
-                bitmap, 0, 0, 
-                bitmap.width, bitmap.height, 
+                bitmap, 0, 0,
+                bitmap.width, bitmap.height,
                 matrix, true
             )
-            
+
             // Save to a new file
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(java.util.Date())
             val rotatedFile = File(
-                requireContext().filesDir,
+                ctx.filesDir,
                 "scans/ROT_${timestamp}.jpg"
             )
             rotatedFile.parentFile?.mkdirs()
-            
+
             FileOutputStream(rotatedFile).use { outputStream ->
                 rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             }
-            
+
             // Clean up
             bitmap.recycle()
             rotatedBitmap.recycle()
-            
+
             Uri.fromFile(rotatedFile)
         } catch (e: Exception) {
             null
@@ -781,44 +789,39 @@ class PagesFragment : Fragment() {
          * This prevents crashes from updating destroyed UI
          */
         lifecycleScope.launch {
+            val ctx = context ?: return@launch
             try {
                 /**
                  * withContext(Dispatchers.IO) - run this block on background thread
-                 * 
+                 *
                  * generatePdf() is CPU-intensive, so we run it off main thread
                  * The result is returned to the outer coroutine
                  */
                 val pdfFile = withContext(Dispatchers.IO) {
-                    generatePdf(pages)
+                    generatePdf(ctx, pages)
                 }
 
                 // Store reference for sharing
                 generatedPdfFile = pdfFile
 
-                /**
-                 * withContext(Dispatchers.Main) - update UI on main thread
-                 * 
-                 * UI operations MUST run on main thread in Android
-                 * Doing them on background thread crashes the app
-                 */
-                withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    binding.fabShare.visibility = View.VISIBLE
-                    Toast.makeText(requireContext(), R.string.pdf_created, Toast.LENGTH_SHORT).show()
-                    
-                    // Save to document history
-                    saveToHistory(pdfFile, pages.size)
-                }
+                val currentBinding = _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                currentBinding.loadingOverlay.visibility = View.GONE
+                currentBinding.fabShare.visibility = View.VISIBLE
+                Toast.makeText(currentCtx, R.string.pdf_created, Toast.LENGTH_SHORT).show()
+
+                // Save to document history
+                saveToHistory(currentCtx, pdfFile, pages.size)
             } catch (e: Exception) {
                 // Handle errors (file I/O, out of memory, etc.)
-                withContext(Dispatchers.Main) {
-                    binding.loadingOverlay.visibility = View.GONE
-                    Toast.makeText(
-                        requireContext(),
-                        "${getString(R.string.pdf_error)}: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                val currentBinding = _binding ?: return@launch
+                val currentCtx = context ?: return@launch
+                currentBinding.loadingOverlay.visibility = View.GONE
+                Toast.makeText(
+                    currentCtx,
+                    "${getString(R.string.pdf_error)}: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -839,11 +842,12 @@ class PagesFragment : Fragment() {
      * 3. Write document to file
      * 4. Close document
      * 
+     * @param ctx Application or activity context (captured before IO switch)
      * @param pageUris List of image URIs to include
      * @param customBaseName Optional custom name for the PDF
      * @return File object pointing to generated PDF
      */
-    private fun generatePdf(pageUris: List<Uri>, customBaseName: String? = null): File {
+    private fun generatePdf(ctx: android.content.Context, pageUris: List<Uri>, customBaseName: String? = null): File {
         // Create new PDF document
         val pdfDocument = PdfDocument()
 
@@ -866,7 +870,7 @@ class PagesFragment : Fragment() {
          */
         pageUris.forEachIndexed { index, uri ->
             // Decode the image bitmap
-            val bitmap = decodeSampledBitmap(uri, pageWidth, pageHeight)
+            val bitmap = decodeSampledBitmap(ctx, uri, pageWidth, pageHeight)
                 ?: throw Exception("Failed to decode page ${index + 1}")
 
             /**
@@ -939,7 +943,7 @@ class PagesFragment : Fragment() {
         }
 
         // Create output directory and file
-        val pdfsDir = File(requireContext().filesDir, "pdfs").apply { mkdirs() }
+        val pdfsDir = File(ctx.filesDir, "pdfs").apply { mkdirs() }
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
             .format(System.currentTimeMillis())
         
@@ -976,35 +980,36 @@ class PagesFragment : Fragment() {
      * For PDF generation, we don't need full resolution
      * Downsampling to ~2× the PDF page size is sufficient
      * 
+     * @param ctx Application or activity context (captured before IO switch)
      * @param uri Image file URI
      * @param reqWidth Target width
      * @param reqHeight Target height
      * @return Decoded bitmap, or null if failed
      */
-    private fun decodeSampledBitmap(uri: Uri, reqWidth: Int, reqHeight: Int): Bitmap? {
+    private fun decodeSampledBitmap(ctx: android.content.Context, uri: Uri, reqWidth: Int, reqHeight: Int): Bitmap? {
         return try {
             // Step 1: Get dimensions without loading pixels
             val options = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
             }
 
-            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+            ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
                 BitmapFactory.decodeStream(inputStream, null, options)
             }
 
             /**
              * Step 2: Calculate appropriate inSampleSize
-             * 
+             *
              * inSampleSize = 2 loads every 2nd pixel (1/4 total pixels)
              * inSampleSize = 4 loads every 4th pixel (1/16 total pixels)
-             * 
+             *
              * We target 2× the required size for better quality
              */
             options.inSampleSize = calculateInSampleSize(options, reqWidth * 2, reqHeight * 2)
             options.inJustDecodeBounds = false  // Actually load pixels this time
 
             // Step 3: Decode with calculated sample size
-            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+            ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
                 BitmapFactory.decodeStream(inputStream, null, options)
             }
         } catch (e: Exception) {
@@ -1119,16 +1124,17 @@ class PagesFragment : Fragment() {
 
     /**
      * Save newly created PDF to document history
-     * 
+     *
+     * @param ctx Application or activity context
      * @param pdfFile The generated PDF file
      * @param pageCount Number of pages in the PDF
      */
-    private fun saveToHistory(pdfFile: File, pageCount: Int) {
-        val repository = DocumentHistoryRepository.getInstance(requireContext())
-        
+    private fun saveToHistory(ctx: android.content.Context, pdfFile: File, pageCount: Int) {
+        val repository = DocumentHistoryRepository.getInstance(ctx)
+
         // Get the display name (without extension and timestamp)
         val baseName = viewModel.pdfBaseName.value ?: "Scan"
-        
+
         repository.addDocument(
             name = baseName,
             filePath = pdfFile.absolutePath,
