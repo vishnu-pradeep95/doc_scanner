@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    androidTest/AndroidManifest.xml
+
+    This manifest is merged into the debug test APK.
+
+    tools:overrideLibrary is required because mockk-android declares minSdk 26
+    while the app targets minSdk 24. The override forces the merge to succeed.
+    MockK's minSdk 26 requirement is a Manifest declaration only — MockK itself
+    does not use APIs that are unavailable on API 24 at runtime.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-sdk tools:overrideLibrary="io.mockk.android,io.mockk.proxy.android" />
+
+</manifest>

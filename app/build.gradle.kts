@@ -338,12 +338,19 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")         // UPDATE from 3.5.1
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")      // ADD
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.7.0")      // ADD
-    androidTestImplementation("io.mockk:mockk-android:1.14.7")                      // ADD
-    androidTestImplementation("io.mockk:mockk-agent:1.14.7")                        // ADD
+    // mockk-android:1.14.7 and mockk-agent:1.14.7 are compiled with Kotlin 2.1.0 binary
+    // and are incompatible with this project's Kotlin 1.9.21. They are removed because
+    // no instrumented test files use MockK — fragment smoke tests use only Truth assertions.
+    // androidTestImplementation("io.mockk:mockk-android:1.14.7")
+    // androidTestImplementation("io.mockk:mockk-agent:1.14.7")
     androidTestImplementation("com.google.truth:truth:1.4.4")                       // ADD
 
     // ===== FRAGMENT TESTING (stretch — TEST-07) =====
     debugImplementation("androidx.fragment:fragment-testing:1.8.9")                 // ADD
+
+    // ===== NAVIGATION TESTING (TEST-07/TEST-08) =====
+    // Provides TestNavHostController for navigation flow tests
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.6")       // ADD
 }
 
 // ===== JACOCO COVERAGE REPORT (RELEASE-09) =====
