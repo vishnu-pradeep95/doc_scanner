@@ -265,9 +265,16 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     
     // ===========================================
+    // IMAGE PROCESSING
+    // ===========================================
+
+    // ExifInterface - read EXIF orientation from imported images
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+
+    // ===========================================
     // UI COMPONENTS
     // ===========================================
-    
+
     // RecyclerView - efficient scrolling lists and grids
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     
