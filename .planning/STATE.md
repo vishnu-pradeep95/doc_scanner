@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Quality Gates
-status: planning
+status: ready_to_plan
 last_updated: "2026-03-01"
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
+  total_plans: 8
   completed_plans: 0
 ---
 
@@ -18,46 +18,40 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** v1.1 Quality Gates — Phase 4 (Test Coverage) → Phase 5 (Release Readiness)
+**Current focus:** Phase 4 — Test Coverage (first phase of v1.1)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Requirements defined, roadmap TBD
-Last activity: 2026-03-01 — Milestone v1.1 started, REQUIREMENTS.md created
+Phase: 4 of 5 (Test Coverage)
+Plan: 0 of 5 in current phase
+Status: Ready to plan — roadmap created, Phase 4 is next
+Last activity: 2026-03-01 — v1.1 roadmap created (Phases 4–5 defined, 8 requirements mapped per phase)
+
+Progress: [░░░░░░░░░░] 0% (0/8 plans complete)
 
 ## Accumulated Context
 
 ### Key Decisions (Full log in PROJECT.md)
 
-Critical decisions for v1.1 planning:
-
+Critical decisions carrying forward from v1.0:
 - Transitions must be set in `onCreate()` not `onViewCreated()` — transition system ignores post-creation changes
 - `limitedParallelism(1)` for PdfRenderer serialization — use instead of Mutex
-- Coil 2.7.0 (not 3.x) — Kotlin 1.9 compatibility
-- `tools:text` for programmatically-set TextViews — not `android:text`
 - Context capture: `val ctx = context ?: return@launch` at TOP of every `lifecycleScope.launch` body
-- `?attr/colorOnSurface*` in TextAppearance styles — not direct color references
 
-### Testing Decisions (from v1.1 research)
-
-- JaCoCo counter type MUST be LINE (not BRANCH) — coroutines inflate BRANCH by 15-25% with synthetic state-machine branches
-- Detekt MUST stay at 1.23.x — Detekt 2.x targets Kotlin 2.x and will fail with Kotlin 1.9.21
-- coroutines-test MUST match coroutines-android version exactly (both 1.7.3) — version mismatch causes NoSuchMethodError
-- MockK for Android instrumented tests requires TWO artifacts: `mockk-android` + `mockk-agent`
-- CameraX and ML Kit are INCOMPATIBLE with Robolectric (UnsatisfiedLinkError) — instrumented tests only
-- Navigation 2.7.x has known LeakCanary false positive (AbstractAppBarOnDestinationChangedListener) — library bug, not app code
-- Use `UnconfinedTestDispatcher` + `runTest` (NOT deprecated `TestCoroutineDispatcher` / `runBlockingTest`)
-- `InstantTaskExecutorRule` required in EVERY ViewModel test class or LiveData assertions return null
-- Detekt baseline: generate ONCE from unmodified codebase, commit immediately, NEVER generate in CI
+Testing decisions locked for Phase 4:
+- JaCoCo counter type MUST be LINE (not BRANCH) — coroutines inflate BRANCH by 15–25% with synthetic branches
+- Detekt MUST stay at 1.23.x — 2.x is Kotlin 2.x only
+- coroutines-test MUST match coroutines-android version exactly (both 1.7.3)
+- Use `UnconfinedTestDispatcher` + `runTest` (NOT deprecated `TestCoroutineDispatcher`)
+- `InstantTaskExecutorRule` required in EVERY ViewModel test class
+- CameraX and ML Kit INCOMPATIBLE with Robolectric — instrumented tests only
+- Detekt baseline: generate ONCE from unmodified codebase, commit immediately
 
 ### Blockers/Concerns
 
-- **Build environment**: WSL2 lacks Java/JDK — cannot run `./gradlew assembleDebug/Release`. RELEASE-04 (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis (Detekt, Lint) CAN run in WSL2 after JDK is resolved or via Android Studio.
-- **Library versions**: All versions verified March 2026 — MockK 1.14.7, Robolectric 4.16, Espresso 3.7.0, fragment-testing 1.8.9, LeakCanary 2.14, Detekt 1.23.8. See .planning/research/STACK.md for complete build.gradle.kts diff.
-- **OcrProcessor interface**: PITFALLS.md recommends wrapping ML Kit behind an OcrProcessor interface before writing TEST-04. Verify at Phase 4 start whether ocr/OcrProcessor.kt already exists as an interface or needs one created.
-- **Navigation 2.7.x library leak**: LeakCanary will fire for AbstractAppBarOnDestinationChangedListener — document as library bug immediately to avoid wasted investigation. Consider Navigation 2.8+ upgrade or LeakCanary named exclusion.
+- **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
+- **OcrProcessor interface (TEST-04)**: Verify at Phase 4 start whether `ocr/OcrProcessor.kt` already exists as an interface — if not, refactoring step is required before Robolectric test writing can begin.
+- **Navigation 2.7.x library leak**: LeakCanary will fire for `AbstractAppBarOnDestinationChangedListener` — document as library bug immediately, do not investigate as app code.
 
 ### Pending Todos
 
@@ -66,5 +60,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: v1.1 milestone initialized — REQUIREMENTS.md created, roadmap TBD
+Stopped at: Roadmap created — Phase 4 and Phase 5 defined with success criteria and plan stubs
 Resume file: None

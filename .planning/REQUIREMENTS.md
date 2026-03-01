@@ -54,26 +54,24 @@
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| TEST-01 | Phase 4 | Pending |
-| TEST-02 | Phase 4 | Pending |
-| TEST-03 | Phase 4 | Pending |
-| TEST-04 | Phase 4 | Pending |
-| TEST-05 | Phase 4 | Pending |
-| TEST-07 | Phase 4 | Pending |
-| TEST-08 | Phase 4 | Pending |
-| RELEASE-01 | Phase 5 | Pending |
-| RELEASE-02 | Phase 5 | Pending |
-| RELEASE-03 | Phase 5 | Pending |
-| RELEASE-04 | Phase 5 | Pending |
-| RELEASE-05 | Phase 5 | Pending |
-| RELEASE-06 | Phase 5 | Pending |
-| RELEASE-07 | Phase 5 | Pending |
-| RELEASE-08 | Phase 5 | Pending |
-| RELEASE-09 | Phase 4 | Pending |
+| Requirement | Phase | Plan | Status |
+|-------------|-------|------|--------|
+| TEST-01 | Phase 4 | 04-01 | Pending |
+| TEST-02 | Phase 4 | 04-02 | Pending |
+| TEST-03 | Phase 4 | 04-03 | Pending |
+| TEST-04 | Phase 4 | 04-03 | Pending |
+| TEST-05 | Phase 4 | 04-04 | Pending |
+| TEST-07 | Phase 4 | 04-05 | Pending |
+| TEST-08 | Phase 4 | 04-05 | Pending |
+| RELEASE-09 | Phase 4 | 04-04 | Pending |
+| RELEASE-01 | Phase 5 | 05-01 | Pending |
+| RELEASE-02 | Phase 5 | 05-02 | Pending |
+| RELEASE-03 | Phase 5 | 05-03 | Pending |
+| RELEASE-04 | Phase 5 | 05-03 | Pending |
+| RELEASE-05 | Phase 5 | 05-02 | Pending |
+| RELEASE-06 | Phase 5 | 05-02 | Pending |
+| RELEASE-07 | Phase 5 | 05-02 | Pending |
+| RELEASE-08 | Phase 5 | 05-01 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 16 total
@@ -82,4 +80,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after initial v1.1 definition*
+*Last updated: 2026-03-01 — roadmap creation confirmed 100% coverage, plan assignments added*

@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Polish Pass** — Phases 1–3 (shipped 2026-03-01)
-- 🚧 **v1.1 Quality Gates** — Phases 4–5 (planned)
+- 🚧 **v1.1 Quality Gates** — Phases 4–5 (in progress)
 
 ## Phases
 
@@ -18,15 +18,50 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 
 </details>
 
-### 🚧 v1.1 Quality Gates (Planned)
+### 🚧 v1.1 Quality Gates (In Progress)
 
-- [ ] **Phase 4: Test Coverage** — Unit tests, integration tests, and navigation flow tests locking in correct behavior
-  - Requirements: TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08
-  - Plans: TBD
+**Milestone Goal:** A test foundation covering ViewModel logic, data persistence, JSON serialization, and image processing — plus a release-hardened APK that meets Play Store quality bar on manifest configuration, static analysis, ProGuard rules, and zero memory leaks.
 
-- [ ] **Phase 5: Release Readiness** — Static analysis, ProGuard rules, device compatibility, leak detection, and final QA
-  - Requirements: RELEASE-01, RELEASE-02, RELEASE-03, RELEASE-04, RELEASE-05, RELEASE-06, RELEASE-07, RELEASE-08, RELEASE-09
-  - Plans: TBD
+- [ ] **Phase 4: Test Coverage** — Test dependency scaffold, ViewModel unit tests, JSON round-trip, Robolectric integration tests, JaCoCo coverage reporting, and stretch fragment/navigation tests
+- [ ] **Phase 5: Release Readiness** — Detekt static analysis, Android Lint accessibility enforcement, ProGuard/R8 keep rules, manifest hardening, LeakCanary leak detection, and real-device E2E verification
+
+## Phase Details
+
+### Phase 4: Test Coverage
+**Goal**: The codebase has a verified, runnable test suite covering all pure business logic, data persistence, and image processing — with JaCoCo confirming coverage meets the stated thresholds
+**Depends on**: Phase 3 (stable, feature-complete codebase)
+**Requirements**: TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-07, TEST-08, RELEASE-09
+**Success Criteria** (what must be TRUE):
+  1. Developer can run `./gradlew test` and see a passing test suite with 37+ tests across ViewModel, JSON, ImageProcessor, and Repository classes
+  2. Developer can run `./gradlew jacocoTestReport` and open the HTML report showing LINE coverage at or above 70% for `util/` and 50% for `viewmodel/`
+  3. ScannerViewModel tests exercise page add/remove/reorder, filter state transitions, and PDF naming with no mocked Android framework required (pure JVM)
+  4. Robolectric tests run without a device — ImageProcessor filter tests use FakeOcrProcessor and never invoke ML Kit native code; DocumentHistoryRepository tests exercise all CRUD operations via SharedPreferences stubs
+  5. (Stretch) Fragment smoke tests launch 5+ non-camera fragments via FragmentScenario and verify layout inflation completes without crash; navigation flow test confirms Camera → Preview → Pages → PDF path fires correct nav actions
+**Plans**: TBD
+
+Plans:
+- [ ] 04-01: Test dependency scaffold (build.gradle.kts deps + JaCoCo task + MainDispatcherRule)
+- [ ] 04-02: ScannerViewModel unit tests (15+ tests — page CRUD, filter state, PDF naming)
+- [ ] 04-03: DocumentEntry JSON round-trip tests (pure JVM) + ImageProcessor Robolectric tests (8+ tests, FakeOcrProcessor boundary)
+- [ ] 04-04: DocumentHistoryRepository Robolectric CRUD tests (8+ tests) + JaCoCo report baseline verification
+- [ ] 04-05: (Stretch) Fragment smoke tests + Navigation flow test
+
+### Phase 5: Release Readiness
+**Goal**: The app passes all static analysis checks, has correct manifest configuration for Play Store distribution, ProGuard rules verified against a real release APK, and zero memory leaks confirmed on device
+**Depends on**: Phase 4
+**Requirements**: RELEASE-01, RELEASE-02, RELEASE-03, RELEASE-04, RELEASE-05, RELEASE-06, RELEASE-07, RELEASE-08
+**Success Criteria** (what must be TRUE):
+  1. Developer can run `./gradlew detekt` and see zero new blocking errors — existing violations are captured in `detekt-baseline.xml` so they don't block the build
+  2. Developer can run `./gradlew lint` and see zero errors — accessibility violations (`ContentDescription`, `TouchTargetSizeCheck`) are treated as errors and the app has none
+  3. AndroidManifest.xml declares `uses-feature android:required="false"` for camera, `dataExtractionRules` and `fullBackupContent` excluding private scan directories, and FileProvider paths scoped only to actually-used subdirectories
+  4. Release APK installs on a physical Android device and every screen and feature path (camera capture, gallery import, ML Kit OCR, PDF generation, share/export) completes without crash — confirming ProGuard keep rules for ML Kit and Navigation SafeArgs are correct (ENVIRONMENT-BLOCKED: requires host machine with Android Studio)
+  5. LeakCanary reports zero retained Activity/Fragment/ViewModel leaks after exercising all 8 fragment flows — Navigation 2.7.x AbstractAppBarOnDestinationChangedListener leak documented as library bug and triaged
+**Plans**: TBD
+
+Plans:
+- [ ] 05-01: Detekt baseline + LeakCanary integration + binding nullification audit
+- [ ] 05-02: Android Lint with accessibility-as-errors + manifest hardening (uses-feature, dataExtractionRules, fullBackupContent, FileProvider scope)
+- [ ] 05-03: ProGuard/R8 keep rules (ML Kit, Navigation SafeArgs, Coil, coroutines) + release APK E2E on device
 
 ## Progress
 
@@ -35,5 +70,5 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 1. Stability | v1.0 | 4/4 | Complete | 2026-03-01 |
 | 2. Design System | v1.0 | 8/8 | Complete | 2026-03-01 |
 | 3. Performance & Polish | v1.0 | 3/3 | Complete | 2026-03-01 |
-| 4. Test Coverage | v1.1 | 0/? | Not started | - |
-| 5. Release Readiness | v1.1 | 0/? | Not started | - |
+| 4. Test Coverage | v1.1 | 0/5 | Not started | - |
+| 5. Release Readiness | v1.1 | 0/3 | Not started | - |
