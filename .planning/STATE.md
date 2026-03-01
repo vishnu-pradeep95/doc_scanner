@@ -1,127 +1,58 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: unknown
-last_updated: "2026-03-01T20:32:02.506Z"
+milestone: v1.1
+milestone_name: Quality Gates
+status: planning
+last_updated: "2026-03-01"
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 15
-  completed_plans: 15
+  total_phases: 2
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-28)
+See: .planning/PROJECT.md (updated 2026-03-01 after v1.0 milestone)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** Phase 3: Performance and Polish
+**Current focus:** Planning v1.1 — Phase 4 (Test Coverage) + Phase 5 (Release Readiness)
 
 ## Current Position
 
-Phase: 3 of 5 (Performance and Polish)
-Plan: 3 of 3 complete — 03-01 (edge-to-edge + Snackbar undo), 03-02 (haptic feedback + PdfRenderer cache), 03-03 (Material motion + determinate progress) all done; Phase 3 complete
-Status: Phase 1 complete, Phase 2 complete, Phase 3 complete — ready for Phase 4 (Testing)
-Last activity: 2026-03-01 — 03-03 complete (Material SharedAxis/FadeThrough transitions on all 8 fragments; LinearProgressIndicator with Page X of Y for PDF generation; PERF-01 and PERF-04 satisfied)
+Milestone: v1.0 archived (Phases 1–3 complete, shipped 2026-03-01)
+Next milestone: v1.1 Quality Gates — Phase 4 (Test Coverage) → Phase 5 (Release Readiness)
+Status: Ready to plan Phase 4
 
-Progress: [██████████] 15/15 plans (Phases 1-3 complete; Phase 4 next)
-
-## Performance Metrics
-
-**Velocity:**
-- Total plans completed: 4
-- Average duration: 5 min
-- Total execution time: 0.30 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-stability | 4 | 18 min | 5 min |
-| 02-design-system | 7 | 14 min | 2 min |
-| 03-performance-polish | 3 | 6 min | 2 min |
-
-**Recent Trend:**
-- Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min, 6 min
-- Trend: -
-
-*Updated after each plan completion*
-| Phase 03-performance-polish P01 | 5 | 4 tasks | 13 files |
-| Phase 03-performance-polish P03 | 4 | 3 tasks | 18 files |
+Progress: [██████░░░░] v1.0 shipped; v1.1 not started
 
 ## Accumulated Context
 
-### Decisions
+### Key Decisions (Full log in PROJECT.md)
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Critical decisions for v1.1 planning:
 
-- Roadmap: 5 phases following Stability -> Design System -> Performance -> Testing -> Release dependency chain (research-validated ordering)
-- Roadmap: Tests come after fixes (Phase 4 after Phases 1-3) to avoid testing broken behavior
-- 01-01: Store FilterType as enum.name String in SavedStateHandle (FilterType is not Parcelable; name-string is stable and Bundle-safe; avoids breaking on enum reordering)
-- 01-01: Use savedStateHandle.getLiveData() directly as backing store (no separate MutableLiveData field) to eliminate dual-source-of-truth risk
-- 01-01: Keep currentCaptureUri, pdfUri, isLoading as plain MutableLiveData (transient session state that has no useful meaning across process death)
-- 01-01: No custom ViewModelFactory needed -- fragment-ktx's SavedStateViewModelFactory auto-injects SavedStateHandle when constructor requests it
-- 01-02: Use Kotlin use {} blocks for PdfRenderer/ParcelFileDescriptor — guaranteed close on exception paths
-- 01-02: Individual try-catch per resource in close() methods — partial cleanup if one resource fails
-- 01-02: Capture requireContext().applicationContext before coroutine launch — avoids Activity context leak on IO thread
-- 01-02: Remove undo/redo buttons entirely rather than disabling — non-functional UI unacceptable in portfolio app
-- 01-02: 1-hour threshold for stale temp cleanup — conservative enough for active sessions, aggressive enough for orphaned files
-- 01-03: Capture ctx at coroutine launch top (not inside withContext blocks) to avoid race where context becomes null between IO return and Main resume
-- 01-03: Pass ctx as explicit parameter to IO-thread helper functions — prevents requireContext() on background thread
-- 01-03: EXIF correction runs on main thread in handleGalleryResult (acceptable for small image counts); inside coroutine in handleImportResult
-- 01-03: showImportProgress made null-safe — _binding/context checks rather than pushing responsibility to callers
-- 01-04: Capture applicationContext before coroutine launch when methods need Context on IO thread — prevents requireContext() crash on background thread
-- 01-04: Pass ctx as explicit parameter to loadFullResBitmap and createProcessedFile — enables IO-thread safe access without context capture in IO block
-- 01-04: inSampleSize two-pass decode (2380x3368 max) for PreviewFragment bitmap loading — hardware-accelerated downsampling, prevents 192MB+ OOM on 48MP cameras
-- 01-04: createScaledBitmap + conditional recycle in ImageProcessor — caps pixel array allocation before IntArray(w*h) ops without modifying callers
-- 02-02: Use Coil 3.4.0 base artifact only — no coil-compose or coil-network (View-based app, local file URIs only)
-- 02-02: HistoryAdapter PDF thumbnail loads file URI with error drawable fallback — Coil cannot render PDF pages (PdfRenderer thumbnail is Phase 3 scope)
-- 02-02: Remove adapterScope CoroutineScope from PagesAdapter — Coil manages its own coroutines and auto-cancels on ImageView detach
-- 02-01: Use ?attr/colorOnSurface (not @color/cartoon_text_primary) in TextAppearance styles — theme attribute is dark-mode aware, direct color reference is light-mode only
-- 02-01: Use ?attr/colorOnSurfaceVariant (not @color/cartoon_text_secondary) for secondary text in BodyMedium and BodySmall — enables Material3 dark theme to provide correct contrast automatically
-- 02-01: Keep android:textSize on MaterialButton elements — button textSize is widget style concern, not a typography system violation; only TextView textSize is replaced
-- 02-01: Preserve explicit fontFamily alongside textAppearance for special cases (app name in fragment_home has shadow + custom letterSpacing that must remain)
-- 02-04: app:title emoji in fragment_preview.xml toolbar left as-is — app:title is MaterialToolbar attribute, not android:text; deferred to future cleanup
-- 02-04: fragment_pdf_editor.xml Save button mapped to @string/save_changes — existing "Save" string reused, emoji removed
-- 02-04: "Edit PDF" toolbar title in fragment_pdf_editor.xml replaced with @string/content_desc_edit_pdf — string reuse preferred over creating new title-specific entry
-- 02-03: showSnackbar extension on Fragment uses view?.let{} guard — safe when fragment is detached (view == null)
-- 02-03: PdfEditorFragment (editor package) needs explicit import: import com.pdfscanner.app.ui.showSnackbar
-- 02-03: Anonymous object callbacks (e.g., OnImageSavedCallback) need this@Fragment.showSnackbar() qualification — anonymous objects don't capture Fragment receiver
-- 02-03: Dynamic messages use getString(R.string.format_str, arg) before showSnackbar() call — keeps extension API clean with only String and @StringRes overloads
-- 02-05: Physical device dark mode verification deferred — build environment (Android Studio + JDK) not configured in WSL2; code-side fix (?attr/colorOnSurface* in TextAppearance) confirmed correct via static review of 02-01 changes
-- 02-06: Use tools:text (not android:text) for tvPageInfo page indicator — value is set programmatically by PdfEditorFragment; tools:text is design-time only and stripped at build time
-- 02-06: No string resource for "1 / 1" placeholder — tools:text exists for this pattern; the value is always overwritten by fragment code
-- [Phase 02-design-system]: 02-07: app:title emoji in fragment_pages.xml MaterialToolbar left as-is — app:title not covered by android:text DSYS-06 scope
-- [Phase 02-design-system]: 02-07: Unicode checkmark U+2713 in dialog_signature.xml btnInsert replaced with @string/sig_insert for localization hygiene even though not technically emoji
-- [Phase 02-design-system]: 02-08: android:hint="Enter your text" on tilText in dialog_text_input.xml left unchanged — android:hint scope explicitly deferred to Phase 5 Lint cleanup per established 02-07 decision
-- [Phase 02-design-system]: 02-08: tvSizeValue and tvPreview in dialog_text_input.xml use tools:text (not string resources) — values overwritten at runtime by TextInputDialogFragment; tools:text is design-time only, following tvPageInfo pattern from 02-06
-- [Phase 03-performance-polish]: 03-02: Use Build.VERSION_CODES.R conditional for haptic — CONFIRM (API 30+) gives semantic "success" vibration vs VIRTUAL_KEY (API 24-29) fallback; no VIBRATE permission needed
-- [Phase 03-performance-polish]: 03-02: Use limitedParallelism(1) not a Mutex for PdfRenderer serialization — creates single-threaded dispatcher, naturally serializes openPage() calls without explicit lock management
-- [Phase 03-performance-polish]: 03-02: setImageDrawable(null) before bitmap recycling in onDestroyView — prevents Canvas recycled-bitmap crash if ImageView is still drawing on main thread
-- [Phase 03-performance-polish]: enableEdgeToEdge() called after super.onCreate() before binding — required window flag order
-- [Phase 03-performance-polish]: Remove android:statusBarColor and navigationBarColor from theme; keep windowLight* items for icon tint control
-- [Phase 03-performance-polish]: Snackbar undo pattern: commit deletion immediately, restore on undo tap — no confirmation dialog for recoverable actions
-- [Phase 03-performance-polish]: 03-03: Transitions placed in onCreate() not onViewCreated() — transition system ignores transitions set after view creation begins
-- [Phase 03-performance-polish]: 03-03: enterTransition/returnTransition in entering fragment; exitTransition/reenterTransition at departing fragment's navigate() callsite
-- [Phase 03-performance-polish]: 03-03: MaterialSharedAxis.Z for hierarchical navigation; MaterialFadeThrough for lateral peer navigation
-- [Phase 03-performance-polish]: 03-03: View.post{} for IO→UI progress updates inside withContext(IO) — avoids nested withContext(Main) dispatch
-- [Phase 03-performance-polish]: 03-03: onProgress callback on generatePdf() rather than StateFlow/LiveData — simpler, no extra ViewModel plumbing needed
+- Transitions must be set in `onCreate()` not `onViewCreated()` — transition system ignores post-creation changes
+- `limitedParallelism(1)` for PdfRenderer serialization — use instead of Mutex
+- Coil 2.7.0 (not 3.x) — Kotlin 1.9 compatibility
+- `tools:text` for programmatically-set TextViews — not `android:text`
+- Context capture: `val ctx = context ?: return@launch` at TOP of every `lifecycleScope.launch` body
+- `?attr/colorOnSurface*` in TextAppearance styles — not direct color references
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- Library version verification needed: All dependency versions from research are based on May 2025 training data. Verify against Maven Central before adding to build.gradle.kts (affects Phase 4 primarily).
-- Build verification blocked: WSL2 environment lacks Java/JDK installation. Run `./gradlew assembleDebug` on a machine with Android SDK before release.
+- **Build environment**: WSL2 lacks Java/JDK — cannot run `./gradlew assembleDebug/Release`. Need Android Studio on host machine before Phase 5 (Release Readiness) can execute RELEASE-04.
+- **Library versions**: Verify dependency versions against Maven Central before Phase 4 — research was based on May 2025 training data (JUnit 4, MockK, Robolectric, Espresso versions).
+- **Dark mode physical device test**: Deferred from Phase 2 — should be included in Phase 5 E2E verification (RELEASE-04).
 
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-03-PLAN.md — Material motion transitions + LinearProgressIndicator; PERF-01 and PERF-04 satisfied; Phase 3 complete; ready for Phase 4 (Testing)
+Stopped at: v1.0 milestone completed and archived — MILESTONES.md, PROJECT.md, ROADMAP.md, RETROSPECTIVE.md all updated; git tag v1.0 pending
 Resume file: None
