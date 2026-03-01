@@ -228,9 +228,12 @@
                 android:orientation="vertical"
                 android:padding="@dimen/spacing_lg">
 
-                <ProgressBar
-                    android:layout_width="48dp"
-                    android:layout_height="48dp" />
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressIndicator"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="false"
+                    app:trackCornerRadius="4dp" />
 
                 <TextView
                     android:id="@+id/loadingText"

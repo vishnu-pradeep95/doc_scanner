@@ -589,11 +589,21 @@ class PagesFragment : Fragment() {
         binding.loadingText.text = getString(R.string.creating_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
 
+        // Set up determinate progress indicator before launching IO
+        binding.progressIndicator.max = selectedUris.size
+        binding.progressIndicator.progress = 0
+
         lifecycleScope.launch {
             val ctx = context ?: return@launch
             try {
                 val pdfFile = withContext(Dispatchers.IO) {
-                    generatePdf(ctx, selectedUris, baseName)
+                    generatePdf(ctx, selectedUris, baseName, onProgress = { current, total ->
+                        // post() marshals to UI thread safely from inside withContext(IO)
+                        binding.progressIndicator.post {
+                            binding.progressIndicator.progress = current
+                            binding.loadingText.text = getString(R.string.pdf_progress, current, total)
+                        }
+                    })
                 }
 
                 generatedPdfFile = pdfFile
@@ -832,9 +842,13 @@ class PagesFragment : Fragment() {
         binding.loadingText.text = getString(R.string.creating_pdf)
         binding.loadingOverlay.visibility = View.VISIBLE
 
+        // Set up determinate progress indicator before launching IO
+        binding.progressIndicator.max = pages.size
+        binding.progressIndicator.progress = 0
+
         /**
          * lifecycleScope.launch - start coroutine tied to Fragment lifecycle
-         * 
+         *
          * If Fragment is destroyed, coroutine is automatically cancelled
          * This prevents crashes from updating destroyed UI
          */
@@ -848,7 +862,13 @@ class PagesFragment : Fragment() {
                  * The result is returned to the outer coroutine
                  */
                 val pdfFile = withContext(Dispatchers.IO) {
-                    generatePdf(ctx, pages)
+                    generatePdf(ctx, pages, onProgress = { current, total ->
+                        // post() marshals to UI thread safely from inside withContext(IO)
+                        binding.progressIndicator.post {
+                            binding.progressIndicator.progress = current
+                            binding.loadingText.text = getString(R.string.pdf_progress, current, total)
+                        }
+                    })
                 }
 
                 // Store reference for sharing
@@ -892,28 +912,37 @@ class PagesFragment : Fragment() {
      * @param customBaseName Optional custom name for the PDF
      * @return File object pointing to generated PDF
      */
-    private fun generatePdf(ctx: android.content.Context, pageUris: List<Uri>, customBaseName: String? = null): File {
+    private fun generatePdf(
+        ctx: android.content.Context,
+        pageUris: List<Uri>,
+        customBaseName: String? = null,
+        onProgress: ((current: Int, total: Int) -> Unit)? = null
+    ): File {
         // Create new PDF document
         val pdfDocument = PdfDocument()
 
         /**
          * A4 page dimensions at 72 DPI
-         * 
+         *
          * A4 is 210mm × 297mm
          * At 72 DPI: 595 × 842 points
-         * 
+         *
          * These are PDF points, not pixels
          */
         val pageWidth = 595
         val pageHeight = 842
+        val total = pageUris.size
 
         /**
          * Process each page
-         * 
+         *
          * forEachIndexed gives us both the index and the item
          * Like enumerate() in Python
          */
         pageUris.forEachIndexed { index, uri ->
+            // Report progress before processing each page
+            onProgress?.invoke(index + 1, total)
+
             // Decode the image bitmap
             val bitmap = decodeSampledBitmap(ctx, uri, pageWidth, pageHeight)
                 ?: throw Exception("Failed to decode page ${index + 1}")

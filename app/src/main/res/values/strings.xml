@@ -288,4 +288,7 @@
         <item quantity="other">%d pages deleted</item>
     </plurals>
 
+    <!-- PDF generation progress (determinate indicator) -->
+    <string name="pdf_progress">Page %1$d of %2$d\u2026</string>
+
 </resources>
