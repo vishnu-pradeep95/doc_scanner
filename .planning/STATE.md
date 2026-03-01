@@ -8,7 +8,7 @@ progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 8
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 ## Current Position
 
 Phase: 4 of 5 (Test Coverage)
-Plan: 2 of 5 in current phase (04-02 complete)
-Status: In progress — 04-02 complete, ScannerViewModel tests written (22 tests)
-Last activity: 2026-03-01 — 04-02 complete: 22 JVM unit tests for ScannerViewModel (page CRUD, filter state, PDF naming)
+Plan: 3 of 5 in current phase (04-03 complete)
+Status: In progress — 04-03 complete, DocumentEntry and ImageProcessor tests written (9+9 tests)
+Last activity: 2026-03-01 — 04-03 complete: 9 Robolectric tests for DocumentEntry JSON + formattedSize; 9 Robolectric tests for ImageProcessor filters (all 5 FilterTypes, dimension capping, file write)
 
-Progress: [##░░░░░░░░] 25% (2/8 plans complete)
+Progress: [###░░░░░░░] 37% (3/8 plans complete)
 
 ## Accumulated Context
 
@@ -56,6 +56,10 @@ Decisions from 04-02 execution (2026-03-01):
 - Uri.parse() NOT available on plain JVM (JUnit4 runner without Robolectric) — use mockk(name = "label") for Uri instances in JVM unit tests; reference equality is sufficient for ViewModel list operations
 - Derived LiveData (Transformations.map) requires observeForever to activate — attach in @Before, remove in @After. Direct SavedStateHandle.getLiveData() does not need this.
 
+Decisions from 04-03 execution (2026-03-01):
+- org.json.JSONObject requires RobolectricTestRunner — plain JVM Android stubs throw RuntimeException on put/getString; DocumentEntryTest uses @RunWith(RobolectricTestRunner::class) instead of JUnit4
+- ImageProcessor does NOT call OcrProcessor — no ML Kit interface refactor needed; confirmed via test run with 0 UnsatisfiedLinkError
+
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
@@ -69,5 +73,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-02 — ScannerViewModel unit tests (22 tests, page CRUD + filter state + PDF naming)
+Stopped at: Completed 04-03 — DocumentEntry and ImageProcessor unit tests (9+9 Robolectric tests)
 Resume file: None
