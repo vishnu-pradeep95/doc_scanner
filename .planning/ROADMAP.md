@@ -58,7 +58,7 @@ Plans:
 - [x] 02-05-PLAN.md — Dark mode visual verification checkpoint on all 7 screens (DSYS-07)
 - [x] 02-06-PLAN.md — Gap closure: fragment_pdf_editor.xml 12 tool labels + page indicator extracted to strings.xml (DSYS-05)
 - [x] 02-07-PLAN.md — Gap closure: emoji removed from fragment_pages.xml + dialog_signature.xml + dialog_success.xml + dialog_ocr_result.xml (DSYS-06)
-- [ ] 02-08-PLAN.md — Gap closure (round 3): dialog_stamp_picker.xml + dialog_text_input.xml + 2 minor contentDescriptions fully extracted to strings.xml (DSYS-05, DSYS-06)
+- [x] 02-08-PLAN.md — Gap closure (round 3): dialog_stamp_picker.xml + dialog_text_input.xml + 2 minor contentDescriptions fully extracted to strings.xml (DSYS-05, DSYS-06)
 
 ### Phase 3: Performance & Polish
 **Goal**: The app feels responsive and delightful — smooth transitions, tactile feedback, modern edge-to-edge display, and clear progress indicators
@@ -70,11 +70,12 @@ Plans:
   3. App content extends behind the system bars with proper padding — no content clipped by status bar or navigation bar on any API level
   4. PDF generation shows "Page X of Y" progress — user knows exactly how far along the operation is
   5. Deleting a page or discarding a scan shows a Snackbar with an undo action — user can recover from accidental destructive actions
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — Edge-to-edge in MainActivity + insets in all 8 fragments + Snackbar undo for page delete (PERF-03, PERF-05)
+- [ ] 03-02-PLAN.md — Haptic feedback on camera capture + SparseArray page cache in PdfViewerFragment (PERF-02, PERF-06)
+- [ ] 03-03-PLAN.md — Material motion transitions in all 8 fragments + determinate PDF progress (PERF-01, PERF-04)
 
 ### Phase 4: Test Coverage
 **Goal**: Automated tests verify that all stability fixes and UI patterns from Phases 1-3 remain correct as the codebase evolves
@@ -117,6 +118,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Stability | 4/4 | Complete    | 2026-03-01 |
 | 2. Design System | 8/8 | Complete    | 2026-03-01 |
-| 3. Performance & Polish | 0/? | Not started | - |
+| 3. Performance & Polish | 0/3 | Not started | - |
 | 4. Test Coverage | 0/? | Not started | - |
 | 5. Release Readiness | 0/? | Not started | - |
