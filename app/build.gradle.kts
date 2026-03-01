@@ -12,6 +12,7 @@
  */
 
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
 plugins {
     // Android Application Plugin - required for Android apps
@@ -151,6 +152,34 @@ android {
         // View Binding generates a binding class for each XML layout
         // Provides type-safe access to views (no more findViewById)
         viewBinding = true
+    }
+}
+
+// ===== ROBOLECTRIC JACOCO COVERAGE FIX =====
+// Problem: Robolectric's InstrumentingClassLoader re-instruments classes with its own
+// ASM pass, which strips the JaCoCo instrumentation that AGP added at compile time.
+// The AGP exec file therefore shows 0% for Robolectric-backed test classes.
+//
+// Fix: Use the JaCoCo Gradle plugin's built-in task extension to write a SEPARATE
+// exec file specifically for the testDebugUnitTest JVM process. JaCoCo's agent runs
+// in the host JVM (not Robolectric's sandboxed classloader), so it captures coverage
+// for the instrument call chains that Robolectric exposes back to the host JVM.
+//
+// The jacocoTestReport task is updated below to include BOTH exec files.
+apply(plugin = "jacoco")
+
+// Configure the JaCoCo agent for the unit test task to write a separate exec file
+afterEvaluate {
+    tasks.named("testDebugUnitTest") {
+        extensions.configure<JacocoTaskExtension> {
+            isEnabled = true
+            destinationFile = layout.buildDirectory.file(
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTestRobolectric.exec"
+            ).get().asFile
+            isIncludeNoLocationClasses = true
+            // Exclude synthetic Kotlin lambdas/coroutine continuations from probe insertion
+            excludes = listOf("jdk.internal.*", "sun.reflect.*")
+        }
     }
 }
 
@@ -393,7 +422,14 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     classDirectories.setFrom(files(debugTree, kotlinDebugTree))
     sourceDirectories.setFrom(files("${projectDir}/src/main/java"))
+    // Include both exec files:
+    // 1. AGP-generated exec (covers JUnit4/MockK tests — ScannerViewModelTest)
+    // 2. Gradle JaCoCo plugin exec (covers Robolectric tests — ImageProcessorTest,
+    //    DocumentEntryTest, DocumentHistoryRepositoryTest)
     executionData.setFrom(fileTree(layout.buildDirectory.get()) {
-        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        include(
+            "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+            "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTestRobolectric.exec",
+        )
     })
 }
