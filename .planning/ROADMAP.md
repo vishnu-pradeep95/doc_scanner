@@ -12,7 +12,7 @@ This is a systematic quality pass on a feature-complete Android document scanner
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Stability** - Fix crashes, resource leaks, data integrity, and process death recovery
+- [x] **Phase 1: Stability** - Fix crashes, resource leaks, data integrity, and process death recovery
 - [ ] **Phase 2: Design System** - Establish and apply consistent typography, spacing, feedback patterns, and image loading
 - [ ] **Phase 3: Performance & Polish** - Navigation transitions, haptic feedback, edge-to-edge display, and smooth rendering
 - [ ] **Phase 4: Test Coverage** - Unit tests, integration tests, and navigation flow tests locking in correct behavior
@@ -36,7 +36,7 @@ Plans:
 - [x] 01-01-PLAN.md — ScannerViewModel immutable collections + SavedStateHandle (BUG-04, BUG-05)
 - [x] 01-02-PLAN.md — Resource leak fixes, temp cleanup, undo/redo removal (BUG-02, BUG-03, BUG-07)
 - [x] 01-03-PLAN.md — Fragment crash safety (high-risk) + EXIF import fix (BUG-01, BUG-08)
-- [ ] 01-04-PLAN.md — Fragment crash safety (remaining) + bitmap memory caps (BUG-01, BUG-06)
+- [x] 01-04-PLAN.md — Fragment crash safety (remaining) + bitmap memory caps (BUG-01, BUG-06)
 
 ### Phase 2: Design System
 **Goal**: Every screen follows the same typography scale, spacing grid, and feedback patterns — the cartoon theme feels intentional, not ad-hoc
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Stability | 3/4 | In progress | - |
+| 1. Stability | 4/4 | Complete | 2026-03-01 |
 | 2. Design System | 0/? | Not started | - |
 | 3. Performance & Polish | 0/? | Not started | - |
 | 4. Test Coverage | 0/? | Not started | - |

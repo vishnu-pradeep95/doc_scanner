@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 1 of 5 (Stability)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-28 — Completed 01-03: Fragment crash safety (high-risk) + EXIF orientation correction
+Plan: 4 of 4 in current phase — Phase 1 COMPLETE
+Status: Phase 1 complete, Phase 2 not started
+Last activity: 2026-03-01 — Completed 01-04: Fragment crash safety (remaining) + bitmap OOM prevention
 
-Progress: [███░░░░░░░] 15%
+Progress: [████░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 4 min
-- Total execution time: 0.20 hours
+- Total plans completed: 4
+- Average duration: 5 min
+- Total execution time: 0.30 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-stability | 3 | 12 min | 4 min |
+| 01-stability | 4 | 18 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 5 min, 5 min
+- Last 5 plans: 2 min, 5 min, 5 min, 6 min
 - Trend: -
 
 *Updated after each plan completion*
@@ -57,6 +57,10 @@ Recent decisions affecting current work:
 - 01-03: Pass ctx as explicit parameter to IO-thread helper functions — prevents requireContext() on background thread
 - 01-03: EXIF correction runs on main thread in handleGalleryResult (acceptable for small image counts); inside coroutine in handleImportResult
 - 01-03: showImportProgress made null-safe — _binding/context checks rather than pushing responsibility to callers
+- 01-04: Capture applicationContext before coroutine launch when methods need Context on IO thread — prevents requireContext() crash on background thread
+- 01-04: Pass ctx as explicit parameter to loadFullResBitmap and createProcessedFile — enables IO-thread safe access without context capture in IO block
+- 01-04: inSampleSize two-pass decode (2380x3368 max) for PreviewFragment bitmap loading — hardware-accelerated downsampling, prevents 192MB+ OOM on 48MP cameras
+- 01-04: createScaledBitmap + conditional recycle in ImageProcessor — caps pixel array allocation before IntArray(w*h) ops without modifying callers
 
 ### Pending Todos
 
@@ -65,11 +69,10 @@ None yet.
 ### Blockers/Concerns
 
 - Library version verification needed: All dependency versions from research are based on May 2025 training data. Verify against Maven Central before adding to build.gradle.kts (affects Phase 4 primarily).
-- Phase 1 scope: 154 requireContext() call sites audited for PagesFragment, HistoryFragment, HomeFragment (01-03 complete). Remaining audit needed for 01-04 (other fragments).
 - Build verification blocked: WSL2 environment lacks Java/JDK installation. Run `./gradlew assembleDebug` on a machine with Android SDK before release.
 
 ## Session Continuity
 
-Last session: 2026-02-28
-Stopped at: Completed 01-03-PLAN.md (fragment crash safety high-risk, EXIF correction)
+Last session: 2026-03-01
+Stopped at: Completed 01-04-PLAN.md (fragment crash safety remaining, bitmap OOM prevention) — Phase 1 complete
 Resume file: None

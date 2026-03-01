@@ -12,7 +12,7 @@
 - [x] **BUG-03**: Stale temp files (>1hr) in cacheDir cleaned up on app startup — storage does not grow unboundedly
 - [x] **BUG-04**: ScannerViewModel page list uses immutable list pattern — no concurrent modification or silent data loss during batch scan
 - [x] **BUG-05**: ScannerViewModel preserves in-progress scan state across process death using SavedStateHandle
-- [ ] **BUG-06**: Bitmap decode dimensions capped to PDF output size during generation, explicit `recycle()` called after use — no OOM on 10+ page documents
+- [x] **BUG-06**: Bitmap decode dimensions capped to PDF output size during generation, explicit `recycle()` called after use — no OOM on 10+ page documents
 - [x] **BUG-07**: PDF Editor undo/redo is either fully implemented or buttons are removed — no "coming soon" placeholder in a portfolio app
 - [x] **BUG-08**: Imported images display with correct rotation (EXIF orientation respected)
 
@@ -95,7 +95,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUG-03 | Phase 1 | Complete (01-02) |
 | BUG-04 | Phase 1 | Complete (01-01) |
 | BUG-05 | Phase 1 | Complete (01-01) |
-| BUG-06 | Phase 1 | Pending |
+| BUG-06 | Phase 1 | Complete (01-04) |
 | BUG-07 | Phase 1 | Complete (01-02) |
 | BUG-08 | Phase 1 | Complete (01-03) |
 | DSYS-01 | Phase 2 | Pending |
@@ -136,4 +136,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-02-28 after 01-03 plan completion*
+*Last updated: 2026-03-01 after 01-04 plan completion (Phase 1 complete — all BUG-* requirements satisfied)*
