@@ -27,6 +27,9 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -137,6 +140,19 @@ class HomeFragment : Fragment() {
         setupRecentDocuments()
         setupSettings()
         observeViewModel()
+
+        // Edge-to-edge inset handling
+        // HomeFragment has no toolbar — apply top inset to root, bottom inset to recycler
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.recyclerRecentDocs) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     override fun onResume() {

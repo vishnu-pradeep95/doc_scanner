@@ -17,6 +17,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.pdfscanner.app.ui.showSnackbar
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -66,6 +69,18 @@ class PdfViewerFragment : Fragment() {
         setupToolbar()
         setupNavigation()
         loadPdf()
+
+        // Edge-to-edge inset handling
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.navigationBar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
     
     private fun setupToolbar() {

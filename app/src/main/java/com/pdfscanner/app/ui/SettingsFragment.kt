@@ -15,6 +15,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -49,6 +52,19 @@ class SettingsFragment : Fragment() {
         setupToolbar()
         setupSettings()
         updateUI()
+
+        // Edge-to-edge inset handling
+        // SettingsFragment uses a ScrollView root — apply top inset to toolbar, bottom to root
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun setupToolbar() {

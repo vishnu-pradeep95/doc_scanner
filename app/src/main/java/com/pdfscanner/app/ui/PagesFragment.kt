@@ -35,6 +35,9 @@ import android.widget.TextView
 // AlertDialog for confirmation prompts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider  // Secure file URI provider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 
@@ -128,6 +131,33 @@ class PagesFragment : Fragment() {
         setupRecyclerView()
         setupButtons()
         observeViewModel()
+
+        // Edge-to-edge inset handling — PagesFragment has two toolbars + two button bars
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.selectionToolbar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.buttonsLayout) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.selectionButtonsLayout) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.recyclerPages) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     // ============================================================

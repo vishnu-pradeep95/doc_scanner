@@ -39,6 +39,9 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider  // Secure file sharing
 import androidx.core.net.toUri  // Extension to convert File to Uri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels  // Shared ViewModel
 import androidx.lifecycle.lifecycleScope
@@ -228,9 +231,21 @@ class PreviewFragment : Fragment() {
         setupToolbar()
         setupButtons()
         setupFilterButtons()
-        
+
         // Display the captured image
         loadImage(currentImageUri!!)
+
+        // Edge-to-edge inset handling
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.buttonsLayout) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     // ============================================================

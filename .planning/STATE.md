@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T18:33:36.922Z"
+last_updated: "2026-03-01T20:14:37Z"
 progress:
-  total_phases: 2
+  total_phases: 5
   completed_phases: 2
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 15
+  completed_plans: 13
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** Phase 2: Design System
+**Current focus:** Phase 3: Performance and Polish
 
 ## Current Position
 
-Phase: 2 of 5 (Design System)
-Plan: 8 of 8 complete — Phase 2 fully complete (including gap closure plans 02-06, 02-07, and 02-08)
-Status: Phase 1 complete, Phase 2 complete — all 8 plans done; DSYS-05 and DSYS-06 fully closed; ready for Phase 3
-Last activity: 2026-03-01 — 02-08 complete (10 string entries added, 14 hardcoded attributes replaced across dialog_stamp_picker.xml, dialog_text_input.xml, item_saved_signature.xml, fragment_home.xml; DSYS-05 and DSYS-06 fully satisfied)
+Phase: 3 of 5 (Performance and Polish)
+Plan: 2 of 3 complete — 03-01 (bulk-delete Snackbar undo) and 03-02 (haptic feedback + PDF page cache) done
+Status: Phase 1 complete, Phase 2 complete, Phase 3 in progress — 2/3 plans done
+Last activity: 2026-03-01 — 03-02 complete (haptic feedback on camera capture; SparseArray bitmap cache + serialized pdfIoDispatcher in PDF viewer; PERF-02 and PERF-06 satisfied)
 
-Progress: [██████████] 100% (10/10 plans — Phases 1-2 complete)
+Progress: [████████░░] 13/15 plans (Phases 1-2 complete; Phase 3: 2/3 done)
 
 ## Performance Metrics
 
@@ -42,6 +42,7 @@ Progress: [██████████] 100% (10/10 plans — Phases 1-2 comp
 |-------|-------|-------|----------|
 | 01-stability | 4 | 18 min | 5 min |
 | 02-design-system | 7 | 14 min | 2 min |
+| 03-performance-polish | 2 | 2 min | 1 min |
 
 **Recent Trend:**
 - Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min, 6 min
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 02-design-system]: 02-07: Unicode checkmark U+2713 in dialog_signature.xml btnInsert replaced with @string/sig_insert for localization hygiene even though not technically emoji
 - [Phase 02-design-system]: 02-08: android:hint="Enter your text" on tilText in dialog_text_input.xml left unchanged — android:hint scope explicitly deferred to Phase 5 Lint cleanup per established 02-07 decision
 - [Phase 02-design-system]: 02-08: tvSizeValue and tvPreview in dialog_text_input.xml use tools:text (not string resources) — values overwritten at runtime by TextInputDialogFragment; tools:text is design-time only, following tvPageInfo pattern from 02-06
+- [Phase 03-performance-polish]: 03-02: Use Build.VERSION_CODES.R conditional for haptic — CONFIRM (API 30+) gives semantic "success" vibration vs VIRTUAL_KEY (API 24-29) fallback; no VIBRATE permission needed
+- [Phase 03-performance-polish]: 03-02: Use limitedParallelism(1) not a Mutex for PdfRenderer serialization — creates single-threaded dispatcher, naturally serializes openPage() calls without explicit lock management
+- [Phase 03-performance-polish]: 03-02: setImageDrawable(null) before bitmap recycling in onDestroyView — prevents Canvas recycled-bitmap crash if ImageView is still drawing on main thread
 
 ### Pending Todos
 
@@ -109,5 +113,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-08-PLAN.md — DSYS-05 and DSYS-06 fully satisfied; Phase 2 fully done (all 8 plans); ready for Phase 3
+Stopped at: Completed 03-02-PLAN.md — haptic feedback on camera capture + SparseArray bitmap cache in PDF viewer; PERF-02 and PERF-06 satisfied; ready for 03-03
 Resume file: None

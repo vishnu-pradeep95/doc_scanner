@@ -73,8 +73,8 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Edge-to-edge in MainActivity + insets in all 8 fragments + Snackbar undo for page delete (PERF-03, PERF-05)
-- [ ] 03-02-PLAN.md — Haptic feedback on camera capture + SparseArray page cache in PdfViewerFragment (PERF-02, PERF-06)
+- [x] 03-01-PLAN.md — Edge-to-edge in MainActivity + insets in all 8 fragments + Snackbar undo for page delete (PERF-03, PERF-05)
+- [x] 03-02-PLAN.md — Haptic feedback on camera capture + SparseArray page cache in PdfViewerFragment (PERF-02, PERF-06)
 - [ ] 03-03-PLAN.md — Material motion transitions in all 8 fragments + determinate PDF progress (PERF-01, PERF-04)
 
 ### Phase 4: Test Coverage
@@ -118,6 +118,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Stability | 4/4 | Complete    | 2026-03-01 |
 | 2. Design System | 8/8 | Complete    | 2026-03-01 |
-| 3. Performance & Polish | 0/3 | Not started | - |
+| 3. Performance & Polish | 2/3 | In progress | - |
 | 4. Test Coverage | 0/? | Not started | - |
 | 5. Release Readiness | 0/? | Not started | - |

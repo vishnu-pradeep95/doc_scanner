@@ -53,6 +53,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider  // Manages camera lifecy
 // AndroidX utilities
 import androidx.core.content.ContextCompat  // Permission checking helper
 import androidx.core.net.toUri  // Extension function: File.toUri()
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment  // Base Fragment class
 import androidx.fragment.app.activityViewModels  // Shared ViewModel injection
 import androidx.navigation.fragment.findNavController  // Navigation helper
@@ -274,12 +277,20 @@ class CameraFragment : Fragment() {
 
         // Setup UI components
         setupUI()
-        
+
         // Check/request camera permission
         checkCameraPermission()
-        
+
         // Start observing ViewModel data
         observeViewModel()
+
+        // Edge-to-edge inset handling
+        // CameraFragment: full-screen preview — apply bottom inset only to controlsLayout
+        ViewCompat.setOnApplyWindowInsetsListener(binding.controlsLayout) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     /**

@@ -25,6 +25,9 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import com.pdfscanner.app.ui.showSnackbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -74,9 +77,21 @@ class PdfEditorFragment : Fragment() {
         setupAnnotationCanvas()
         setupPageNavigation()
         setupColorPreview()
-        
+
         loadPdf()
         observeViewModel()
+
+        // Edge-to-edge inset handling
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbarBottom) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
     
     private fun setupToolbar() {
