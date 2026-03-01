@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material motion duration: 300ms matches Material Design guidelines -->
+    <integer name="motion_duration_large">300</integer>
+</resources>
