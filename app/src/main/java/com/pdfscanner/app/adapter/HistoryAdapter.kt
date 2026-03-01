@@ -10,12 +10,15 @@
 
 package com.pdfscanner.app.adapter
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil3.load
+import coil3.request.crossfade
 import com.pdfscanner.app.R
 import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.databinding.ItemDocumentBinding
@@ -78,7 +81,19 @@ class HistoryAdapter(
                 File(document.filePath).nameWithoutExtension
             }
             binding.textDocumentName.text = displayName
-            
+
+            // Load document thumbnail via Coil
+            val file = File(document.filePath)
+            if (file.exists()) {
+                binding.imageDocumentThumbnail.load(Uri.fromFile(file)) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_cartoon_document)
+                    error(R.drawable.ic_cartoon_document)
+                }
+            } else {
+                binding.imageDocumentThumbnail.setImageResource(R.drawable.ic_cartoon_document)
+            }
+
             // Format details: "5 pages • 1.2 MB • Dec 26, 2025"
             val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             val formattedDate = dateFormat.format(Date(document.createdAt))

@@ -1,20 +1,17 @@
 /**
  * PagesAdapter.kt - RecyclerView Adapter for Page Thumbnails
- * 
+ *
  * FEATURES:
  * - Grid display with thumbnails
  * - Multi-selection mode with long press
  * - Selection order tracking for PDF generation
  * - Drag & drop reordering
- * - Efficient thumbnail caching
+ * - Coil-based thumbnail loading (automatic caching, lifecycle-aware, no OOM risk)
  */
 
 package com.pdfscanner.app.adapter
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -23,17 +20,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import coil3.load
+import coil3.request.crossfade
 
+import com.pdfscanner.app.R
 import com.pdfscanner.app.databinding.ItemPageBinding
 
 /**
  * PagesAdapter - Displays page thumbnails with multi-selection & drag-to-reorder
- * 
+ *
  * @param onDeleteClick Callback when delete button is clicked
  * @param onItemClick Callback when page is tapped (for editing) - not called in selection mode
  * @param onItemMoved Callback when items are reordered via drag
@@ -73,23 +68,6 @@ class PagesAdapter(
     private var selectionCounter = 0
 
     // ============================================================
-    // THUMBNAIL CACHE
-    // ============================================================
-
-    private val thumbnailCache: LruCache<String, Bitmap> = run {
-        val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
-        val cacheSize = maxMemory / 8
-        
-        object : LruCache<String, Bitmap>(cacheSize) {
-            override fun sizeOf(key: String, bitmap: Bitmap): Int {
-                return bitmap.byteCount / 1024
-            }
-        }
-    }
-
-    private val adapterScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
-    // ============================================================
     // SELECTION METHODS
     // ============================================================
 
@@ -113,7 +91,7 @@ class PagesAdapter(
             // Deselect - remove and update order numbers
             val removedOrder = selectedItems[position]!!
             selectedItems.remove(position)
-            
+
             // Update order numbers for items selected after this one
             selectedItems.entries.forEach { entry ->
                 if (entry.value > removedOrder) {
@@ -126,9 +104,9 @@ class PagesAdapter(
             selectionCounter++
             selectedItems[position] = selectionCounter
         }
-        
+
         notifyItemChanged(position)
-        
+
         // Exit selection mode if nothing selected
         if (selectedItems.isEmpty()) {
             exitSelectionMode()
@@ -234,11 +212,11 @@ class PagesAdapter(
                 binding.selectionOverlay.visibility = if (isItemSelected) View.VISIBLE else View.GONE
                 binding.textSelectionOrder.visibility = if (isItemSelected) View.VISIBLE else View.GONE
                 binding.checkboxSelect.visibility = View.GONE  // We use order badge instead
-                
+
                 if (isItemSelected) {
                     binding.textSelectionOrder.text = selectionOrder.toString()
                 }
-                
+
                 // Hide normal buttons in selection mode
                 binding.btnDelete.visibility = View.GONE
                 binding.btnRotate.visibility = View.GONE
@@ -252,26 +230,11 @@ class PagesAdapter(
                 binding.dragHandle.visibility = View.VISIBLE
             }
 
-            // Thumbnail loading with caching
-            val cacheKey = uri.toString()
-            val cachedBitmap = thumbnailCache.get(cacheKey)
-            
-            if (cachedBitmap != null) {
-                binding.imageThumbnail.setImageBitmap(cachedBitmap)
-            } else {
-                binding.imageThumbnail.setImageDrawable(null)
-                binding.imageThumbnail.tag = cacheKey
-                
-                adapterScope.launch {
-                    val bitmap = withContext(Dispatchers.IO) {
-                        loadThumbnail(uri, binding.root.context)
-                    }
-                    
-                    if (binding.imageThumbnail.tag == cacheKey && bitmap != null) {
-                        thumbnailCache.put(cacheKey, bitmap)
-                        binding.imageThumbnail.setImageBitmap(bitmap)
-                    }
-                }
+            // Coil handles caching, lifecycle, and placeholder automatically
+            binding.imageThumbnail.load(uri) {
+                crossfade(true)
+                placeholder(R.drawable.ic_cartoon_document)
+                error(R.drawable.ic_cartoon_document)
             }
 
             // Click handlers
@@ -318,54 +281,6 @@ class PagesAdapter(
                 false
             }
         }
-        
-        private fun loadThumbnail(uri: Uri, context: android.content.Context): Bitmap? {
-            return try {
-                var width = 0
-                var height = 0
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val options = BitmapFactory.Options().apply {
-                        inJustDecodeBounds = true
-                    }
-                    BitmapFactory.decodeStream(inputStream, null, options)
-                    width = options.outWidth
-                    height = options.outHeight
-                }
-
-                val targetSize = 200
-                val inSampleSize = calculateInSampleSize(width, height, targetSize, targetSize)
-
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val options = BitmapFactory.Options().apply {
-                        this.inSampleSize = inSampleSize
-                    }
-                    BitmapFactory.decodeStream(inputStream, null, options)
-                }
-            } catch (e: Exception) {
-                null
-            }
-        }
-        
-        private fun calculateInSampleSize(
-            srcWidth: Int,
-            srcHeight: Int,
-            reqWidth: Int,
-            reqHeight: Int
-        ): Int {
-            var inSampleSize = 1
-            
-            if (srcHeight > reqHeight || srcWidth > reqWidth) {
-                val halfHeight = srcHeight / 2
-                val halfWidth = srcWidth / 2
-                
-                while (halfHeight / inSampleSize >= reqHeight && 
-                       halfWidth / inSampleSize >= reqWidth) {
-                    inSampleSize *= 2
-                }
-            }
-            
-            return inSampleSize
-        }
     }
 
     // ============================================================
@@ -401,7 +316,7 @@ class PagesAdapter(
             if (adapter.isSelectionMode) {
                 return makeMovementFlags(0, 0)
             }
-            val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or 
+            val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or
                            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
             return makeMovementFlags(dragFlags, 0)
         }
