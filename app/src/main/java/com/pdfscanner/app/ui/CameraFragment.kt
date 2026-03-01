@@ -663,6 +663,14 @@ class CameraFragment : Fragment() {
                     b.progressBar.visibility = View.GONE
                     b.btnCapture.isEnabled = true
 
+                    // Haptic pulse: confirms document was captured
+                    // CONFIRM added in API 30; fall back to VIRTUAL_KEY for API 24-29
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                        b.btnCapture.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM)
+                    } else {
+                        b.btnCapture.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                    }
+
                     // Convert File to Uri using extension function
                     // Uri is Android's standard way to reference files/resources
                     val savedUri = photoFile.toUri()
