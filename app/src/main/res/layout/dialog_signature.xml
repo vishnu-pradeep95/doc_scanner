@@ -24,14 +24,14 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_signature_mascot"
-            android:contentDescription="Signature mascot" />
+            android:contentDescription="@string/content_desc_sig_mascot" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="✍️ Draw Your Signature"
+            android:text="@string/sig_draw_title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -67,7 +67,7 @@
                 android:id="@+id/tvSavedLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Saved Signatures"
+                android:text="@string/sig_saved_title"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
@@ -88,7 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="75dp"
             android:gravity="center"
-            android:text="No saved signatures yet ✨"
+            android:text="@string/sig_no_saved"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:background="@drawable/bg_dashed_border"
@@ -118,7 +118,7 @@
                 android:id="@+id/tvDrawLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Draw New Signature"
+                android:text="@string/sig_draw_new"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
@@ -149,7 +149,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Sign here ✍️"
+                    android:text="@string/sig_hint"
                     android:textColor="#BBBBBB"
                     android:textSize="14sp" />
 
@@ -181,7 +181,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
                 android:layout_marginEnd="8dp"
-                android:text="🗑️ Clear"
+                android:text="@string/clear"
                 android:textColor="@color/text_secondary" />
 
             <com.google.android.material.button.MaterialButton
@@ -189,7 +189,7 @@
                 style="@style/DialogButton.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
-                android:text="↩️ Undo"
+                android:text="@string/undo"
                 android:textColor="@color/primary" />
 
         </LinearLayout>
@@ -199,7 +199,7 @@
             android:id="@+id/cbSaveSignature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="💾 Save for later"
+            android:text="@string/sig_save_for_later"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             app:buttonTint="@color/primary" />
@@ -246,7 +246,7 @@
             style="@style/DialogButton.Outlined"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnInsert"
@@ -254,7 +254,7 @@
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:layout_marginStart="12dp"
-            android:text="✓ Insert"
+            android:text="@string/sig_insert"
             android:enabled="false"
             app:cornerRadius="20dp"
             android:backgroundTint="@color/primary" />

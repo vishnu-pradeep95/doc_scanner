@@ -135,7 +135,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="@dimen/spacing_xs"
             android:layout_weight="1"
-            android:text="➕ Add More"
+            android:text="@string/add_more"
             android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -144,11 +144,11 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1.2"
-            android:text="📄 Create PDF"
+            android:text="@string/create_pdf"
             android:textSize="14sp" />
 
     </LinearLayout>
-    
+
     <!-- Selection Mode Action buttons (hidden by default) -->
     <LinearLayout
         android:id="@+id/selectionButtonsLayout"
@@ -173,7 +173,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="@dimen/spacing_xs"
             android:layout_weight="1"
-            android:text="🗑️ Delete"
+            android:text="@string/delete_selected"
             android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -182,7 +182,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1.2"
-            android:text="📄 Create PDF"
+            android:text="@string/create_pdf"
             android:textSize="14sp" />
 
     </LinearLayout>
