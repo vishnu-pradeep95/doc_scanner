@@ -78,6 +78,10 @@ Recent decisions affecting current work:
 - 02-02: Use Coil 3.4.0 base artifact only — no coil-compose or coil-network (View-based app, local file URIs only)
 - 02-02: HistoryAdapter PDF thumbnail loads file URI with error drawable fallback — Coil cannot render PDF pages (PdfRenderer thumbnail is Phase 3 scope)
 - 02-02: Remove adapterScope CoroutineScope from PagesAdapter — Coil manages its own coroutines and auto-cancels on ImageView detach
+- 02-01: Use ?attr/colorOnSurface (not @color/cartoon_text_primary) in TextAppearance styles — theme attribute is dark-mode aware, direct color reference is light-mode only
+- 02-01: Use ?attr/colorOnSurfaceVariant (not @color/cartoon_text_secondary) for secondary text in BodyMedium and BodySmall — enables Material3 dark theme to provide correct contrast automatically
+- 02-01: Keep android:textSize on MaterialButton elements — button textSize is widget style concern, not a typography system violation; only TextView textSize is replaced
+- 02-01: Preserve explicit fontFamily alongside textAppearance for special cases (app name in fragment_home has shadow + custom letterSpacing that must remain)
 - 02-04: app:title emoji in fragment_preview.xml toolbar left as-is — app:title is MaterialToolbar attribute, not android:text; deferred to future cleanup
 - 02-04: fragment_pdf_editor.xml Save button mapped to @string/save_changes — existing "Save" string reused, emoji removed
 - 02-04: "Edit PDF" toolbar title in fragment_pdf_editor.xml replaced with @string/content_desc_edit_pdf — string reuse preferred over creating new title-specific entry
@@ -94,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: 02-04-PLAN.md complete — string externalization done, 02-05 next
+Stopped at: 02-01-PLAN.md complete — design system foundation (Cartoon theme, dimens.xml, dark mode fixes, textAppearance on all layouts); 02-05 still next
 Resume file: None
