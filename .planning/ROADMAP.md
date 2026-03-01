@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — ScannerViewModel immutable collections + SavedStateHandle (BUG-04, BUG-05)
+- [x] 01-01-PLAN.md — ScannerViewModel immutable collections + SavedStateHandle (BUG-04, BUG-05)
 - [ ] 01-02-PLAN.md — Resource leak fixes, temp cleanup, undo/redo removal (BUG-02, BUG-03, BUG-07)
 - [ ] 01-03-PLAN.md — Fragment crash safety (high-risk) + EXIF import fix (BUG-01, BUG-08)
 - [ ] 01-04-PLAN.md — Fragment crash safety (remaining) + bitmap memory caps (BUG-01, BUG-06)
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Stability | 0/4 | Planning complete | - |
+| 1. Stability | 1/4 | In progress | - |
 | 2. Design System | 0/? | Not started | - |
 | 3. Performance & Polish | 0/? | Not started | - |
 | 4. Test Coverage | 0/? | Not started | - |

@@ -10,8 +10,8 @@
 - [ ] **BUG-01**: App does not crash when fragments detach during long-running operations — all `requireContext()`/`requireActivity()` calls in coroutine callbacks replaced with null-safe patterns (`context ?: return`)
 - [ ] **BUG-02**: PdfRenderer, ParcelFileDescriptor, and all Closeable resources released using `use {}` blocks — no file descriptor leaks
 - [ ] **BUG-03**: Stale temp files (>1hr) in cacheDir cleaned up on app startup — storage does not grow unboundedly
-- [ ] **BUG-04**: ScannerViewModel page list uses immutable list pattern — no concurrent modification or silent data loss during batch scan
-- [ ] **BUG-05**: ScannerViewModel preserves in-progress scan state across process death using SavedStateHandle
+- [x] **BUG-04**: ScannerViewModel page list uses immutable list pattern — no concurrent modification or silent data loss during batch scan
+- [x] **BUG-05**: ScannerViewModel preserves in-progress scan state across process death using SavedStateHandle
 - [ ] **BUG-06**: Bitmap decode dimensions capped to PDF output size during generation, explicit `recycle()` called after use — no OOM on 10+ page documents
 - [ ] **BUG-07**: PDF Editor undo/redo is either fully implemented or buttons are removed — no "coming soon" placeholder in a portfolio app
 - [ ] **BUG-08**: Imported images display with correct rotation (EXIF orientation respected)
@@ -93,8 +93,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUG-01 | Phase 1 | Pending |
 | BUG-02 | Phase 1 | Pending |
 | BUG-03 | Phase 1 | Pending |
-| BUG-04 | Phase 1 | Pending |
-| BUG-05 | Phase 1 | Pending |
+| BUG-04 | Phase 1 | Complete (01-01) |
+| BUG-05 | Phase 1 | Complete (01-01) |
 | BUG-06 | Phase 1 | Pending |
 | BUG-07 | Phase 1 | Pending |
 | BUG-08 | Phase 1 | Pending |
@@ -136,4 +136,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-02-28 after roadmap creation*
+*Last updated: 2026-02-28 after 01-01 plan completion*
