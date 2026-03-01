@@ -154,14 +154,34 @@ android {
     }
 }
 
+// ===== DEPENDENCY RESOLUTION STRATEGY =====
+// Force coroutines to 1.7.3 across ALL configurations.
+// Without this, mockk / Robolectric transitive dependencies pull in a
+// kotlinx-coroutines BOM that upgrades coroutines to 1.10.1 (Kotlin 2.1.0 binary),
+// which is incompatible with this project's Kotlin 1.9.21 compiler.
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+        force("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")
+        force("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+        force("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+        force("org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:1.7.3")
+        force("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+        // Keep Kotlin stdlib at 1.9.x — prevents transitive Kotlin 2.x stdlib from being pulled in
+        force("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.21")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.21")
+    }
+}
+
 /**
  * dependencies {} block - External Libraries
- * 
+ *
  * implementation() - library is used in your code, not exposed to dependents
  * api() - library is used and exposed to dependents (for library modules)
  * testImplementation() - only for unit tests
  * androidTestImplementation() - only for instrumented tests
- * 
+ *
  * Dependency format: "group:artifact:version"
  * Example: "androidx.core:core-ktx:1.12.0"
  */
