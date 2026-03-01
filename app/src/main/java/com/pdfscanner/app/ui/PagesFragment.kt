@@ -499,30 +499,46 @@ class PagesFragment : Fragment() {
     }
     
     /**
-     * Show confirmation dialog for deleting selected pages
+     * Delete all selected pages immediately and show a Snackbar with Undo action.
+     *
+     * Replaces the old MaterialAlertDialogBuilder confirmation for a less disruptive UX.
+     * PERF-05 requires "discard scan" (bulk-page delete) to use Snackbar undo.
      */
     private fun showDeleteSelectedConfirmation(count: Int) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.confirm_delete)
-            .setMessage(getString(R.string.confirm_delete_selected, count))
-            .setPositiveButton(R.string.delete) { _, _ ->
-                deleteSelectedPages()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        deleteSelectedPagesWithUndo()
     }
-    
+
     /**
-     * Delete all selected pages
+     * Commit bulk deletion and show Snackbar with Undo for restoring all deleted pages.
+     *
+     * Positions are deleted in descending order to avoid index-shift issues.
+     * The Undo action calls insertPages() with the entries sorted ascending so
+     * each restored page lands at the correct position.
      */
-    private fun deleteSelectedPages() {
-        // Get positions in reverse order to avoid index shifting issues
+    private fun deleteSelectedPagesWithUndo() {
+        val pages = viewModel.pages.value ?: return
         val positions = pagesAdapter.getSelectedPositionsInOrder().sortedDescending()
+        if (positions.isEmpty()) return
+
+        // Capture the deleted URIs with their original positions BEFORE deletion
+        val deletedEntries: List<Pair<Int, Uri>> = positions.mapNotNull { pos ->
+            if (pos in pages.indices) Pair(pos, pages[pos]) else null
+        }
+
+        // Commit all deletions (descending order avoids index-shift issues)
         positions.forEach { position ->
             viewModel.removePage(position)
         }
         pagesAdapter.exitSelectionMode()
-        showSnackbar(getString(R.string.pages_deleted_count, positions.size))
+
+        val count = deletedEntries.size
+        val message = resources.getQuantityString(R.plurals.pages_deleted, count, count)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.undo) {
+                // Restore in ascending position order so indices stay correct
+                viewModel.insertPages(deletedEntries.sortedBy { it.first })
+            }
+            .show()
     }
 
     /**
