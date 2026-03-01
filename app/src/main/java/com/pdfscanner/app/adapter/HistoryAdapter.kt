@@ -17,8 +17,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil3.load
-import coil3.request.crossfade
+import coil.load
 import com.pdfscanner.app.R
 import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.databinding.ItemDocumentBinding
