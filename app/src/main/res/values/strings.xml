@@ -230,6 +230,7 @@
     <string name="content_desc_sig_mascot">Signature mascot</string>
     <string name="clear">Clear</string>
     <string name="undo">Undo</string>
+    <string name="page_deleted">Page deleted</string>
 
     <!-- Dialog: Saving Progress -->
     <string name="saving_progress_message">Saving your masterpiece\u2026</string>
@@ -280,4 +281,11 @@
     <string name="content_desc_document_preview">Document preview</string>
     <string name="content_desc_pdf_badge">PDF badge</string>
     <string name="content_desc_scanned_preview">Scanned page preview</string>
+
+    <!-- Plural strings for bulk page operations -->
+    <plurals name="pages_deleted">
+        <item quantity="one">%d page deleted</item>
+        <item quantity="other">%d pages deleted</item>
+    </plurals>
+
 </resources>

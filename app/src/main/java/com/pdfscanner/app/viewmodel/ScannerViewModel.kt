@@ -256,6 +256,39 @@ class ScannerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
     }
 
     /**
+     * Insert a page at a specific position (used by Snackbar Undo after single-page delete).
+     *
+     * Creates a NEW list with the URI inserted at [position].
+     * If [position] is out of range, it is clamped to [0, size].
+     *
+     * @param position Index to insert at (0-based)
+     * @param uri File URI of the page to restore
+     */
+    fun insertPage(position: Int, uri: Uri) {
+        val current = savedStateHandle.get<List<Uri>>(KEY_PAGES).orEmpty().toMutableList()
+        val clampedPosition = position.coerceIn(0, current.size)
+        current.add(clampedPosition, uri)
+        savedStateHandle[KEY_PAGES] = current.toList()
+    }
+
+    /**
+     * Insert multiple pages at their original positions (used by Snackbar Undo after bulk delete).
+     *
+     * Entries must be sorted ASCENDING by position before calling this function —
+     * we insert from lowest to highest so each prior insertion does not shift later indices.
+     *
+     * @param entries List of (originalPosition, uri) pairs, sorted ascending by position
+     */
+    fun insertPages(entries: List<Pair<Int, Uri>>) {
+        val current = savedStateHandle.get<List<Uri>>(KEY_PAGES).orEmpty().toMutableList()
+        entries.sortedBy { it.first }.forEach { (position, uri) ->
+            val clampedPosition = position.coerceIn(0, current.size)
+            current.add(clampedPosition, uri)
+        }
+        savedStateHandle[KEY_PAGES] = current.toList()
+    }
+
+    /**
      * Move a page from one position to another (for drag & drop reordering).
      *
      * Creates a NEW list with the elements at [fromPosition] and [toPosition] swapped.

@@ -32,8 +32,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-// AlertDialog for confirmation prompts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider  // Secure file URI provider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -660,21 +658,24 @@ class PagesFragment : Fragment() {
     // ============================================================
 
     /**
-     * Show confirmation dialog before deleting a page
-     * 
-     * AlertDialog is Android's standard dialog component
-     * Builder pattern is used to configure it
-     * 
+     * Delete a page immediately and show a Snackbar with Undo action.
+     *
+     * Replaces the old AlertDialog confirmation for a less disruptive UX.
+     * The deletion is committed immediately; the user can undo within the Snackbar duration.
+     *
      * @param position Index of page to delete
      */
     private fun showDeleteConfirmation(position: Int) {
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.confirm_delete)  // "Delete this page?"
-            .setPositiveButton(R.string.yes) { _, _ ->
-                // User confirmed - delete the page
-                viewModel.removePage(position)
+        val pages = viewModel.pages.value ?: return
+        if (position !in pages.indices) return
+        val deletedUri = pages[position]
+
+        viewModel.removePage(position)   // Commit deletion immediately
+
+        Snackbar.make(binding.root, R.string.page_deleted, Snackbar.LENGTH_LONG)
+            .setAction(R.string.undo) {
+                viewModel.insertPage(position, deletedUri)
             }
-            .setNegativeButton(R.string.no, null)  // null = just dismiss
             .show()
     }
 
