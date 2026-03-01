@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (Design System)
-Plan: 7 of 7 complete — Phase 2 fully complete (including gap closure plans 02-06 and 02-07)
-Status: Phase 1 complete, Phase 2 complete — all 7 plans done; DSYS-06 closed; ready for Phase 3
-Last activity: 2026-03-01 — 02-07 complete (19 android:text/contentDescription attributes in 4 layout files converted to @string/ references; DSYS-06 fully closed)
+Plan: 8 of 8 complete — Phase 2 fully complete (including gap closure plans 02-06, 02-07, and 02-08)
+Status: Phase 1 complete, Phase 2 complete — all 8 plans done; DSYS-05 and DSYS-06 fully closed; ready for Phase 3
+Last activity: 2026-03-01 — 02-08 complete (10 string entries added, 14 hardcoded attributes replaced across dialog_stamp_picker.xml, dialog_text_input.xml, item_saved_signature.xml, fragment_home.xml; DSYS-05 and DSYS-06 fully satisfied)
 
-Progress: [██████████] 100% (9/9 plans — Phases 1-2 complete)
+Progress: [██████████] 100% (10/10 plans — Phases 1-2 complete)
 
 ## Performance Metrics
 
@@ -41,7 +41,7 @@ Progress: [██████████] 100% (9/9 plans — Phases 1-2 comple
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-stability | 4 | 18 min | 5 min |
-| 02-design-system | 6 | 9 min | 2 min |
+| 02-design-system | 7 | 14 min | 2 min |
 
 **Recent Trend:**
 - Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min, 6 min
@@ -94,6 +94,8 @@ Recent decisions affecting current work:
 - 02-06: No string resource for "1 / 1" placeholder — tools:text exists for this pattern; the value is always overwritten by fragment code
 - [Phase 02-design-system]: 02-07: app:title emoji in fragment_pages.xml MaterialToolbar left as-is — app:title not covered by android:text DSYS-06 scope
 - [Phase 02-design-system]: 02-07: Unicode checkmark U+2713 in dialog_signature.xml btnInsert replaced with @string/sig_insert for localization hygiene even though not technically emoji
+- [Phase 02-design-system]: 02-08: android:hint="Enter your text" on tilText in dialog_text_input.xml left unchanged — android:hint scope explicitly deferred to Phase 5 Lint cleanup per established 02-07 decision
+- [Phase 02-design-system]: 02-08: tvSizeValue and tvPreview in dialog_text_input.xml use tools:text (not string resources) — values overwritten at runtime by TextInputDialogFragment; tools:text is design-time only, following tvPageInfo pattern from 02-06
 
 ### Pending Todos
 
@@ -107,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-07-PLAN.md — DSYS-06 gap closure complete; Phase 2 fully done; ready for Phase 3
+Stopped at: Completed 02-08-PLAN.md — DSYS-05 and DSYS-06 fully satisfied; Phase 2 fully done (all 8 plans); ready for Phase 3
 Resume file: None
