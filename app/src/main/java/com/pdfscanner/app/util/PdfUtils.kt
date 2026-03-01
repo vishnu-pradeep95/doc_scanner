@@ -241,7 +241,7 @@ object PdfUtils {
             PdfOperationResult(
                 success = true,
                 outputUris = outputUris,
-                message = "Split into $pageCount separate PDFs",
+                message = "Split into ${outputUris.size} separate PDFs",
                 originalSize = originalSize,
                 newSize = totalNewSize
             )

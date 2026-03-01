@@ -32,8 +32,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import com.google.android.material.snackbar.Snackbar
-
 // AlertDialog for confirmation prompts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider  // Secure file URI provider
