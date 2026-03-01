@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 3 of 5 (Performance and Polish)
-Plan: 1 of 3 complete — 03-01 (edge-to-edge + Snackbar undo) done; PERF-03 and PERF-05 satisfied
-Status: Phase 1 complete, Phase 2 complete, Phase 3 in progress — 1/3 plans done
-Last activity: 2026-03-01 — 03-01 complete (enableEdgeToEdge + 8-fragment WindowInsets + Snackbar undo for single+bulk page delete; PERF-03 and PERF-05 satisfied)
+Plan: 3 of 3 complete — 03-01 (edge-to-edge + Snackbar undo), 03-02 (haptic feedback + PdfRenderer cache), 03-03 (Material motion + determinate progress) all done; Phase 3 complete
+Status: Phase 1 complete, Phase 2 complete, Phase 3 complete — ready for Phase 4 (Testing)
+Last activity: 2026-03-01 — 03-03 complete (Material SharedAxis/FadeThrough transitions on all 8 fragments; LinearProgressIndicator with Page X of Y for PDF generation; PERF-01 and PERF-04 satisfied)
 
-Progress: [████████░░] 13/15 plans (Phases 1-2 complete; Phase 3: 1/3 done)
+Progress: [██████████] 15/15 plans (Phases 1-3 complete; Phase 4 next)
 
 ## Performance Metrics
 
@@ -42,7 +42,7 @@ Progress: [████████░░] 13/15 plans (Phases 1-2 complete; Pha
 |-------|-------|-------|----------|
 | 01-stability | 4 | 18 min | 5 min |
 | 02-design-system | 7 | 14 min | 2 min |
-| 03-performance-polish | 2 | 2 min | 1 min |
+| 03-performance-polish | 3 | 6 min | 2 min |
 
 **Recent Trend:**
 - Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min, 6 min
@@ -50,6 +50,7 @@ Progress: [████████░░] 13/15 plans (Phases 1-2 complete; Pha
 
 *Updated after each plan completion*
 | Phase 03-performance-polish P01 | 5 | 4 tasks | 13 files |
+| Phase 03-performance-polish P03 | 4 | 3 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,11 @@ Recent decisions affecting current work:
 - [Phase 03-performance-polish]: enableEdgeToEdge() called after super.onCreate() before binding — required window flag order
 - [Phase 03-performance-polish]: Remove android:statusBarColor and navigationBarColor from theme; keep windowLight* items for icon tint control
 - [Phase 03-performance-polish]: Snackbar undo pattern: commit deletion immediately, restore on undo tap — no confirmation dialog for recoverable actions
+- [Phase 03-performance-polish]: 03-03: Transitions placed in onCreate() not onViewCreated() — transition system ignores transitions set after view creation begins
+- [Phase 03-performance-polish]: 03-03: enterTransition/returnTransition in entering fragment; exitTransition/reenterTransition at departing fragment's navigate() callsite
+- [Phase 03-performance-polish]: 03-03: MaterialSharedAxis.Z for hierarchical navigation; MaterialFadeThrough for lateral peer navigation
+- [Phase 03-performance-polish]: 03-03: View.post{} for IO→UI progress updates inside withContext(IO) — avoids nested withContext(Main) dispatch
+- [Phase 03-performance-polish]: 03-03: onProgress callback on generatePdf() rather than StateFlow/LiveData — simpler, no extra ViewModel plumbing needed
 
 ### Pending Todos
 
@@ -117,5 +123,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-01-PLAN.md — edge-to-edge enabled across all 8 fragments + Snackbar undo for both page delete flows; PERF-03 and PERF-05 satisfied; ready for 03-02
+Stopped at: Completed 03-03-PLAN.md — Material motion transitions + LinearProgressIndicator; PERF-01 and PERF-04 satisfied; Phase 3 complete; ready for Phase 4 (Testing)
 Resume file: None

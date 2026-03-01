@@ -28,10 +28,10 @@
 
 ### Performance & Polish (PERF)
 
-- [ ] **PERF-01**: Material motion navigation transitions implemented between all major screen transitions
+- [x] **PERF-01**: Material motion navigation transitions implemented between all major screen transitions
 - [x] **PERF-02**: Haptic feedback triggered on camera capture (matching Adobe Scan / Microsoft Lens UX)
 - [x] **PERF-03**: Edge-to-edge display enabled with proper WindowInsets handling across API 24–34
-- [ ] **PERF-04**: PDF generation progress shown as determinate indicator ("Page X of Y") — not spinner
+- [x] **PERF-04**: PDF generation progress shown as determinate indicator ("Page X of Y") — not spinner
 - [x] **PERF-05**: Destructive actions (delete page, discard scan) use Snackbar with undo action instead of confirmation dialogs
 - [x] **PERF-06**: PdfRenderer caches adjacent pages (previous/current/next) for smooth page swiping in viewer
 
@@ -105,10 +105,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSYS-05 | Phase 2 | Complete (02-04) |
 | DSYS-06 | Phase 2 | Complete (02-04) |
 | DSYS-07 | Phase 2 | Complete (02-05) |
-| PERF-01 | Phase 3 | Pending |
+| PERF-01 | Phase 3 | Complete |
 | PERF-02 | Phase 3 | Complete |
 | PERF-03 | Phase 3 | Complete |
-| PERF-04 | Phase 3 | Pending |
+| PERF-04 | Phase 3 | Complete |
 | PERF-05 | Phase 3 | Complete |
 | PERF-06 | Phase 3 | Complete |
 | TEST-01 | Phase 4 | Pending |
