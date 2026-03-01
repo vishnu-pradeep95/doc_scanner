@@ -34,7 +34,7 @@ android {
     
     // SDK version to compile against
     // Use latest stable SDK for newest APIs and best tooling
-    compileSdk = 34
+    compileSdk = 35
 
     /**
      * Signing Configs - for release builds
