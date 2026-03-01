@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:contentDescription="Document preview"
+                android:contentDescription="@string/content_desc_document_preview"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
             <!-- PDF icon badge with cartoon theme -->
@@ -48,7 +48,7 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_pdf"
                     android:padding="6dp"
-                    android:contentDescription="PDF badge"
+                    android:contentDescription="@string/content_desc_pdf_badge"
                     app:tint="?attr/colorOnPrimary" />
 
             </com.google.android.material.card.MaterialCardView>

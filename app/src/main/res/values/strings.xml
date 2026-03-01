@@ -277,4 +277,7 @@
     <!-- Content descriptions: item_saved_signature + fragment_home -->
     <string name="content_desc_delete_signature">Delete signature</string>
     <string name="content_desc_app_logo">App logo</string>
+    <string name="content_desc_document_preview">Document preview</string>
+    <string name="content_desc_pdf_badge">PDF badge</string>
+    <string name="content_desc_scanned_preview">Scanned page preview</string>
 </resources>
