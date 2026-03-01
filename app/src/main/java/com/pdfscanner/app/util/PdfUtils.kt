@@ -104,39 +104,37 @@ object PdfUtils {
             for (pdfUri in pdfUris) {
                 val fileSize = getFileSize(context, pdfUri)
                 totalOriginalSize += fileSize
-                
+
                 val pfd = context.contentResolver.openFileDescriptor(pdfUri, "r")
                     ?: continue
-                
-                val renderer = PdfRenderer(pfd)
-                
-                // Render each page and add to new document
-                for (i in 0 until renderer.pageCount) {
-                    val page = renderer.openPage(i)
-                    
-                    // Calculate dimensions at default DPI
-                    val width = (page.width * DEFAULT_DPI / 72f).toInt()
-                    val height = (page.height * DEFAULT_DPI / 72f).toInt()
-                    
-                    // Render page to bitmap
-                    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                    bitmap.eraseColor(Color.WHITE)
-                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                    page.close()
-                    
-                    // Add to new PDF
-                    pageNumber++
-                    val pageInfo = PdfDocument.PageInfo.Builder(width, height, pageNumber).create()
-                    val newPage = pdfDocument.startPage(pageInfo)
-                    val canvas = newPage.canvas
-                    canvas.drawBitmap(bitmap, 0f, 0f, null)
-                    pdfDocument.finishPage(newPage)
-                    
-                    bitmap.recycle()
+
+                pfd.use { fd ->
+                    PdfRenderer(fd).use { renderer ->
+                        // Render each page and add to new document
+                        for (i in 0 until renderer.pageCount) {
+                            renderer.openPage(i).use { page ->
+                                // Calculate dimensions at default DPI
+                                val width = (page.width * DEFAULT_DPI / 72f).toInt()
+                                val height = (page.height * DEFAULT_DPI / 72f).toInt()
+
+                                // Render page to bitmap
+                                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                                bitmap.eraseColor(Color.WHITE)
+                                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+                                // Add to new PDF
+                                pageNumber++
+                                val pageInfo = PdfDocument.PageInfo.Builder(width, height, pageNumber).create()
+                                val newPage = pdfDocument.startPage(pageInfo)
+                                val canvas = newPage.canvas
+                                canvas.drawBitmap(bitmap, 0f, 0f, null)
+                                pdfDocument.finishPage(newPage)
+
+                                bitmap.recycle()
+                            }
+                        }
+                    }
                 }
-                
-                renderer.close()
-                pfd.close()
             }
             
             // Save merged PDF
@@ -188,59 +186,56 @@ object PdfUtils {
                     success = false,
                     message = "Could not open PDF"
                 )
-            
-            val renderer = PdfRenderer(pfd)
-            val pageCount = renderer.pageCount
-            
-            if (pageCount <= 1) {
-                renderer.close()
-                pfd.close()
-                return@withContext PdfOperationResult(
-                    success = false,
-                    message = "PDF has only one page, nothing to split"
-                )
-            }
-            
+
             val outputUris = mutableListOf<Uri>()
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             var totalNewSize = 0L
-            
-            // Create a separate PDF for each page
-            for (i in 0 until pageCount) {
-                val page = renderer.openPage(i)
-                
-                // Calculate dimensions
-                val width = (page.width * DEFAULT_DPI / 72f).toInt()
-                val height = (page.height * DEFAULT_DPI / 72f).toInt()
-                
-                // Render page to bitmap
-                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                bitmap.eraseColor(Color.WHITE)
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                page.close()
-                
-                // Create single-page PDF
-                val singlePagePdf = PdfDocument()
-                val pageInfo = PdfDocument.PageInfo.Builder(width, height, 1).create()
-                val newPage = singlePagePdf.startPage(pageInfo)
-                newPage.canvas.drawBitmap(bitmap, 0f, 0f, null)
-                singlePagePdf.finishPage(newPage)
-                
-                // Save
-                val outputFile = File(getPdfsDir(context), "${baseName}_${i + 1}_$timestamp.pdf")
-                FileOutputStream(outputFile).use { fos ->
-                    singlePagePdf.writeTo(fos)
+
+            pfd.use { fd ->
+                PdfRenderer(fd).use { renderer ->
+                    val pageCount = renderer.pageCount
+
+                    if (pageCount <= 1) {
+                        return@withContext PdfOperationResult(
+                            success = false,
+                            message = "PDF has only one page, nothing to split"
+                        )
+                    }
+
+                    // Create a separate PDF for each page
+                    for (i in 0 until pageCount) {
+                        renderer.openPage(i).use { page ->
+                            // Calculate dimensions
+                            val width = (page.width * DEFAULT_DPI / 72f).toInt()
+                            val height = (page.height * DEFAULT_DPI / 72f).toInt()
+
+                            // Render page to bitmap
+                            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                            bitmap.eraseColor(Color.WHITE)
+                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+                            // Create single-page PDF
+                            val singlePagePdf = PdfDocument()
+                            val pageInfo = PdfDocument.PageInfo.Builder(width, height, 1).create()
+                            val newPage = singlePagePdf.startPage(pageInfo)
+                            newPage.canvas.drawBitmap(bitmap, 0f, 0f, null)
+                            singlePagePdf.finishPage(newPage)
+
+                            // Save
+                            val outputFile = File(getPdfsDir(context), "${baseName}_${i + 1}_$timestamp.pdf")
+                            FileOutputStream(outputFile).use { fos ->
+                                singlePagePdf.writeTo(fos)
+                            }
+                            singlePagePdf.close()
+                            bitmap.recycle()
+
+                            outputUris.add(Uri.fromFile(outputFile))
+                            totalNewSize += outputFile.length()
+                        }
+                    }
                 }
-                singlePagePdf.close()
-                bitmap.recycle()
-                
-                outputUris.add(Uri.fromFile(outputFile))
-                totalNewSize += outputFile.length()
             }
-            
-            renderer.close()
-            pfd.close()
-            
+
             Log.d(TAG, "Split PDF into ${outputUris.size} files")
             
             PdfOperationResult(
@@ -289,46 +284,46 @@ object PdfUtils {
                     success = false,
                     message = "Could not open PDF"
                 )
-            
-            val renderer = PdfRenderer(pfd)
+
             val pdfDocument = PdfDocument()
             var newPageNumber = 0
-            
-            // Extract specified pages (convert to 0-indexed)
-            for (pageNum in pageNumbers) {
-                val pageIndex = pageNum - 1
-                if (pageIndex < 0 || pageIndex >= renderer.pageCount) continue
-                
-                val page = renderer.openPage(pageIndex)
-                
-                val width = (page.width * DEFAULT_DPI / 72f).toInt()
-                val height = (page.height * DEFAULT_DPI / 72f).toInt()
-                
-                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                bitmap.eraseColor(Color.WHITE)
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                page.close()
-                
-                newPageNumber++
-                val pageInfo = PdfDocument.PageInfo.Builder(width, height, newPageNumber).create()
-                val newPage = pdfDocument.startPage(pageInfo)
-                newPage.canvas.drawBitmap(bitmap, 0f, 0f, null)
-                pdfDocument.finishPage(newPage)
-                
-                bitmap.recycle()
+
+            pfd.use { fd ->
+                PdfRenderer(fd).use { renderer ->
+                    // Extract specified pages (convert to 0-indexed)
+                    for (pageNum in pageNumbers) {
+                        val pageIndex = pageNum - 1
+                        if (pageIndex < 0 || pageIndex >= renderer.pageCount) continue
+
+                        renderer.openPage(pageIndex).use { page ->
+                            val width = (page.width * DEFAULT_DPI / 72f).toInt()
+                            val height = (page.height * DEFAULT_DPI / 72f).toInt()
+
+                            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                            bitmap.eraseColor(Color.WHITE)
+                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+                            newPageNumber++
+                            val pageInfo = PdfDocument.PageInfo.Builder(width, height, newPageNumber).create()
+                            val newPage = pdfDocument.startPage(pageInfo)
+                            newPage.canvas.drawBitmap(bitmap, 0f, 0f, null)
+                            pdfDocument.finishPage(newPage)
+
+                            bitmap.recycle()
+                        }
+                    }
+                }
             }
-            
+
             // Save extracted PDF
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             val outputFile = File(getPdfsDir(context), "${outputName}_$timestamp.pdf")
-            
+
             FileOutputStream(outputFile).use { fos ->
                 pdfDocument.writeTo(fos)
             }
             pdfDocument.close()
-            renderer.close()
-            pfd.close()
-            
+
             PdfOperationResult(
                 success = true,
                 outputUri = Uri.fromFile(outputFile),
@@ -372,79 +367,79 @@ object PdfUtils {
         
         try {
             val originalSize = getFileSize(context, pdfUri)
-            
+
             val pfd = context.contentResolver.openFileDescriptor(pdfUri, "r")
                 ?: return@withContext PdfOperationResult(
                     success = false,
                     message = "Could not open PDF"
                 )
-            
-            val renderer = PdfRenderer(pfd)
+
             val pdfDocument = PdfDocument()
-            
+
             // Select parameters based on compression level
             val (scale, jpegQuality) = when (level) {
                 CompressionLevel.LOW -> Pair(0.5f, 40)    // Aggressive: 50% size, 40% quality
                 CompressionLevel.MEDIUM -> Pair(0.7f, 60) // Balanced: 70% size, 60% quality
                 CompressionLevel.HIGH -> Pair(0.9f, 80)   // Light: 90% size, 80% quality
             }
-            
+
             // Create temp directory for compressed images
             val tempDir = File(context.cacheDir, "pdf_compress_temp")
             if (!tempDir.exists()) tempDir.mkdirs()
-            
-            // Process each page: render -> compress as JPEG -> add to PDF
-            for (i in 0 until renderer.pageCount) {
-                val page = renderer.openPage(i)
-                
-                // Scale dimensions based on compression level
-                val width = (page.width * scale).toInt().coerceAtLeast(100)
-                val height = (page.height * scale).toInt().coerceAtLeast(100)
-                
-                // Render page to bitmap
-                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                bitmap.eraseColor(Color.WHITE)
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                page.close()
-                
-                // Compress to JPEG and reload (this actually reduces quality/size)
-                val tempJpeg = File(tempDir, "page_$i.jpg")
-                FileOutputStream(tempJpeg).use { fos ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, fos)
+
+            pfd.use { fd ->
+                PdfRenderer(fd).use { renderer ->
+                    // Process each page: render -> compress as JPEG -> add to PDF
+                    for (i in 0 until renderer.pageCount) {
+                        renderer.openPage(i).use { page ->
+                            // Scale dimensions based on compression level
+                            val width = (page.width * scale).toInt().coerceAtLeast(100)
+                            val height = (page.height * scale).toInt().coerceAtLeast(100)
+
+                            // Render page to bitmap
+                            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                            bitmap.eraseColor(Color.WHITE)
+                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+                            // Compress to JPEG and reload (this actually reduces quality/size)
+                            val tempJpeg = File(tempDir, "page_$i.jpg")
+                            FileOutputStream(tempJpeg).use { fos ->
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, fos)
+                            }
+                            bitmap.recycle()
+
+                            // Load the compressed JPEG back
+                            val compressedBitmap = android.graphics.BitmapFactory.decodeFile(tempJpeg.absolutePath)
+
+                            // Add compressed bitmap to PDF
+                            val pageInfo = PdfDocument.PageInfo.Builder(
+                                compressedBitmap.width,
+                                compressedBitmap.height,
+                                i + 1
+                            ).create()
+                            val newPage = pdfDocument.startPage(pageInfo)
+                            newPage.canvas.drawBitmap(compressedBitmap, 0f, 0f, null)
+                            pdfDocument.finishPage(newPage)
+
+                            compressedBitmap.recycle()
+                            tempJpeg.delete()
+                        }
+                    }
                 }
-                bitmap.recycle()
-                
-                // Load the compressed JPEG back
-                val compressedBitmap = android.graphics.BitmapFactory.decodeFile(tempJpeg.absolutePath)
-                
-                // Add compressed bitmap to PDF
-                val pageInfo = PdfDocument.PageInfo.Builder(
-                    compressedBitmap.width, 
-                    compressedBitmap.height, 
-                    i + 1
-                ).create()
-                val newPage = pdfDocument.startPage(pageInfo)
-                newPage.canvas.drawBitmap(compressedBitmap, 0f, 0f, null)
-                pdfDocument.finishPage(newPage)
-                
-                compressedBitmap.recycle()
-                tempJpeg.delete()
             }
-            
+
             // Cleanup temp directory
             tempDir.delete()
-            
+
             // Save compressed PDF
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             val baseName = outputName ?: "Compressed"
             val outputFile = File(getPdfsDir(context), "${baseName}_$timestamp.pdf")
-            
+
             FileOutputStream(outputFile).use { fos ->
                 pdfDocument.writeTo(fos)
             }
             pdfDocument.close()
-            renderer.close()
-            pfd.close()
             
             val newSize = outputFile.length()
             val savingsPercent = if (originalSize > 0) {
@@ -487,12 +482,11 @@ object PdfUtils {
      */
     suspend fun getPageCount(context: Context, pdfUri: Uri): Int = withContext(Dispatchers.IO) {
         try {
-            val pfd = context.contentResolver.openFileDescriptor(pdfUri, "r") ?: return@withContext 0
-            val renderer = PdfRenderer(pfd)
-            val count = renderer.pageCount
-            renderer.close()
-            pfd.close()
-            count
+            context.contentResolver.openFileDescriptor(pdfUri, "r")?.use { pfd ->
+                PdfRenderer(pfd).use { renderer ->
+                    renderer.pageCount
+                }
+            } ?: 0
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get page count", e)
             0

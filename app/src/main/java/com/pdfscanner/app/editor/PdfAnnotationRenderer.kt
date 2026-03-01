@@ -42,62 +42,61 @@ class PdfAnnotationRenderer(private val context: Context) {
             // Open the input PDF
             val inputPfd = context.contentResolver.openFileDescriptor(inputUri, "r")
                 ?: return null
-            
-            val renderer = PdfRenderer(inputPfd)
-            val pageCount = renderer.pageCount
-            
+
             // Create output document
             val outputDoc = PdfDocument()
-            
-            for (pageIndex in 0 until pageCount) {
-                // Render each page
-                val page = renderer.openPage(pageIndex)
-                
-                val pageWidth = page.width
-                val pageHeight = page.height
-                
-                // Create bitmap for the page
-                val bitmap = Bitmap.createBitmap(pageWidth, pageHeight, Bitmap.Config.ARGB_8888)
-                bitmap.eraseColor(Color.WHITE)
-                
-                // Render original PDF page
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
-                page.close()
-                
-                // Draw annotations on top
-                val canvas = Canvas(bitmap)
-                val annotations = pageAnnotations[pageIndex] ?: emptyList()
-                
-                for (annotation in annotations) {
-                    drawAnnotation(canvas, annotation, pageWidth.toFloat(), pageHeight.toFloat())
+
+            inputPfd.use { pfd ->
+                PdfRenderer(pfd).use { renderer ->
+                    val pageCount = renderer.pageCount
+
+                    for (pageIndex in 0 until pageCount) {
+                        // Render each page
+                        renderer.openPage(pageIndex).use { page ->
+                            val pageWidth = page.width
+                            val pageHeight = page.height
+
+                            // Create bitmap for the page
+                            val bitmap = Bitmap.createBitmap(pageWidth, pageHeight, Bitmap.Config.ARGB_8888)
+                            bitmap.eraseColor(Color.WHITE)
+
+                            // Render original PDF page
+                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+
+                            // Draw annotations on top
+                            val canvas = Canvas(bitmap)
+                            val annotations = pageAnnotations[pageIndex] ?: emptyList()
+
+                            for (annotation in annotations) {
+                                drawAnnotation(canvas, annotation, pageWidth.toFloat(), pageHeight.toFloat())
+                            }
+
+                            // Create page in output document
+                            val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageIndex + 1).create()
+                            val outputPage = outputDoc.startPage(pageInfo)
+
+                            // Draw the annotated bitmap to the page
+                            outputPage.canvas.drawBitmap(bitmap, 0f, 0f, null)
+                            outputDoc.finishPage(outputPage)
+
+                            // Clean up bitmap
+                            bitmap.recycle()
+                        }
+                    }
                 }
-                
-                // Create page in output document
-                val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageIndex + 1).create()
-                val outputPage = outputDoc.startPage(pageInfo)
-                
-                // Draw the annotated bitmap to the page
-                outputPage.canvas.drawBitmap(bitmap, 0f, 0f, null)
-                outputDoc.finishPage(outputPage)
-                
-                // Clean up bitmap
-                bitmap.recycle()
             }
-            
-            renderer.close()
-            inputPfd.close()
-            
+
             // Generate output filename
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val outputFile = File(pdfsDir, "Edited_$timestamp.pdf")
-            
+
             // Write output document
             FileOutputStream(outputFile).use { out ->
                 outputDoc.writeTo(out)
             }
-            
+
             outputDoc.close()
-            
+
             outputFile
         } catch (e: Exception) {
             e.printStackTrace()
