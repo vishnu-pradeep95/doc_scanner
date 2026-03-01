@@ -279,6 +279,15 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     
     // ===========================================
+    // IMAGE LOADING
+    // ===========================================
+
+    // Coil - Kotlin-first image loading with automatic caching, lifecycle handling, and placeholders
+    // Replaces manual BitmapFactory + LruCache in PagesAdapter and HistoryAdapter
+    // 3.4.0 is current stable (released 2026-02-24). No network fetcher needed — loads local file URIs.
+    implementation("io.coil-kt.coil3:coil:3.4.0")
+
+    // ===========================================
     // TESTING
     // ===========================================
     
