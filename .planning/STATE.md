@@ -60,6 +60,11 @@ Decisions from 04-03 execution (2026-03-01):
 - org.json.JSONObject requires RobolectricTestRunner — plain JVM Android stubs throw RuntimeException on put/getString; DocumentEntryTest uses @RunWith(RobolectricTestRunner::class) instead of JUnit4
 - ImageProcessor does NOT call OcrProcessor — no ML Kit interface refactor needed; confirmed via test run with 0 UnsatisfiedLinkError
 
+Decisions from 04-04 execution (2026-03-01):
+- Robolectric JaCoCo two-exec-file fix: AGP's enableUnitTestCoverage instruments classes at compile time; Robolectric's InstrumentingClassLoader strips those probes. Fix: apply Gradle jacoco plugin + configure JacocoTaskExtension on testDebugUnitTest to write a separate exec file; jacocoTestReport reads both exec files. Result: data/ 92.9%, viewmodel/ 88.9%, util/ImageProcessor 96.8%
+- util/ 70% threshold not met: PdfUtils, AnimationHelper, DocumentScanner, SoundManager, AppPreferences, PdfPageExtractor require CameraX/ML Kit/native PDF — not feasible in JVM unit tests; ImageProcessor itself is at 96.8%
+- DocumentHistoryRepository test isolation: clear SharedPreferences "document_history" in @Before via context.getSharedPreferences(...).edit().clear().commit(); construct new repository instance directly (do NOT use getInstance() singleton)
+
 Decisions from 04-05 execution (2026-03-01):
 - CRITICAL: mockk-android:1.14.7 and mockk-agent:1.14.7 compiled with Kotlin 2.1.0 binary — incompatible with Kotlin 1.9.21 project; removed from androidTestImplementation (no androidTest file uses MockK)
 - androidTest/AndroidManifest.xml required with tools:overrideLibrary for mockk minSdk 26 vs app minSdk 24 conflict
@@ -80,5 +85,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-05 — Fragment smoke tests (5) and NavigationFlowTest (1), Phase 4 complete
+Stopped at: Completed 04-04 — DocumentHistoryRepositoryTest (11 tests) + JaCoCo Robolectric exec file fix; data/ 92.9%, viewmodel/ 88.9%
 Resume file: None

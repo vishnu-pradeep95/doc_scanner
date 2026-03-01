@@ -11,7 +11,7 @@
 - [x] **TEST-02**: 15+ ScannerViewModel unit tests cover page CRUD, filter state, and PDF naming logic (using InstantTaskExecutorRule + UnconfinedTestDispatcher + runTest)
 - [x] **TEST-03**: DocumentEntry JSON serialization round-trips correctly with all fields preserved (pure JVM test, no Android dependencies)
 - [x] **TEST-04**: 8+ ImageProcessor filter tests run via Robolectric covering all FilterType enum values (Robolectric for Bitmap; ImageProcessor does not call OcrProcessor — no ML Kit boundary mock needed)
-- [ ] **TEST-05**: 8+ DocumentHistoryRepository CRUD tests run via Robolectric covering create, read, update, delete, and filter operations
+- [x] **TEST-05**: 8+ DocumentHistoryRepository CRUD tests run via Robolectric covering create, read, update, delete, and filter operations
 - [x] **TEST-07**: 5+ fragment smoke tests verify layout inflation and View Binding initialization across non-camera fragments via FragmentScenario *(stretch goal)*
 - [x] **TEST-08**: Navigation flow test verifies Home → Camera nav action fires correctly using TestNavHostController (full camera hardware flow not testable without a device) *(stretch goal)*
 
