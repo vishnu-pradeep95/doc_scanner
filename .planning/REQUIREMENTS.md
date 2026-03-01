@@ -1,0 +1,85 @@
+# Requirements: PDF Scanner v1.1 — Quality Gates
+
+**Defined:** 2026-03-01
+**Core Value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
+
+## v1.1 Requirements
+
+### Testing
+
+- [ ] **TEST-01**: User can run a basic test suite (test dependencies: MockK 1.14.7, Robolectric 4.16, Espresso 3.7.0, fragment-testing 1.8.9, kotlinx-coroutines-test 1.7.3, core-testing 2.2.0; JaCoCo configured with LINE counter and generated-class exclusions for R, BuildConfig, *Args, *Directions, *Binding)
+- [ ] **TEST-02**: 15+ ScannerViewModel unit tests cover page CRUD, filter state, and PDF naming logic (using InstantTaskExecutorRule + UnconfinedTestDispatcher + runTest)
+- [ ] **TEST-03**: DocumentEntry JSON serialization round-trips correctly with all fields preserved (pure JVM test, no Android dependencies)
+- [ ] **TEST-04**: 8+ ImageProcessor filter tests run via Robolectric with FakeOcrProcessor interface for ML Kit boundary (Robolectric for Bitmap; ML Kit calls never invoked in JVM tests)
+- [ ] **TEST-05**: 8+ DocumentHistoryRepository CRUD tests run via Robolectric covering create, read, update, delete, and filter operations
+- [ ] **TEST-07**: 5+ fragment smoke tests verify layout inflation and View Binding initialization across non-camera fragments via FragmentScenario *(stretch goal)*
+- [ ] **TEST-08**: Navigation flow test verifies Camera → Preview → Pages → PDF created path using TestNavHostController *(stretch goal)*
+
+### Release Readiness
+
+- [ ] **RELEASE-01**: Detekt 1.23.8 + detekt-formatting configured with baseline file; `./gradlew detekt` passes with zero new blocking errors (existing violations captured in baseline, not fixed)
+- [ ] **RELEASE-02**: Android Lint with `lint.xml` — accessibility errors (`ContentDescription`, `TouchTargetSizeCheck`, etc.) promoted to build errors; `./gradlew lint` passes
+- [ ] **RELEASE-03**: ProGuard/R8 keep rules in `proguard-rules.pro` for ML Kit (`com.google.mlkit.**`, `com.google.android.gms.**`), Navigation SafeArgs (`**.*Args`, `**.*Directions`), Coil, and coroutines; verified via release APK inspection
+- [ ] **RELEASE-04**: Release APK installed on physical Android device; every screen and feature path manually exercised (camera capture, gallery import, ML Kit OCR, PDF generation, share/export); requires host machine with Android Studio + JDK — environment-blocked in WSL2
+- [ ] **RELEASE-05**: `<uses-feature android:name="android.hardware.camera" android:required="false" />` added to AndroidManifest.xml (enables install on tablets and Chromebooks)
+- [ ] **RELEASE-06**: `dataExtractionRules` (API 31+) and `fullBackupContent` attributes added to AndroidManifest.xml excluding private `scans/`, `processed/`, `cache/`, and `pdfs/` directories from auto-backup
+- [ ] **RELEASE-07**: FileProvider `file_paths.xml` paths scoped to only actually-used subdirectories (remove overly-broad `cache-path path="/"`)
+- [ ] **RELEASE-08**: LeakCanary 2.14 added as `debugImplementation`; zero retained Activity/Fragment/ViewModel leaks after exercising all 8 fragment flows; Navigation 2.7.x `AbstractAppBarOnDestinationChangedListener` library leak documented as known and triaged (not an app bug)
+- [ ] **RELEASE-09**: JaCoCo coverage report generated; LINE coverage meets 70% for `util/` package and 50% for `viewmodel/` package (BRANCH counter excluded due to coroutine synthetic branch inflation)
+
+## v2 Requirements (Deferred)
+
+### Testing
+
+- **TEST-06**: PdfUtils instrumented tests via AndroidJUnitRunner — 8+ tests covering PDF generation, page merge, and file output; deferred because PdfRenderer requires real device/emulator (Robolectric does not shadow PdfRenderer); HIGH complexity and environment uncertainty make this a scope risk for v1.1
+
+### Quality
+
+- **QUAL-01**: JaCoCo hard enforcement gate in CI (`jacocoTestCoverageVerification` with minimum thresholds) — add only after coverage is established and stable for several milestones
+- **QUAL-02**: CI/CD pipeline (GitHub Actions or similar) automating test, lint, and detekt on every PR
+- **QUAL-03**: Screenshot regression tests (Roborazzi/Paparazzi) — explicitly out of scope; tooling confidence LOW
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| New product features (cloud sync, searchable PDF, etc.) | This milestone is exclusively quality gates — no feature expansion |
+| Kotlin/Coroutines upgrade (1.9 → 2.x) | Would require Detekt 2.x upgrade and risk regressions across 31 source files |
+| Navigation Component upgrade (2.7.x → 2.8.x) | Can resolve LeakCanary false positive but adds upgrade risk; LeakCanary config exclusion is sufficient |
+| JUnit 5 | Instrumentation friction with no benefit for this test suite; JUnit 4 throughout |
+| Mockito | MockK has better Kotlin DSL for final classes and coroutines; Mockito requires extra workarounds |
+| Play Store submission | Out of scope for v1.1 — submission is a separate milestone action after RELEASE-04 confirms release quality |
+| Tablet-optimized layouts | v2+ |
+| Internationalization | v2+ |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TEST-01 | Phase 4 | Pending |
+| TEST-02 | Phase 4 | Pending |
+| TEST-03 | Phase 4 | Pending |
+| TEST-04 | Phase 4 | Pending |
+| TEST-05 | Phase 4 | Pending |
+| TEST-07 | Phase 4 | Pending |
+| TEST-08 | Phase 4 | Pending |
+| RELEASE-01 | Phase 5 | Pending |
+| RELEASE-02 | Phase 5 | Pending |
+| RELEASE-03 | Phase 5 | Pending |
+| RELEASE-04 | Phase 5 | Pending |
+| RELEASE-05 | Phase 5 | Pending |
+| RELEASE-06 | Phase 5 | Pending |
+| RELEASE-07 | Phase 5 | Pending |
+| RELEASE-08 | Phase 5 | Pending |
+| RELEASE-09 | Phase 4 | Pending |
+
+**Coverage:**
+- v1.1 requirements: 16 total
+- Mapped to phases: 16
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-03-01*
+*Last updated: 2026-03-01 after initial v1.1 definition*

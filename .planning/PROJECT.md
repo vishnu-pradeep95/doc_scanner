@@ -1,5 +1,13 @@
 # PDF Scanner — Android App Polish & Quality Pass
 
+## Current Milestone: v1.1 Quality Gates
+
+**Goal:** Add a complete test foundation and release-hardening layer so the app meets Play Store quality bar on all shipped features.
+
+**Target features:**
+- Test suite: ViewModel unit tests, JSON round-trip, Robolectric filter and repository tests, JaCoCo coverage reporting
+- Release hardening: Detekt, Android Lint (a11y as errors), ProGuard for ML Kit + SafeArgs, backup rules, FileProvider scoping, LeakCanary, real-device E2E
+
 ## What This Is
 
 A feature-rich Android document scanner app (Kotlin, CameraX, Material Design 3) with a distinctive playful cartoon/mascot theme. Phases 1–3 (v1.0) delivered a systematic stability, design system, and performance pass — the app now meets portfolio quality on all shipped features. Phases 4–5 (v1.1) will add test coverage and Play Store release readiness.
@@ -98,4 +106,4 @@ Every feature that exists must work flawlessly, feel delightful, and be verified
 | Dark mode physical verification deferred | WSL2 lacks Android build environment | ⚠️ Revisit — needs device test in Phase 5 |
 
 ---
-*Last updated: 2026-03-01 after v1.0 milestone*
+*Last updated: 2026-03-01 after v1.1 milestone started*
