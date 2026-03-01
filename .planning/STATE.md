@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 1 of 5 (Stability)
-Plan: 1 of ? in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-28 — Completed 01-01: ScannerViewModel immutable collections and SavedStateHandle
+Last activity: 2026-03-01 — Completed 01-02: Resource leak fixes, temp cleanup, undo/redo removal
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 2 min
-- Total execution time: 0.03 hours
+- Total plans completed: 2
+- Average duration: 4 min
+- Total execution time: 0.12 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-stability | 1 | 2 min | 2 min |
+| 01-stability | 2 | 7 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min
+- Last 5 plans: 2 min, 5 min
 - Trend: -
 
 *Updated after each plan completion*
@@ -48,6 +48,11 @@ Recent decisions affecting current work:
 - 01-01: Use savedStateHandle.getLiveData() directly as backing store (no separate MutableLiveData field) to eliminate dual-source-of-truth risk
 - 01-01: Keep currentCaptureUri, pdfUri, isLoading as plain MutableLiveData (transient session state that has no useful meaning across process death)
 - 01-01: No custom ViewModelFactory needed -- fragment-ktx's SavedStateViewModelFactory auto-injects SavedStateHandle when constructor requests it
+- 01-02: Use Kotlin use {} blocks for PdfRenderer/ParcelFileDescriptor — guaranteed close on exception paths
+- 01-02: Individual try-catch per resource in close() methods — partial cleanup if one resource fails
+- 01-02: Capture requireContext().applicationContext before coroutine launch — avoids Activity context leak on IO thread
+- 01-02: Remove undo/redo buttons entirely rather than disabling — non-functional UI unacceptable in portfolio app
+- 01-02: 1-hour threshold for stale temp cleanup — conservative enough for active sessions, aggressive enough for orphaned files
 
 ### Pending Todos
 
@@ -61,6 +66,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-28
-Stopped at: Completed 01-01-PLAN.md (ScannerViewModel refactor)
+Last session: 2026-03-01
+Stopped at: Completed 01-02-PLAN.md (resource leak fixes, temp cleanup, undo/redo removal)
 Resume file: None
