@@ -189,4 +189,39 @@
     <string name="error_failed_to_load_pdf">Failed to load PDF file</string>
     <string name="error_could_not_access_pdf">Could not access PDF file</string>
     <string name="error_loading_pdf">Error loading PDF: %s</string>
+
+    <!-- Dialog: Save Success -->
+    <string name="save_success_title">Woohoo!</string>
+    <string name="save_success_body">Your PDF has been saved!</string>
+    <string name="content_desc_success">Success</string>
+
+    <!-- Dialog: Signature Pro -->
+    <string name="sig_draw_title">Draw Your Signature</string>
+    <string name="sig_draw_subtitle">Make it personal!</string>
+    <string name="sig_saved_title">Saved Signatures</string>
+    <string name="sig_no_saved">No saved signatures yet</string>
+    <string name="sig_draw_new">Draw New Signature</string>
+    <string name="sig_hint">Sign here</string>
+    <string name="sig_save_for_later">Save this signature for later</string>
+    <string name="sig_insert">Insert Signature</string>
+    <string name="content_desc_sig_mascot">Signature mascot</string>
+    <string name="clear">Clear</string>
+    <string name="undo">Undo</string>
+
+    <!-- Dialog: Saving Progress -->
+    <string name="saving_progress_message">Saving your masterpiece\u2026</string>
+    <string name="saving_tip">Tip: You can add signatures to any page!</string>
+    <string name="content_desc_saving">Saving</string>
+
+    <!-- Preview Fragment -->
+    <string name="filter_style">Style</string>
+
+    <!-- Content descriptions -->
+    <string name="content_desc_page_thumbnail">Page thumbnail</string>
+    <string name="content_desc_edit_pdf">Edit PDF</string>
+    <string name="content_desc_edit_mascot">Edit mascot</string>
+    <string name="content_desc_zoom_in">Zoom in</string>
+    <string name="content_desc_zoom_out">Zoom out</string>
+    <string name="content_desc_make_smaller">Make smaller</string>
+    <string name="content_desc_make_larger">Make larger</string>
 </resources>
