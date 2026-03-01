@@ -261,4 +261,20 @@
     <string name="editor_tool_color">Color</string>
     <string name="editor_tool_size">Size</string>
     <string name="editor_tool_stroke">Stroke</string>
+
+    <!-- Dialog: Stamp Picker -->
+    <string name="stamp_picker_title">Select Stamp</string>
+    <string name="content_desc_stamp_mascot">Stamp mascot</string>
+
+    <!-- Dialog: Text Annotation -->
+    <string name="text_annotation_title">Add Text</string>
+    <string name="text_size_label">Text Size</string>
+    <string name="color_label">Color</string>
+    <string name="preview_label">Preview</string>
+    <string name="text_insert">Insert</string>
+    <string name="content_desc_text_mascot">Text mascot</string>
+
+    <!-- Content descriptions: item_saved_signature + fragment_home -->
+    <string name="content_desc_delete_signature">Delete signature</string>
+    <string name="content_desc_app_logo">App logo</string>
 </resources>
