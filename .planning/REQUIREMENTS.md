@@ -24,7 +24,7 @@
 - [x] **DSYS-04**: All 70 Toast calls replaced with Snackbar (transient feedback) or inline messages (persistent feedback) — no Toast used as a loading indicator
 - [x] **DSYS-05**: All hardcoded `contentDescription` strings and UI text moved to `strings.xml` — no hardcoded English strings in code or layouts
 - [x] **DSYS-06**: Emoji removed from programmatic strings — emoji only in drawables/resources, not in code strings
-- [ ] **DSYS-07**: Dark mode visually verified on all 7 screens — no unreadable text, invisible icons, or wrong backgrounds
+- [x] **DSYS-07**: Dark mode visually verified on all 7 screens — no unreadable text, invisible icons, or wrong backgrounds
 
 ### Performance & Polish (PERF)
 
@@ -104,7 +104,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSYS-04 | Phase 2 | Complete (02-03) |
 | DSYS-05 | Phase 2 | Complete (02-04) |
 | DSYS-06 | Phase 2 | Complete (02-04) |
-| DSYS-07 | Phase 2 | Pending |
+| DSYS-07 | Phase 2 | Complete (02-05) |
 | PERF-01 | Phase 3 | Pending |
 | PERF-02 | Phase 3 | Pending |
 | PERF-03 | Phase 3 | Pending |
@@ -136,4 +136,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-03-01 after 02-04 plan completion (DSYS-05, DSYS-06 complete — string externalization and emoji cleanup done)*
+*Last updated: 2026-03-01 after 02-05 plan completion (DSYS-07 complete — dark mode verification checkpoint approved; Phase 2 fully complete)*

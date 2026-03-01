@@ -55,7 +55,7 @@ Plans:
 - [x] 02-02-PLAN.md — Coil integration: PagesAdapter manual loading replaced, HistoryAdapter thumbnail added (DSYS-03)
 - [x] 02-03-PLAN.md — Toast-to-Snackbar migration across all 7 fragments (68 call sites) (DSYS-04)
 - [x] 02-04-PLAN.md — Hardcoded strings + emoji moved to strings.xml across layouts (DSYS-05, DSYS-06)
-- [ ] 02-05-PLAN.md — Dark mode visual verification checkpoint on all 7 screens (DSYS-07)
+- [x] 02-05-PLAN.md — Dark mode visual verification checkpoint on all 7 screens (DSYS-07)
 
 ### Phase 3: Performance & Polish
 **Goal**: The app feels responsive and delightful — smooth transitions, tactile feedback, modern edge-to-edge display, and clear progress indicators
@@ -113,7 +113,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Stability | 4/4 | Complete    | 2026-03-01 |
-| 2. Design System | 5/5 | In progress | - |
+| 2. Design System | 5/5 | Complete    | 2026-03-01 |
 | 3. Performance & Polish | 0/? | Not started | - |
 | 4. Test Coverage | 0/? | Not started | - |
 | 5. Release Readiness | 0/? | Not started | - |
