@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Quality Gates
-status: ready_to_plan
+status: in_progress
 last_updated: "2026-03-01"
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 8
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 ## Current Position
 
 Phase: 4 of 5 (Test Coverage)
-Plan: 0 of 5 in current phase
-Status: Ready to plan — roadmap created, Phase 4 is next
-Last activity: 2026-03-01 — v1.1 roadmap created (Phases 4–5 defined, 8 requirements mapped per phase)
+Plan: 1 of 5 in current phase (04-01 complete)
+Status: In progress — 04-01 complete, test scaffold ready
+Last activity: 2026-03-01 — 04-01 complete: test infra scaffold with JaCoCo, MainDispatcherRule, 15 test deps
 
-Progress: [░░░░░░░░░░] 0% (0/8 plans complete)
+Progress: [#░░░░░░░░░] 12% (1/8 plans complete)
 
 ## Accumulated Context
 
@@ -47,6 +47,11 @@ Testing decisions locked for Phase 4:
 - CameraX and ML Kit INCOMPATIBLE with Robolectric — instrumented tests only
 - Detekt baseline: generate ONCE from unmodified codebase, commit immediately
 
+Decisions from 04-01 execution (2026-03-01):
+- CRITICAL: Force coroutines to 1.7.3 via `configurations.all { resolutionStrategy { force() } }` — mockk 1.14.7 and Robolectric 4.16 pull in kotlinx-coroutines-bom:1.10.1 (Kotlin 2.1.0 binary), incompatible with project's Kotlin 1.9.21
+- Also force kotlin-stdlib to 1.9.21 to prevent Kotlin 2.x stdlib from entering classpath
+- WindowCompat.enableEdgeToEdge() does not exist; correct API is setDecorFitsSystemWindows(window, false) — this pre-existing bug was fixed
+
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
@@ -60,5 +65,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Roadmap created — Phase 4 and Phase 5 defined with success criteria and plan stubs
+Stopped at: Completed 04-01 — Test infrastructure scaffold complete (JaCoCo, MainDispatcherRule, 15 test deps)
 Resume file: None

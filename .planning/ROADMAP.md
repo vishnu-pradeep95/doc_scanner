@@ -71,5 +71,5 @@ Plans:
 | 1. Stability | v1.0 | 4/4 | Complete | 2026-03-01 |
 | 2. Design System | v1.0 | 8/8 | Complete | 2026-03-01 |
 | 3. Performance & Polish | v1.0 | 3/3 | Complete | 2026-03-01 |
-| 4. Test Coverage | v1.1 | 0/5 | Not started | - |
+| 4. Test Coverage | 1/5 | In Progress|  | - |
 | 5. Release Readiness | v1.1 | 0/3 | Not started | - |

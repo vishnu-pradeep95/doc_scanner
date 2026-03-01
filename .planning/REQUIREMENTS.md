@@ -7,7 +7,7 @@
 
 ### Testing
 
-- [ ] **TEST-01**: User can run a basic test suite (test dependencies: MockK 1.14.7, Robolectric 4.16, Espresso 3.7.0, fragment-testing 1.8.9, kotlinx-coroutines-test 1.7.3, core-testing 2.2.0; JaCoCo configured with LINE counter and generated-class exclusions for R, BuildConfig, *Args, *Directions, *Binding)
+- [x] **TEST-01**: User can run a basic test suite (test dependencies: MockK 1.14.7, Robolectric 4.16, Espresso 3.7.0, fragment-testing 1.8.9, kotlinx-coroutines-test 1.7.3, core-testing 2.2.0; JaCoCo configured with LINE counter and generated-class exclusions for R, BuildConfig, *Args, *Directions, *Binding)
 - [ ] **TEST-02**: 15+ ScannerViewModel unit tests cover page CRUD, filter state, and PDF naming logic (using InstantTaskExecutorRule + UnconfinedTestDispatcher + runTest)
 - [ ] **TEST-03**: DocumentEntry JSON serialization round-trips correctly with all fields preserved (pure JVM test, no Android dependencies)
 - [ ] **TEST-04**: 8+ ImageProcessor filter tests run via Robolectric covering all FilterType enum values (Robolectric for Bitmap; ImageProcessor does not call OcrProcessor — no ML Kit boundary mock needed)
@@ -25,7 +25,7 @@
 - [ ] **RELEASE-06**: `dataExtractionRules` (API 31+) and `fullBackupContent` attributes added to AndroidManifest.xml excluding private `scans/`, `processed/`, `cache/`, and `pdfs/` directories from auto-backup
 - [ ] **RELEASE-07**: FileProvider `file_paths.xml` paths scoped to only actually-used subdirectories (remove overly-broad `cache-path path="/"`)
 - [ ] **RELEASE-08**: LeakCanary 2.14 added as `debugImplementation`; zero retained Activity/Fragment/ViewModel leaks after exercising all 8 fragment flows; Navigation 2.7.x `AbstractAppBarOnDestinationChangedListener` library leak documented as known and triaged (not an app bug)
-- [ ] **RELEASE-09**: JaCoCo coverage report generated; LINE coverage meets 70% for `util/` package and 50% for `viewmodel/` package (BRANCH counter excluded due to coroutine synthetic branch inflation)
+- [x] **RELEASE-09**: JaCoCo coverage report generated; LINE coverage meets 70% for `util/` package and 50% for `viewmodel/` package (BRANCH counter excluded due to coroutine synthetic branch inflation)
 
 ## v2 Requirements (Deferred)
 
