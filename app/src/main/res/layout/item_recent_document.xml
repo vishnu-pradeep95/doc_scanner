@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="160dp"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="12dp"
-    android:layout_marginVertical="4dp"
+    android:layout_marginEnd="@dimen/spacing_sm"
+    android:layout_marginVertical="@dimen/spacing_xxs"
     app:cardCornerRadius="16dp"
     app:cardElevation="3dp"
     android:clickable="true"
@@ -38,7 +38,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="bottom|end"
-                android:layout_margin="8dp"
+                android:layout_margin="@dimen/spacing_xs"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="3dp"
                 app:cardBackgroundColor="?attr/colorPrimary">
@@ -60,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="@dimen/spacing_sm">
 
             <TextView
                 android:id="@+id/textDocName"
@@ -68,18 +68,16 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="14sp"
-                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:textAppearance="@style/TextAppearance.Cartoon.TitleSmall"
                 tools:text="Scan_20241227" />
 
             <TextView
                 android:id="@+id/textDocDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
+                android:layout_marginTop="@dimen/spacing_xxs"
+                android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                 tools:text="Dec 27, 2024" />
 
             <TextView
@@ -87,8 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/text_hint"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Cartoon.LabelSmall"
                 tools:text="3 pages" />
 
         </LinearLayout>

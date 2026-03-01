@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="@dimen/spacing_sm">
 
         <!-- Document thumbnail — loaded via Coil; falls back to cartoon document icon -->
         <ImageView
@@ -31,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="@dimen/spacing_sm"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -43,8 +43,8 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:fontFamily="@font/nunito_bold"
-                android:textColor="#2C3E50"
-                android:textSize="15sp"
+                android:textColor="?attr/colorOnSurface"
+                android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium"
                 tools:text="Business Contract.pdf" />
 
             <!-- Document details (pages, size, date) -->
@@ -54,8 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/nunito_regular"
-                android:textColor="#7F8C8D"
-                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                 tools:text="5 pages • 1.2 MB • Dec 26, 2025" />
 
         </LinearLayout>
@@ -68,7 +67,7 @@
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/content_desc_edit_pdf"
-            android:padding="8dp"
+            android:padding="@dimen/spacing_xs"
             android:src="@drawable/ic_edit_small_mascot" />
 
         <!-- Share button with mascot icon -->
@@ -79,7 +78,7 @@
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/share_pdf"
-            android:padding="8dp"
+            android:padding="@dimen/spacing_xs"
             android:src="@drawable/ic_share_small_mascot" />
 
         <!-- Delete button with mascot icon -->
@@ -90,7 +89,7 @@
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/delete_document"
-            android:padding="8dp"
+            android:padding="@dimen/spacing_xs"
             android:src="@drawable/ic_delete_small_mascot" />
 
     </LinearLayout>

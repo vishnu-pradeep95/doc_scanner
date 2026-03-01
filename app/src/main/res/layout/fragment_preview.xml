@@ -38,7 +38,7 @@
         android:id="@+id/previewCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/spacing_md"
         app:cardCornerRadius="20dp"
         app:cardElevation="8dp"
         app:strokeWidth="3dp"
@@ -52,7 +52,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
+            android:padding="@dimen/spacing_xs"
             android:background="@color/white">
 
             <ImageView
@@ -76,8 +76,8 @@
         android:background="?attr/colorSurfaceContainerLow"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="16dp"
+        android:paddingHorizontal="@dimen/spacing_md"
+        android:paddingVertical="@dimen/spacing_md"
         app:layout_constraintBottom_toTopOf="@id/buttonsLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -175,8 +175,8 @@
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="16dp"
+        android:paddingHorizontal="@dimen/spacing_md"
+        android:paddingVertical="@dimen/spacing_md"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -186,7 +186,7 @@
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/spacing_xs"
             android:layout_weight="1"
             android:text="@string/retake"
             android:textSize="14sp" />
@@ -196,7 +196,7 @@
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/spacing_xs"
             android:layout_weight="1"
             android:text="@string/crop_rotate"
             android:textSize="14sp" />
@@ -232,7 +232,7 @@
             android:background="@drawable/loading_bg"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="@dimen/spacing_lg">
 
             <ProgressBar
                 android:layout_width="48dp"
@@ -241,7 +241,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:text="@string/applying_filter"
                 android:textColor="@color/gray_dark" />
 

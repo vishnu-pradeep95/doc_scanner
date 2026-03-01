@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="32dp">
+        android:paddingBottom="@dimen/spacing_xl">
 
         <!-- Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
@@ -30,11 +30,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_lg"
             android:text="@string/appearance"
             android:textColor="@color/cartoon_primary"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.Cartoon.TitleSmall" />
 
         <!-- Dark Mode -->
         <LinearLayout
@@ -45,7 +44,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
-            android:paddingVertical="16dp">
+            android:paddingVertical="@dimen/spacing_md">
 
             <ImageView
                 android:layout_width="24dp"
@@ -56,7 +55,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="@dimen/spacing_md"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -65,15 +64,14 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dark_mode"
                     android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium" />
 
                 <TextView
                     android:id="@+id/textCurrentTheme"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                     tools:text="System default" />
 
             </LinearLayout>
@@ -95,7 +93,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
-            android:paddingVertical="16dp">
+            android:paddingVertical="@dimen/spacing_md">
 
             <ImageView
                 android:layout_width="24dp"
@@ -106,7 +104,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="@dimen/spacing_md"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -115,15 +113,14 @@
                     android:layout_height="wrap_content"
                     android:text="@string/default_filter"
                     android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium" />
 
                 <TextView
                     android:id="@+id/textCurrentFilter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                     tools:text="Magic" />
 
             </LinearLayout>
@@ -139,7 +136,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_xs"
             android:background="@color/gray_light" />
 
         <!-- About Section -->
@@ -147,11 +144,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_lg"
             android:text="@string/about"
             android:textColor="@color/ghibli_forest"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.Cartoon.TitleSmall" />
 
         <!-- Version -->
         <LinearLayout
@@ -160,7 +156,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
-            android:paddingVertical="16dp">
+            android:paddingVertical="@dimen/spacing_md">
 
             <ImageView
                 android:layout_width="24dp"
@@ -171,7 +167,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="@dimen/spacing_md"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -180,15 +176,14 @@
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
                     android:textColor="?android:textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium" />
 
                 <TextView
                     android:id="@+id/textVersion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                     tools:text="Version 1.6.0" />
 
             </LinearLayout>
@@ -204,7 +199,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
-            android:paddingVertical="16dp">
+            android:paddingVertical="@dimen/spacing_md">
 
             <ImageView
                 android:layout_width="24dp"
@@ -215,10 +210,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="@dimen/spacing_md"
                 android:text="@string/share_app"
                 android:textColor="?android:textColorPrimary"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium" />
 
         </LinearLayout>
 

@@ -62,10 +62,10 @@
         android:layout_height="wrap_content"
         android:background="@color/surface_variant"
         android:gravity="center"
-        android:paddingVertical="8dp"
+        android:paddingVertical="@dimen/spacing_xs"
         android:text="@string/long_press_to_select_pdfs"
         android:textColor="@color/text_secondary"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbarContainer" />
@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="32dp"
+        android:padding="@dimen/spacing_xl"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -109,19 +109,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_md"
             android:gravity="center"
             android:text="@string/no_documents_yet"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textAppearance="@style/TextAppearance.Cartoon.BodyLarge"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_xs"
             android:gravity="center"
             android:text="@string/create_first_pdf_hint"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textAppearance="@style/TextAppearance.Cartoon.BodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
     </LinearLayout>
@@ -147,7 +147,7 @@
             android:background="@drawable/loading_bg"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="@dimen/spacing_lg">
 
             <ProgressBar
                 android:layout_width="48dp"
@@ -157,10 +157,10 @@
                 android:id="@+id/loadingText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:text="@string/loading"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Cartoon.BodyMedium" />
 
         </LinearLayout>
 

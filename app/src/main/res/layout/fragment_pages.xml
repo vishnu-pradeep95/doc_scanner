@@ -92,8 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/long_press_to_select"
-            android:textColor="@color/text_hint"
-            android:textSize="12sp"
+            android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
             android:visibility="gone" />
         
     </LinearLayout>
@@ -123,8 +122,8 @@
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="@dimen/spacing_md"
+        android:paddingVertical="@dimen/spacing_sm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -134,7 +133,7 @@
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/spacing_xs"
             android:layout_weight="1"
             android:text="➕ Add More"
             android:textSize="14sp" />
@@ -159,8 +158,8 @@
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="@dimen/spacing_md"
+        android:paddingVertical="@dimen/spacing_sm"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -172,7 +171,7 @@
             style="@style/ActionButton.Secondary"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/spacing_xs"
             android:layout_weight="1"
             android:text="🗑️ Delete"
             android:textSize="14sp" />
@@ -193,7 +192,7 @@
         android:id="@+id/fabShare"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/spacing_md"
         android:contentDescription="@string/share_pdf"
         android:src="@drawable/ic_share_mascot"
         android:visibility="gone"
@@ -222,7 +221,7 @@
             android:background="@drawable/loading_bg"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="@dimen/spacing_lg">
 
             <ProgressBar
                 android:layout_width="48dp"
@@ -232,7 +231,7 @@
                 android:id="@+id/loadingText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:text="@string/loading"
                 android:textColor="@color/gray_dark" />
 

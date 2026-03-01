@@ -23,9 +23,9 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="40dp"
-                android:paddingBottom="24dp">
-                
+                android:paddingTop="@dimen/spacing_xxl"
+                android:paddingBottom="@dimen/spacing_lg">
+
                 <!-- Floating illustrations positioned to the right -->
                 <ImageView
                     android:layout_width="200dp"
@@ -36,13 +36,13 @@
                     android:scaleType="fitEnd"
                     android:src="@drawable/il_home_decorations"
                     android:contentDescription="@null" />
-                
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingHorizontal="24dp"
-                    android:paddingTop="8dp">
+                    android:paddingHorizontal="@dimen/spacing_lg"
+                    android:paddingTop="@dimen/spacing_xs">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="@dimen/spacing_sm"
                         android:orientation="vertical">
 
                         <TextView
@@ -69,7 +69,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/app_name"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="28sp"
+                            android:textAppearance="@style/TextAppearance.Cartoon.HeadlineMedium"
                             android:fontFamily="@font/nunito_extrabold"
                             android:letterSpacing="-0.01"
                             android:shadowColor="#40000000"
@@ -83,7 +83,7 @@
                             android:layout_marginTop="2dp"
                             android:text="@string/home_subtitle"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp"
+                            android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                             android:fontFamily="@font/nunito_regular" />
 
                     </LinearLayout>
@@ -108,9 +108,9 @@
                     </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
-                
+
             </LinearLayout>
-            
+
             </FrameLayout>
 
             <!-- Quick Actions Section -->
@@ -118,18 +118,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="@dimen/spacing_lg"
                 android:text="@string/quick_actions"
                 android:textColor="?android:textColorPrimary"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textAppearance="@style/TextAppearance.Cartoon.TitleLarge" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="16dp">
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:paddingTop="@dimen/spacing_md">
 
                 <!-- New Scan Card - with bounce animation -->
                 <com.google.android.material.card.MaterialCardView
@@ -161,11 +160,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
+                            android:layout_marginTop="@dimen/spacing_sm"
                             android:text="@string/new_scan"
                             android:textColor="@color/white"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textAppearance="@style/TextAppearance.Cartoon.LabelLarge" />
 
                     </LinearLayout>
 
@@ -201,11 +199,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
+                            android:layout_marginTop="@dimen/spacing_sm"
                             android:text="@string/auto_scan"
                             android:textColor="@color/white"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textAppearance="@style/TextAppearance.Cartoon.LabelLarge" />
 
                     </LinearLayout>
 
@@ -241,11 +238,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
+                            android:layout_marginTop="@dimen/spacing_sm"
                             android:text="@string/import_image"
                             android:textColor="@color/white"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textAppearance="@style/TextAppearance.Cartoon.LabelLarge" />
 
                     </LinearLayout>
 
@@ -258,10 +254,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="@dimen/spacing_lg"
                 android:text="@string/pdf_tools"
                 android:textColor="?android:textColorPrimary"
-                android:textSize="18sp"
+                android:textAppearance="@style/TextAppearance.Cartoon.TitleLarge"
                 android:fontFamily="@font/nunito_bold" />
 
             <LinearLayout
@@ -269,8 +265,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:paddingHorizontal="24dp"
-                android:paddingTop="16dp">
+                android:paddingHorizontal="@dimen/spacing_lg"
+                android:paddingTop="@dimen/spacing_md">
 
                 <!-- Merge PDFs - Clean clickable thumbnail -->
                 <LinearLayout
@@ -293,10 +289,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/spacing_xs"
                         android:text="@string/merge"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                         android:fontFamily="@font/nunito_semibold" />
 
                 </LinearLayout>
@@ -322,10 +318,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/spacing_xs"
                         android:text="@string/split"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                         android:fontFamily="@font/nunito_semibold" />
 
                 </LinearLayout>
@@ -351,10 +347,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/spacing_xs"
                         android:text="@string/compress"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="13sp"
+                        android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
                         android:fontFamily="@font/nunito_semibold" />
 
                 </LinearLayout>
@@ -376,8 +372,7 @@
                     android:layout_weight="1"
                     android:text="@string/recent_documents"
                     android:textColor="?android:textColorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="@style/TextAppearance.Cartoon.TitleLarge" />
 
                 <TextView
                     android:id="@+id/btnViewAll"
@@ -385,8 +380,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/view_all"
                     android:textColor="@color/primary"
-                    android:textSize="14sp"
-                    android:padding="8dp"
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodyMedium"
+                    android:padding="@dimen/spacing_xs"
                     android:background="?attr/selectableItemBackgroundBorderless" />
 
             </LinearLayout>
@@ -396,9 +391,9 @@
                 android:id="@+id/recyclerRecentDocs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/spacing_sm"
                 android:clipToPadding="false"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/spacing_md"
                 tools:listitem="@layout/item_recent_document" />
 
             <!-- Empty state for recent documents -->
@@ -422,19 +417,19 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/spacing_md"
                     android:text="@string/no_recent_documents"
                     android:textColor="@color/text_secondary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodyLarge" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:gravity="center"
                     android:text="@string/no_recent_documents_hint"
                     android:textColor="@color/text_hint"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodyMedium" />
 
             </LinearLayout>
 
@@ -461,8 +456,7 @@
                         android:layout_weight="1"
                         android:text="@string/current_session"
                         android:textColor="?android:textColorPrimary"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:textAppearance="@style/TextAppearance.Cartoon.TitleLarge" />
 
                     <TextView
                         android:id="@+id/btnContinueSession"
@@ -470,8 +464,8 @@
                         android:layout_height="wrap_content"
                         android:text="@string/continue_editing"
                         android:textColor="@color/primary"
-                        android:textSize="14sp"
-                        android:padding="8dp"
+                        android:textAppearance="@style/TextAppearance.Cartoon.BodyMedium"
+                        android:padding="@dimen/spacing_xs"
                         android:background="?attr/selectableItemBackgroundBorderless" />
 
                 </LinearLayout>
@@ -480,7 +474,7 @@
                     android:id="@+id/cardCurrentSession"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/spacing_sm"
                     android:layout_marginHorizontal="20dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp">
@@ -489,7 +483,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:padding="16dp"
+                        android:padding="@dimen/spacing_md"
                         android:gravity="center_vertical">
 
                         <ImageView
@@ -502,7 +496,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="@dimen/spacing_md"
                             android:orientation="vertical">
 
                             <TextView
@@ -510,8 +504,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="?android:textColorPrimary"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
+                                android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium"
                                 tools:text="5 pages scanned" />
 
                             <TextView
@@ -519,8 +512,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
                                 android:text="@string/tap_to_continue"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="13sp" />
+                                android:textAppearance="@style/TextAppearance.Cartoon.BodySmall" />
 
                         </LinearLayout>
 
@@ -557,7 +549,7 @@
             android:background="@drawable/loading_bg"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="@dimen/spacing_lg">
 
             <ProgressBar
                 android:layout_width="48dp"
@@ -567,10 +559,10 @@
                 android:id="@+id/loadingText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:text="@string/loading"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Cartoon.BodyMedium" />
 
         </LinearLayout>
 
