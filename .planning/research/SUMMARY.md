@@ -1,234 +1,221 @@
 # Project Research Summary
 
-**Project:** PDF Scanner -- Polish & Quality Pass
-**Domain:** Android Document Scanner App (existing app, post-feature-complete quality pass)
-**Researched:** 2026-02-28
+**Project:** PDF Scanner -- v1.1 Testing & Release Pass
+**Domain:** Android testing infrastructure + static analysis + release tooling
+**Researched:** 2026-03-01
 **Confidence:** HIGH
 
 ## Executive Summary
 
-This is a feature-complete Android document scanner app (Phase 10) built with Single Activity + Navigation Component + MVVM that needs a systematic quality pass before Play Store submission. The app has zero tests, 70 Toast calls used as the primary feedback mechanism, 154 unsafe `requireContext()` calls in coroutine callbacks, no image loading library, incomplete ProGuard rules, and unbounded temp file accumulation. The cartoon mascot theme is a genuine differentiator, but inconsistent spacing, typography, and several crash-prone code paths undermine it. The core scanning and PDF generation functionality works but is fragile under stress (OOM on 10+ page documents, resource leaks in error paths, race conditions in shared mutable LiveData).
+This milestone adds a complete testing foundation and Play Store release readiness layer to a feature-complete Android document scanner. The app is already built on a solid MVVM + Single Activity + Navigation Component + CameraX + ML Kit stack -- no architectural changes are needed. The work is exclusively additive: write tests for existing code, add static analysis tooling, fix manifest and ProGuard gaps, and verify the release build on a real device. The recommended approach is to tackle testing first (Phase 4 in two internal waves: JVM unit tests, then Robolectric and integration tests), then release hardening (Phase 5), with a mandatory real-device E2E gate before any Play Store submission.
 
-The recommended approach is a phased quality pass that prioritizes stability before polish. Fix crashes and resource leaks first (the `requireContext()` pattern alone accounts for the most common crash class in production Android apps). Then establish a design system (typography scale, spacing grid, Snackbar patterns) so UI fixes are systematic rather than ad-hoc. Add an image loading library (Coil) early because it simultaneously solves memory management, thumbnail caching, and scroll performance. Only after the app is stable and visually consistent should test coverage be added -- writing tests against broken behavior wastes effort. The testing stack is straightforward: JUnit 4 + MockK + Robolectric for unit tests, Espresso for integration, with LeakCanary and Detekt for ongoing quality enforcement.
+The primary risk is environment fragmentation: some test categories (CameraX, ML Kit, PdfUtils with PdfRenderer) cannot run on the JVM and require a physical device or emulator. This is not a design problem -- it is a well-understood Android testing boundary. The research identifies exactly which components fall into which test environment, enabling the roadmap to assign tests to the correct phase and environment without surprises. A secondary risk is ProGuard/R8 stripping ML Kit and Navigation SafeArgs classes in release builds -- this is a known failure mode with a documented fix that must be applied and verified on a real device before submission.
 
-The key risks are: (1) OOM crashes during PDF generation with many pages -- the app allocates up to 48MB per uncompressed bitmap and the magic filter triples memory usage; (2) Fragment detachment crashes from the 154 `requireContext()` calls in coroutine contexts; (3) ProGuard stripping ML Kit and Play Services classes in release builds, which will only be discovered when testing the release APK; and (4) the `android:required="true"` camera declaration silently filtering the app from tablets and Chromebooks on the Play Store.
+The testing stack is straightforward: MockK for Kotlin-native mocking, Robolectric for JVM-based Android class access, JUnit 4 throughout (JUnit 5 introduces instrumentation friction with no benefit here), Espresso plus FragmentScenario for UI tests, and JaCoCo via AGP built-in for coverage reporting. Detekt with a baseline file handles static analysis without blocking the initial rollout. All version selections are verified stable as of March 2026 with HIGH confidence against official release channels.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The testing and quality stack builds on the existing JUnit 4 + Espresso foundation already declared in build.gradle.kts. No framework migration is needed. See [STACK.md](./STACK.md) for full dependency configuration.
+The existing production stack (CameraX 1.3.1, Coil 2.7.0, ML Kit, Navigation 2.7.x, Material 3, Kotlin 1.9.21, Coroutines 1.7.3) needs no changes. All additions are in the test and debug configuration only -- zero production APK impact.
 
 **Core technologies:**
-- **MockK 1.13.12**: Kotlin-first mocking -- handles suspend functions, sealed classes, and final classes natively (verify version on Maven Central)
-- **Robolectric 4.12+**: Runs Android-dependent tests (Bitmap, SharedPreferences) on JVM -- critical for ImageProcessor and DocumentHistoryRepository tests without device
-- **Detekt 1.23.6 + detekt-formatting**: Kotlin static analysis covering code smells, complexity, and formatting in one tool (replaces standalone ktlint)
-- **LeakCanary 2.14**: Auto-detects Activity/Fragment memory leaks in debug -- essential given CameraX lifecycle binding and fragment navigation patterns
-- **Coil** (not in STACK.md but identified in FEATURES.md as critical): Kotlin-first image loading library for thumbnail caching, memory management, and smooth loading transitions
-- **AndroidX Arch Core Testing 2.2.0**: `InstantTaskExecutorRule` for synchronous LiveData in unit tests -- required since the app uses LiveData extensively
-- **JaCoCo** (AGP built-in): Code coverage with targets of 70% for utilities, 50% for ViewModels
+- MockK 1.14.7: Kotlin-first mocking -- handles `suspend fun`, final classes (Kotlin default), sealed classes, and coroutines natively; Mockito cannot do this without painful workarounds
+- kotlinx-coroutines-test 1.7.3: Coroutine test dispatchers -- MUST match the app's coroutines version exactly; version mismatch causes `NoSuchMethodError` at runtime
+- androidx.arch.core:core-testing 2.2.0: Provides `InstantTaskExecutorRule` -- makes LiveData post synchronously in JVM unit tests; without it every `liveData.value` assertion returns null
+- Robolectric 4.16: Android API access on JVM -- enables testing Bitmap, SharedPreferences, and Context-dependent code without a device; supports compileSdk 35/36
+- Espresso 3.7.0 + espresso-intents + espresso-contrib: UI interaction testing -- industry standard, auto-synchronizes with UI thread; intents artifact verifies FileProvider share flows; contrib adds RecyclerView actions
+- androidx.fragment:fragment-testing 1.8.9: `launchFragmentInContainer<T>()` -- tests each fragment in isolation without launching the full Activity; requires `debugImplementation` for manifest merge
+- LeakCanary 2.14: Automatic memory leak detection in debug builds -- zero production APK impact, installs via ContentProvider, catches Activity/Fragment/ViewModel leaks during manual testing
+- Detekt 1.23.8 + detekt-formatting: Kotlin static analysis -- 1.23.x is the correct series for Kotlin 1.9.21; Detekt 2.x is alpha and incompatible with Kotlin 1.9
+- JaCoCo: Coverage reporting via AGP built-in (`enableUnitTestCoverage = true`) -- no third-party plugin needed for a single-module project
 
-**Version warning:** All versions are from training data (cutoff May 2025). WebSearch was unavailable during research. Verify every version against Maven Central / Google Maven before adding to build.gradle.kts.
+**Critical version constraints:**
+- Detekt must stay at 1.23.x -- Detekt 2.x targets Kotlin 2.x and will fail to compile with Kotlin 1.9.21
+- coroutines-test must match coroutines-android version exactly (both 1.7.3)
+- MockK Android instrumented tests require two artifacts: `mockk-android` + `mockk-agent`; the JVM-only `mockk` artifact fails silently on device
+
+See `.planning/research/STACK.md` for the authoritative `app/build.gradle.kts` diff with all dependency declarations.
 
 ### Expected Features
 
-This is a polish pass, not a feature build. "Features" here are quality attributes. See [FEATURES.md](./FEATURES.md) for the full audit.
+This milestone has no product features -- the app is feature-complete. Every task is a testing or release gate.
 
-**Must fix (Play Store launch blockers):**
-- Crash freedom on all core flows -- zero test coverage currently, 52 catch blocks catching generic Exception
-- Memory management for bitmap operations -- no image loading library, manual bitmap handling causes OOM
-- Fix Toast-as-loading-indicator pattern -- broken UX in HomeFragment
-- Process death recovery -- no SavedStateHandle; in-progress scans lost when Android kills the app
-- ProGuard rules for ML Kit and Play Services -- release builds will crash without them
-- Move hardcoded contentDescription strings to resources -- accessibility and i18n requirement
-- Remove emoji from programmatic strings
+**Must have -- table stakes (P1):**
+- TEST-01: Test dependency scaffold -- blocks all other tests; must be Day 1 of Phase 4
+- TEST-02: ScannerViewModel unit tests (15+ tests) -- core business logic is currently entirely untested
+- TEST-03: DocumentEntry JSON round-trip -- silent serialization regression equals user data corruption
+- RELEASE-02: Android Lint with accessibility errors promoted to errors -- required for any quality release
+- RELEASE-03: ProGuard/R8 keep rules for ML Kit and Navigation SafeArgs -- known to cause release-build crashes without these
+- RELEASE-04: Release APK E2E on a real device -- unverified release build is an unknown quantity (ENVIRONMENT-BLOCKED: requires host machine with Android Studio, not WSL2)
+- RELEASE-05: Camera `uses-feature required="false"` -- without this, tablets and Chromebooks cannot install the app from Play Store
+- RELEASE-06: `dataExtractionRules` + `fullBackupContent` excluding private scan files -- private file paths backed up to Google and restored to a different device path are broken
+- RELEASE-07: FileProvider scope tightened -- current `cache-path path="/"` is overly broad and exposes all cached files
 
-**Should fix (portfolio quality):**
-- Typography scale and spacing system (8dp grid) applied consistently
-- Replace Toast spam (70 calls) with Snackbar/inline feedback
-- Navigation transitions using Material motion patterns
-- Edge-to-edge display with proper inset handling
-- Dark mode visual verification on all screens
-- Haptic feedback on capture (Adobe Scan, Microsoft Lens, Google Drive all have this)
-- Camera `uses-feature required="false"` for tablet/Chromebook compatibility
+**Should have -- differentiators (P2):**
+- TEST-04: ImageProcessor filter tests via Robolectric (8+ tests) -- core image algorithm coverage
+- TEST-05: DocumentHistoryRepository CRUD via Robolectric (8+ tests) -- production persistence layer
+- TEST-07: Fragment smoke tests (5+ fragments) -- catches layout inflation errors and View Binding NPEs
+- TEST-08: Navigation flow test (Camera -> Preview -> Pages -> PDF) -- happy path verification
+- RELEASE-01: Detekt with baseline -- zero new blocking errors
+- RELEASE-08: LeakCanary debug build -- zero retained Activity/Fragment leaks
+- RELEASE-09: JaCoCo coverage reporting -- 70% line coverage for `util/`, 50% for `viewmodel/`
 
-**Defer (v2+):**
-- First-launch onboarding
-- Skeleton/shimmer loading placeholders
-- Predictive back gesture (Android 14+)
-- Dynamic color theming
-- Searchable PDFs, cloud sync, new export formats
-- Internationalization
+**Defer to v2+:**
+- TEST-06: PdfUtils instrumented tests -- HIGH complexity; PdfRenderer requires device/emulator; environment uncertainty makes this a scope risk for v1.1
+- Screenshot regression tests -- explicitly out of scope per PROJECT.md; tooling confidence is LOW
+- CI/CD pipeline -- not in v1.1 scope
+- JaCoCo hard enforcement gate -- add only after coverage is established and stable for several milestones
+
+See `.planning/research/FEATURES.md` for the full prioritization matrix and Play Store submission reality check.
 
 ### Architecture Approach
 
-The app follows a clean Single Activity + Navigation Component + MVVM architecture that is well-suited for testing without restructuring. ScannerViewModel (shared across fragments via `activityViewModels()`) and PdfEditorViewModel handle state; 7 fragments compose the UI; utility classes (ImageProcessor, PdfUtils, DocumentHistoryRepository) contain the business logic. See [ARCHITECTURE.md](./ARCHITECTURE.md) for test directory structure and patterns.
+The test architecture follows the standard Android test pyramid: approximately 60% JVM unit tests covering ViewModels, data models, and utility pure logic; approximately 30% integration and instrumented tests covering Fragments, Navigation, and file I/O; and approximately 10% manual E2E covering camera, ML Kit, and full flows on device. The existing codebase needs zero structural refactoring to achieve the core test targets -- `ScannerViewModel`, `DocumentEntry`, and most utility logic are testable as-is. The only structural gap is that ML Kit calls within `ImageProcessor` must be wrapped behind an `OcrProcessor` interface so unit tests can inject a `FakeOcrProcessor` instead of invoking the native TFLite runtime (which crashes on JVM).
 
-**Major components and test strategy:**
-1. **ScannerViewModel** -- page list management, filter state, PDF naming. Fully unit-testable on JVM with InstantTaskExecutorRule. Highest priority.
-2. **ImageProcessor** -- bitmap filter functions (Enhanced, B&W, Magic, Sharpen). Unit-testable via Robolectric.
-3. **PdfUtils** -- merge, split, compress operations. Requires real device/emulator for PdfRenderer. Integration test territory.
-4. **DocumentHistoryRepository** -- SharedPreferences + JSON CRUD. Testable via Robolectric.
-5. **7 Fragments** -- UI layer with View Binding and LiveData observation. Espresso + FragmentScenario for integration tests.
-6. **3 Custom Views** (AnnotationCanvasView, SignaturePadView, NativePdfView) -- Canvas-based, need real device for meaningful tests.
+**Major test component boundaries:**
+1. JVM unit tests (src/test/) -- ScannerViewModel, DocumentEntry, pure utility logic; runs on any machine including WSL2
+2. Robolectric unit tests (src/test/ with @RunWith annotation) -- ImageProcessor (Bitmap), DocumentHistoryRepository (SharedPreferences); runs on JVM with Android framework stubs
+3. Instrumented tests (src/androidTest/) -- PdfUtils (PdfRenderer), Fragment smoke tests, Navigation flow; requires emulator or physical device
+4. Static analysis and lint -- Detekt + Android Lint; runs on any machine, no device required
+5. Manual E2E -- camera capture, ML Kit OCR, share PDF; requires physical device on host machine
 
-**Test pyramid target:** ~60% unit (40-60 tests), ~30% integration (15-20 tests), ~10% manual E2E (~5 smoke tests).
+**Build configuration changes required:**
+- `app/build.gradle.kts`: Add all test dependencies; `enableUnitTestCoverage = true`; custom `jacocoTestReport` task with generated-class exclusions; Detekt plugin; lint block
+- Root `build.gradle.kts`: Add `io.gitlab.arturbosch.detekt` plugin declaration
+- New files: `app/lint.xml`, `app/detekt.yml`, `app/detekt-baseline.xml` (generated), additions to `app/proguard-rules.pro`
+- `AndroidManifest.xml`: `uses-feature required="false"`, `dataExtractionRules`, `fullBackupContent` attributes
+
+See `.planning/research/ARCHITECTURE.md` for the complete test directory structure, all code-level patterns with examples, and the full JaCoCo task configuration.
 
 ### Critical Pitfalls
 
-See [PITFALLS.md](./PITFALLS.md) for full analysis with code-level detail.
+Ten pitfalls were identified. The five most likely to cause wasted work or silent failures:
 
-1. **OOM during PDF generation** -- 12MP camera images are ~48MB uncompressed each; magic filter triples memory. Fix: explicit `bitmap.recycle()`, cap decoded dimensions to PDF output size, use `inBitmap` for reuse.
-2. **Fragment detachment crashes** -- 154 `requireContext()`/`requireActivity()` calls; coroutines complete after fragment detach. Fix: systematic replacement with `context ?: return` in all coroutine callbacks.
-3. **Leaked PdfRenderer and temp files** -- manual `close()` instead of `use {}` blocks; temp files never cleaned up. Fix: convert to `use {}`, add cache cleanup routine.
-4. **Incomplete ProGuard rules** -- ML Kit, Play Services, and Navigation Safe Args classes will be stripped in release. Fix: add keep rules, test release APK on device.
-5. **Mutable LiveData race conditions** -- `LiveData<MutableList<Uri>>` allows direct mutation without notification and concurrent modification. Fix: switch to immutable list pattern (`currentList + newUri`).
-6. **Camera hardware requirement** -- `required="true"` blocks tablets and Chromebooks from Play Store. Fix: change to `required="false"`, handle missing camera at runtime.
+1. **JaCoCo counter type ambiguity** -- "70% coverage" is meaningless without specifying LINE vs BRANCH vs INSTRUCTION. Kotlin coroutines inflate the BRANCH counter by 15+ percentage points due to synthetic state-machine branches. Prevention: configure `jacocoTestCoverageVerification` with `counter = "LINE"` explicitly before writing a single test. Also add generated-class exclusions for `R`, `BuildConfig`, `*Args`, `*Directions`, and `*Binding` classes or coverage numbers will be misleadingly low.
+
+2. **CameraX and ML Kit are incompatible with Robolectric** -- Any test that instantiates `ProcessCameraProvider` or calls ML Kit APIs in a Robolectric context will crash with `UnsatisfiedLinkError` because native `.so` libraries cannot be loaded on JVM. Prevention: CameraFragment tests must be instrumented (androidTest), never Robolectric. Wrap ML Kit behind an `OcrProcessor` interface and inject `FakeOcrProcessor` in all unit tests.
+
+3. **Missing ProGuard rules cause silent release-build crashes** -- ML Kit and Navigation SafeArgs classes are stripped by R8 in release builds. The crash does not appear in debug builds because debug skips R8. Prevention: add explicit keep rules for `com.google.mlkit.**`, native JNI methods, and `**.*Args`/`**.*Directions` Safe Args classes. Verify by installing the release APK on a physical device before submission.
+
+4. **`InstantTaskExecutorRule` missing causes all LiveData assertions to return null** -- Without this rule, `LiveData.setValue()` fails silently or throws `getMainLooper not mocked` on JVM. Prevention: add `@get:Rule val instantExecutorRule = InstantTaskExecutorRule()` to every ViewModel test class; this is a prerequisite for TEST-02.
+
+5. **Deprecated coroutine test API** -- Online tutorials still use deprecated `TestCoroutineDispatcher` and `runBlockingTest` (both deprecated since coroutines-test 1.6). These cause test-ordering bugs that pass locally but fail under different conditions. Prevention: use `UnconfinedTestDispatcher` + `runTest` from the start; do not copy older patterns.
+
+Additional pitfall worth flagging: **LeakCanary will fire for a known Navigation 2.7.x library bug** (`AbstractAppBarOnDestinationChangedListener` holding a Context reference). This is not app code. Prevention: triage it immediately as a library leak to avoid wasted investigation. Fix options: upgrade to Navigation 2.8+, manually remove the listener in `onDestroyView()`, or add a named exclusion to LeakCanary configuration.
+
+See `.planning/research/PITFALLS.md` for all 10 pitfalls with code samples, recovery costs, and a "Looks Done But Isn't" checklist.
 
 ## Implications for Roadmap
 
-Based on combined research, the dependency chain is clear: stability before polish, polish before tests, tests validate the fixes. Here is the suggested phase structure:
+The research maps directly onto two ordered phases. Within each phase, task order is constrained by explicit dependencies identified in the research.
 
-### Phase 1: Critical Bug Fixes and Stability
+### Phase 4: Test Coverage
 
-**Rationale:** The app has crash-prone patterns that must be fixed before any other work. Polishing UI on a crashing app wastes effort. Tests written against broken behavior need rewriting.
-**Delivers:** Crash-free core flows, proper resource management, data integrity in ViewModel.
-**Addresses:** Crash freedom (P1), process death recovery (P1), back navigation during operations, EXIF rotation handling.
-**Avoids:** Fragment detachment crashes (Pitfall 3), leaked resources (Pitfall 2), mutable LiveData races (Pitfall 6), OOM during PDF generation (Pitfall 1).
+**Rationale:** All tests depend on TEST-01 (dependency scaffold), so that must be the first task. JVM unit tests (TEST-02, TEST-03) can run in WSL2 immediately after scaffold setup -- no device needed. Robolectric tests (TEST-04, TEST-05) come next and share the Robolectric setup cost. Fragment and navigation tests (TEST-07, TEST-08) are the final wave because they require instrumented infrastructure and have the highest implementation complexity. JaCoCo configuration (RELEASE-09) should be wired in alongside the first tests, not retrofitted at the end.
+**Delivers:** A test suite with 37+ tests covering ViewModel business logic, data persistence, JSON serialization, and image processing; a JaCoCo coverage report at the target thresholds.
+**Addresses:** TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, RELEASE-09 (core); TEST-07, TEST-08 (stretch)
+**Avoids:**
+- Configure JaCoCo counter type and generated-class exclusions before the first test run (Pitfalls 1 and 2)
+- Use `UnconfinedTestDispatcher` + `runTest` from the start; never use `TestCoroutineDispatcher` (Pitfall 8)
+- Add `InstantTaskExecutorRule` to every ViewModel test class (Pitfall 9)
+- Do NOT use Robolectric for anything touching CameraX or ML Kit native APIs (Pitfalls 3 and 4)
+- Establish the `OcrProcessor` interface boundary before writing TEST-04 (Pitfall 4)
 
-Key tasks:
-- Replace all 154 `requireContext()` in coroutine callbacks with `context ?: return`
-- Convert PdfRenderer/ParcelFileDescriptor to `use {}` blocks
-- Add temp file cleanup routine (delete stale files >1hr on app startup)
-- Refactor ScannerViewModel to immutable collections
-- Add SavedStateHandle for process death recovery
-- Cap bitmap decode dimensions for PDF generation, add explicit `recycle()`
-- Remove or implement undo/redo buttons in PDF editor (no "coming soon" placeholders)
+**Recommended internal order:**
+1. TEST-01: Add all test dependencies to build.gradle.kts + configure JaCoCo task with exclusions + establish MainDispatcherRule
+2. TEST-02: ScannerViewModel unit tests (JVM, MockK, InstantTaskExecutorRule, coroutines-test)
+3. TEST-03: DocumentEntry JSON round-trip (pure JVM, no Android dependencies)
+4. TEST-04: ImageProcessor Robolectric tests (Robolectric for Bitmap; fake OcrProcessor for ML Kit boundary)
+5. TEST-05: DocumentHistoryRepository Robolectric CRUD (Robolectric for SharedPreferences)
+6. RELEASE-09: Run coverage report; verify exclusions are correct; document threshold baseline
+7. (Stretch) TEST-07: Fragment smoke tests via FragmentScenario on device/emulator
+8. (Stretch) TEST-08: Navigation flow test with TestNavHostController
 
-### Phase 2: Design System and UI Consistency
+### Phase 5: Release Readiness
 
-**Rationale:** Before fixing individual UI issues, define the system. A typography scale and spacing grid applied systematically prevents new inconsistencies. This phase also adds Coil for image loading, which is a prerequisite for performance work.
-**Delivers:** Consistent visual language, proper image loading with caching, Snackbar-based feedback pattern.
-**Addresses:** Typography scale (P2), spacing system (P2), Toast replacement (P2), image loading library (P1 -- memory), content descriptions (P1), emoji removal (P1).
-**Avoids:** Creating new inconsistencies by fixing screens ad-hoc without a design system.
+**Rationale:** Release hardening tasks are mostly independent of each other and of the test phase. ProGuard rules (RELEASE-03) must precede the real-device E2E verification (RELEASE-04) -- a broken release build wastes device testing time. The Detekt baseline (RELEASE-01) must be generated from the unmodified codebase before any fixes; generate it as Phase 5's very first action. LeakCanary (RELEASE-08) should be installed early in the phase to catch binding leaks during manual testing of the other tasks.
+**Delivers:** A release-ready APK verified on a physical device with clean Lint, Detekt, ProGuard, backup rules, and manifest configuration.
+**Addresses:** RELEASE-01, RELEASE-02, RELEASE-03, RELEASE-04, RELEASE-05, RELEASE-06, RELEASE-07, RELEASE-08
+**Avoids:**
+- Generate Detekt baseline exactly once from the completely unmodified codebase; commit immediately (Pitfall 10)
+- Triage the Navigation 2.7.x LeakCanary false positive on first encounter; do not investigate as app code (Pitfall 6)
+- Audit all 8 fragments for `_binding = null` in `onDestroyView()` before the LeakCanary run (Pitfall 7)
+- Test release APK on a physical device -- ProGuard bugs cannot be caught by unit tests (Pitfall 5)
 
-Key tasks:
-- Define Material type scale in styles.xml (heading, body, caption sizes)
-- Define spacing constants (8dp grid) and apply across all layouts
-- Add Coil dependency for all image/thumbnail loading
-- Replace Toast spam with Snackbar/inline feedback (70 Toast calls across 7 files)
-- Move all hardcoded contentDescription strings to strings.xml
-- Remove emoji from programmatic strings
-- Verify dark mode on all screens
-
-### Phase 3: Performance and Polish
-
-**Rationale:** With stability fixed and Coil in place, most performance issues (thumbnail caching, scroll jank, memory spikes) are already mitigated. This phase focuses on remaining performance work and UX polish that differentiates from competitors.
-**Delivers:** Smooth 60fps scrolling, fast camera startup, navigation animations, haptic feedback, edge-to-edge display.
-**Addresses:** Camera startup optimization (P2), scroll performance (P2), navigation transitions (P2), haptic feedback (P2), edge-to-edge (P2), determinate progress indicators (P2).
-**Avoids:** Performance traps from PITFALLS.md (full-res bitmap loading in RecyclerView, PdfRenderer re-rendering on every page change).
-
-Key tasks:
-- Verify Coil integration eliminates thumbnail jank
-- Add Material motion transitions for navigation
-- Implement haptic feedback on capture
-- Add edge-to-edge display with WindowInsets handling
-- Replace indeterminate progress with "Page X of Y" for PDF generation
-- Snackbar with undo for destructive actions (replace confirmation dialogs)
-- Cache PdfRenderer pages (previous/current/next) for smooth swiping
-
-### Phase 4: Testing Infrastructure and Coverage
-
-**Rationale:** Tests should be written against stable, correct behavior. The fixes from Phases 1-3 are now the baseline to lock in with automated tests. Start with unit tests (highest value, fastest feedback), then integration.
-**Delivers:** Test suite with ~60 unit tests and ~20 integration tests, CI-ready quality gates.
-**Uses:** JUnit 4, MockK, Robolectric, coroutines-test, arch core-testing, Espresso, FragmentScenario.
-**Implements:** Test pyramid from ARCHITECTURE.md (60% unit, 30% integration, 10% manual).
-
-Key tasks:
-- Add all test dependencies to build.gradle.kts
-- ScannerViewModel unit tests (page CRUD, filter state, PDF naming)
-- DocumentEntry JSON round-trip tests
-- ImageProcessor filter tests via Robolectric
-- DocumentHistoryRepository CRUD tests
-- PdfUtils instrumented tests (merge, split, compress with real PDFs)
-- Fragment smoke tests (HomeFragment navigation, PagesFragment rendering)
-- Navigation flow tests with TestNavHostController
-
-### Phase 5: Static Analysis, Release Readiness, and Play Store Prep
-
-**Rationale:** Final quality gate before Play Store submission. Linting catches remaining issues, ProGuard testing catches release-only crashes, manifest review catches device compatibility problems.
-**Delivers:** Release-ready APK, proper ProGuard rules, device compatibility, lint-clean codebase.
-**Addresses:** ProGuard rules (P1), camera uses-feature (P2), accessibility lint (P1), allowBackup security.
-**Avoids:** ProGuard stripping (Pitfall 5), camera hardware blocking (Pitfall 4), Play Store policy violations.
-
-Key tasks:
-- Configure Detekt with detekt-formatting plugin
-- Configure Android Lint with lint.xml (accessibility errors, hardcoded text)
-- Generate lint baseline, fix errors incrementally
-- Add complete ProGuard rules (ML Kit, Play Services, Navigation Safe Args)
-- Build and test release APK on real device -- every feature path
-- Change camera `uses-feature` to `required="false"`
-- Set `allowBackup="false"` or configure `fullBackupContent` to exclude scans
-- Review FileProvider paths in file_paths.xml
-- Add LeakCanary to debug builds
-- Set JaCoCo coverage thresholds (70% util, 50% viewmodel)
+**Recommended internal order:**
+1. RELEASE-01: Generate Detekt baseline from unmodified codebase; commit `detekt-baseline.xml` immediately
+2. RELEASE-08: Add LeakCanary + audit all 8 fragments for binding nullification pattern
+3. RELEASE-02: Create `lint.xml` with accessibility checks as errors + wire into `build.gradle.kts`
+4. RELEASE-05: Fix `uses-feature required="false"` in AndroidManifest.xml
+5. RELEASE-06: Add `dataExtractionRules` + `fullBackupContent` to exclude private scan/processed/pdf directories
+6. RELEASE-07: Tighten FileProvider paths in `file_paths.xml` to only actually-used subdirectories
+7. RELEASE-03: Complete ProGuard/R8 keep rules for ML Kit, Navigation SafeArgs, Coil, coroutines
+8. RELEASE-04: Build release APK; install on physical device; exercise every screen and feature path (ENVIRONMENT-BLOCKED: host machine with Android Studio required)
 
 ### Phase Ordering Rationale
 
-- **Stability before polish:** Fixing crashes in Phase 1 before UI work in Phase 2 prevents wasted effort on screens that crash. The fragment detachment pattern alone could cause crashes on any screen during any long-running operation.
-- **Design system before screen-by-screen fixes:** Defining typography and spacing constants in Phase 2 before applying them prevents creating new inconsistencies. FEATURES.md explicitly calls this out.
-- **Image loading library early (Phase 2):** Coil solves memory management, thumbnail caching, and scroll performance simultaneously. Many "performance issues" from Phase 3 will already be fixed.
-- **Tests after fixes (Phase 4):** Writing tests against broken behavior is waste. Tests in Phase 4 lock in the correct behavior from Phases 1-3.
-- **Release prep last (Phase 5):** ProGuard, lint, and Play Store readiness are verification steps that make sense after the code is stable and polished.
+- Tests before release hardening because: tests may surface bugs that are easier to fix before release build configuration hardens; RELEASE-09 (JaCoCo) has no meaning without tests existing first; LeakCanary findings during Phase 5 may reveal binding leaks that fragment smoke tests in Phase 4 would have caught earlier.
+- TEST-01 is the universal blocker for Phase 4 -- no test can be written until the dependency scaffold is in `build.gradle.kts`.
+- RELEASE-04 is the terminal gate for Phase 5 -- it cannot happen until RELEASE-03 is complete AND requires a host machine environment that WSL2 cannot provide.
+- TEST-06 (PdfUtils instrumented tests) is deliberately deferred to v2+ due to HIGH implementation complexity (PdfRenderer requires real device/emulator, not Robolectric) and environment uncertainty relative to the v1.1 scope.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 1 (Bug Fixes):** The `requireContext()` audit touches 154 call sites across 12 files. Needs careful per-file analysis to determine which calls are in coroutine contexts vs. safe synchronous contexts. Research-phase recommended.
-- **Phase 3 (Performance):** Edge-to-edge display and WindowInsets handling varies significantly across API levels 24-34. Needs API-level-specific research.
-- **Phase 5 (Release Readiness):** ProGuard rules for ML Kit and Play Services should be researched against current library documentation. Play Store policy for scanner apps needs fresh review.
+- **Phase 4, TEST-08 (Navigation flow test):** Coordinating a CameraX mock plus TestNavHostController plus ViewModel state in a single integration test is HIGH complexity. The pattern is documented, but the specific interaction with this app's 8-fragment navigation graph needs careful scoping during task creation. Consider reducing scope to testing navigation action firing without exercising actual camera capture.
+- **Phase 5, RELEASE-04 (Release APK E2E):** This task is environment-blocked and requires a separate planning note documenting the exact host machine steps (Android Studio setup, device connection, ADB triage commands). The `adb logcat | grep -E "(ClassNotFound|NoSuchMethod|UnsatisfiedLink)"` pattern from PITFALLS.md should be included in the task specification.
 
-Phases with standard patterns (skip research-phase):
-- **Phase 2 (Design System):** Material type scale and 8dp grid are well-documented patterns. Coil integration has extensive documentation.
-- **Phase 4 (Testing):** ARCHITECTURE.md provides concrete test patterns, directory structure, and example code. Standard Android testing patterns throughout.
+Phases with well-documented patterns that can skip research-phase:
+- **Phase 4, TEST-01 through TEST-05:** Exact dependency versions, complete `build.gradle.kts` diffs, and concrete code examples are fully specified in STACK.md and ARCHITECTURE.md. No additional research is needed before implementation.
+- **Phase 5, RELEASE-01 through RELEASE-03, RELEASE-05 through RELEASE-08:** All patterns are fully specified with exact XML and Kotlin code in STACK.md, FEATURES.md, and PITFALLS.md. These are mechanical implementation tasks.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM-HIGH | Concepts are HIGH confidence (established Android testing ecosystem). Specific library versions are MEDIUM -- WebSearch unavailable, versions from May 2025 training data need verification against Maven. |
-| Features | HIGH | Based on Google Core App Quality guidelines (verified via WebFetch), direct codebase audit, and well-known competitor UX patterns. |
-| Architecture | HIGH | Based on direct analysis of all 31 Kotlin source files and established Android testing patterns. Test strategy maps directly to actual code structure. |
-| Pitfalls | HIGH | All critical pitfalls identified from direct code inspection (154 requireContext calls counted, 52 catch blocks verified, bitmap math calculated from actual code). |
+| Stack | HIGH | All versions web-verified March 2026 against GitHub releases, Maven Central, and official Android documentation. Compatibility matrix explicitly documented in STACK.md. |
+| Features | HIGH | Based on direct codebase inspection of AndroidManifest.xml, proguard-rules.pro, build.gradle.kts, and all source files. Tasks derived from PROJECT.md with no guesswork. |
+| Architecture | HIGH | Test patterns are established Android community standards per official docs and AndroidX test libraries. Test-to-component mapping derived from actual codebase analysis. |
+| Pitfalls | HIGH for Kotlin, JaCoCo, MockK, ProGuard (multi-source verified); MEDIUM for CameraX and ML Kit test environment behavior (fewer authoritative sources available). |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Library version verification:** All dependency versions need checking against Maven Central / Google Maven before adding to build.gradle.kts. This is a 30-minute task at the start of Phase 4.
-- **Screenshot testing tool choice:** LOW confidence on Roborazzi vs Paparazzi recommendation. Evaluate both if screenshot testing is pursued in Phase 4.
-- **Play Store policy (current):** Scanner apps face specific policy scrutiny. Training data may be outdated on current enforcement patterns. Verify against current Play Store developer policy before Phase 5.
-- **Coil vs Glide:** FEATURES.md recommends Coil (Kotlin-first, lightweight). STACK.md does not include it since its focus was testing tools. Decision should be confirmed in Phase 2 planning.
-- **PDF operation quality:** All PDF merge/split/compress operations are lossy (render-to-image). This is documented technical debt. Fixing it requires a real PDF library (iTextPdf, Apache PDFBox) and is HIGH effort -- defer to v2 but consider adding an in-app warning about lossy operations.
+- **RELEASE-04 environment dependency:** The release APK E2E test requires the host machine with Android Studio and a connected physical device. WSL2 cannot run `./gradlew assembleRelease` with USB device connectivity. This is the highest-risk item in the milestone: if the host machine is unavailable or misconfigured, Phase 5 cannot complete. Mitigation: document the host machine requirements explicitly in the RELEASE-04 task specification and identify a concrete test device before Phase 5 begins.
+
+- **TEST-06 PdfUtils instrumented tests:** PdfRenderer behavior on emulator versus physical device can differ. If deferred to v2+, document which PDF operations (merge, split, compress) are currently unverified in the codebase as a known gap.
+
+- **Navigation 2.7.x vs 2.8.x upgrade decision:** The LeakCanary pitfall for `AbstractAppBarOnDestinationChangedListener` can be resolved by upgrading Navigation to 2.8+. The research did not determine whether Navigation 2.8.x is a drop-in upgrade for this app's navigation graph and SafeArgs configuration. If Phase 5 selects the upgrade path over the manual listener removal workaround, that compatibility should be validated first.
+
+- **OcrProcessor interface boundary:** PITFALLS.md recommends wrapping ML Kit behind an `OcrProcessor` interface to enable unit test mocking. ARCHITECTURE.md shows `ocr/OcrProcessor.kt` may already exist as a class. Verify the current interface boundary at the start of Phase 4 -- this determines whether TEST-04 requires a refactoring step before test writing can begin.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Direct codebase analysis -- all 31 Kotlin source files, build.gradle.kts, AndroidManifest.xml, layouts, proguard-rules.pro
-- Google Core App Quality Guidelines (developer.android.com/docs/quality-guidelines/core-app-quality)
-- Android developer documentation on testing (developer.android.com/training/testing)
-- Material Design 3 Guidelines
+- MockK releases -- GitHub (version 1.14.7 confirmed latest stable, March 2026)
+- Robolectric releases -- GitHub (4.16 confirmed, SDK 35/36 support)
+- AndroidX Test releases -- developer.android.com (Espresso 3.7.0, junit-ktx 1.3.0, July 2025 stable)
+- AndroidX Fragment releases -- developer.android.com (fragment-testing 1.8.9, February 2026 stable)
+- LeakCanary changelog -- square.github.io (2.14 latest stable; 3.0 alpha only as of March 2026)
+- Detekt releases -- GitHub (1.23.8, February 2025; 1.23.x is the Kotlin 1.9 compatible series)
+- JaCoCo coverage counters -- eclemma.org official documentation
+- JaCoCo coroutine branch inflation -- GitHub issues #1045 and #1353
+- Navigation 2.7.x library leak -- LeakCanary GitHub issue #2566
+- Fragment ViewBinding leak -- LeakCanary GitHub issue #2341
+- ML Kit known issues -- developers.google.com/ml-kit/known-issues (ProGuard and AGP 7.0+)
+- Android Developers: Local Unit Tests, Test Navigation, Auto Backup, Lint -- official guidance
+- Google Play: Target API requirements and closed testing requirements -- official policy
+- Testing Kotlin coroutines on Android -- official Android developer documentation
+- TestCoroutineDispatcher migration guide -- kotlinx.coroutines GitHub repository
+- Direct codebase inspection -- AndroidManifest.xml, build.gradle.kts, proguard-rules.pro, file_paths.xml, ScannerViewModel.kt, DocumentHistory.kt, ImageProcessor.kt, PdfUtils.kt (all read directly)
 
 ### Secondary (MEDIUM confidence)
-- AndroidX Test, Espresso, MockK, Robolectric ecosystem knowledge (training data, established APIs)
-- Competitor analysis (Adobe Scan, Microsoft Lens, Google Drive scanner UX patterns)
-- Android accessibility guidelines (48dp touch targets, content descriptions)
-
-### Tertiary (LOW confidence)
-- Specific library version numbers (training data cutoff May 2025, WebSearch unavailable)
-- Roborazzi vs Paparazzi recommendation (limited evaluation data)
-- Play Store scanner app policy enforcement patterns (may have changed since training data)
+- ProGuard rules for Navigation SafeArgs -- community blog (koral.dev), multi-source corroborated pattern
+- ML Kit ProGuard issue -- googlesamples/mlkit GitHub issue #213
+- Robolectric native library UnsatisfiedLinkError -- robolectric/robolectric GitHub issue #9099
 
 ---
-*Research completed: 2026-02-28*
+*Research completed: 2026-03-01*
 *Ready for roadmap: yes*

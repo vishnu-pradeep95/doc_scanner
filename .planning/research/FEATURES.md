@@ -1,226 +1,291 @@
-# Feature Research: Polish & Quality Attributes
+# Feature Research: Testing & Release Readiness
 
-**Domain:** Android Document Scanner App -- Polish Pass (not new features)
-**Researched:** 2026-02-28
-**Confidence:** HIGH (based on Google's official Core App Quality guidelines, code audit of existing codebase, and established Android UX patterns)
+**Domain:** Android Document Scanner App — Test Coverage + Play Store Release (v1.1)
+**Researched:** 2026-03-01
+**Confidence:** HIGH (official Android docs, direct codebase inspection, current web sources)
 
 ## Context
 
-This is NOT a "what features to build" research. The app is feature-complete (Phase 10). This research answers: **what quality attributes separate a polished, Play Store-worthy document scanner from an unpolished indie project?**
+This is NOT a "what features to add" research. The app is feature-complete. This research answers: **what testing and release gate capabilities are non-negotiable vs. deferrable for a Kotlin/MVVM Android document scanner aiming for Play Store + portfolio quality?**
 
-Every item below is framed as a quality attribute to audit and fix, not a feature to add.
+Every item below is a testing or release readiness task, not a product feature. Items are drawn directly from PROJECT.md (TEST-01 through RELEASE-09), then classified by actual necessity vs. gold-plating.
 
----
-
-## Table Stakes Quality (Must Fix or Users Uninstall)
-
-Quality attributes users expect. Missing these means 1-star reviews and immediate uninstalls.
-
-### Stability & Crash Freedom
-
-| Quality Attribute | Why Expected | Complexity | Notes |
-|-------------------|--------------|------------|-------|
-| Zero crashes on all core flows | Google Core App Quality requirement; crashes are the #1 reason for 1-star reviews | HIGH | No test suite exists. PagesFragment alone has 7 catch blocks suggesting fragile code paths. 70 Toast.makeText calls across 7 files suggest errors are swallowed with toasts rather than handled gracefully |
-| No ANR (Application Not Responding) | Google flags ANRs in Play Console vitals; >0.47% ANR rate triggers warnings | MEDIUM | PDF operations (merge, split, compress) and PDF generation happen in coroutines but should be verified they never block main thread. Bitmap operations in ImageProcessor need audit |
-| Graceful handling of large files | Users will scan 50+ page documents, import multi-MB PDFs | MEDIUM | PagesFragment loads all page bitmaps; no evidence of memory-aware thumbnail loading. BitmapFactory without inSampleSize will OOM on high-res photos |
-| Configuration change survival | Screen rotation must not lose state or crash | LOW | ViewModel pattern is used correctly. Verify all fragments properly save/restore UI state |
-| Process death recovery | Android can kill background app; returning must not crash | MEDIUM | No SavedStateHandle usage in ScannerViewModel. LiveData with mutableListOf is volatile -- if process dies, all in-progress scan pages are lost |
-
-### Permission & Error Handling
-
-| Quality Attribute | Why Expected | Complexity | Notes |
-|-------------------|--------------|------------|-------|
-| Camera permission denial handled gracefully | Google quality requirement: app must degrade gracefully | LOW | CameraFragment has permission UI but verify it works on all API levels (24-34). Check "Don't ask again" scenario |
-| File not found handling | Documents in history may be deleted externally | LOW | HomeFragment checks `document.exists()` which is good. Verify this pattern is consistent everywhere |
-| Storage full handling | Users with full storage will see cryptic errors | LOW | PDF generation and image saving likely crash or show raw exception messages. Need user-friendly error for disk full |
-| Network-free operation | Document scanner must work fully offline | LOW | ML Kit Text Recognition is bundled (16.0.0). ML Kit Document Scanner (play-services-mlkit-document-scanner) requires Google Play Services -- verify it fails gracefully without GMS |
-
-### Performance
-
-| Quality Attribute | Why Expected | Complexity | Notes |
-|-------------------|--------------|------------|-------|
-| Camera preview starts in under 2 seconds | Adobe Scan and Google Drive scanner show preview almost instantly | MEDIUM | CameraX initialization is async but no cold-start optimization. No splash screen using Android 12+ SplashScreen API |
-| Smooth 60fps scrolling in document list | Jank in lists is immediately noticeable | MEDIUM | HistoryFragment and RecentDocumentsAdapter load thumbnails -- verify they use proper thumbnail caching and not full-resolution bitmap loading |
-| PDF generation shows real progress | Users scan 20 pages, generation can take 10+ seconds | LOW | PagesFragment has loading overlay but uses indeterminate progress. Should show "Page 3/20" determinate progress |
-| Filter preview applies in under 500ms | Top scanner apps show filter previews nearly instantly | MEDIUM | ImageProcessor filter operations need to work on downscaled preview, not full-resolution image |
-| App startup under 1 second | Google quality: show content or progress within 2 seconds | MEDIUM | No evidence of startup optimization. Consider Android 12+ SplashScreen API |
-
-### UI Consistency & Visual Quality
-
-| Quality Attribute | Why Expected | Complexity | Notes |
-|-------------------|--------------|------------|-------|
-| Consistent spacing and padding | Inconsistent spacing looks amateurish | MEDIUM | fragment_home.xml mixes 20dp, 24dp, 16dp, 28dp padding/margin values. Section headers use different text styles (some `textStyle="bold"`, some `fontFamily="@font/nunito_bold"`) |
-| Consistent typography scale | Professional apps have a clear type hierarchy | MEDIUM | Text sizes range from 13sp to 28sp with no apparent Material type scale. Some use `fontFamily` attributes, some do not. Needs a defined type scale enforced everywhere |
-| Touch target minimum 48dp | Google accessibility requirement. Small targets cause mis-taps | LOW | Settings button has 52dp (good). But PDF tool icons are in LinearLayouts with only 12dp padding -- total touch area may be under 48dp. "View All" button uses only 8dp padding |
-| Content descriptions on all interactive elements | Accessibility requirement for TalkBack users | LOW | 13 elements use `contentDescription="@null"` including camera preview decorations (acceptable for decorative) but also some in fragment_camera.xml that may be interactive. Hardcoded strings like "Share", "Undo", "Redo" not using string resources |
-| Dark mode visual correctness | Users who enable dark mode expect all screens to look correct | MEDIUM | Dark mode is supported but hardcoded colors like `#88000000` (loading overlay), `@color/white` (card text), `@color/primary` need verification in dark theme. `android:background="?android:colorBackground"` is correct pattern but check all screens |
-| Proper empty states | Every list screen needs a meaningful empty state | LOW | HomeFragment has empty state for recent documents. Verify all list screens (History, Pages) have proper empty states with illustration + helpful text |
-
-### Edge Cases & Error States
-
-| Quality Attribute | Why Expected | Complexity | Notes |
-|-------------------|--------------|------------|-------|
-| Back navigation works correctly everywhere | Google Core App Quality: standard back must work | LOW | Navigation Component handles this but verify no fragments have broken back stack. CameraFragment has custom home button logic that may conflict |
-| Interruption handling (phone call during scan) | Users get interrupted; app must not lose work | MEDIUM | CameraX is lifecycle-aware and will pause correctly. But verify in-progress PDF operations handle lifecycle interruption without corruption |
-| Orientation lock or proper landscape support | Rotating phone during scanning must not break UI | LOW | No `android:screenOrientation` set in manifest, meaning rotation is allowed. Verify all layouts work in landscape or explicitly lock to portrait |
-| Import of corrupt/malformed PDFs | Users will try to import any PDF | LOW | PdfPageExtractor has try-catch but verify error messages are user-friendly, not raw exceptions |
+The existing test infrastructure is minimal boilerplate only — JUnit 4 + Espresso Core, no tests written. The existing release config has R8/ProGuard enabled, but the rules file covers only CameraX and CanHub; it is missing ML Kit, Navigation SafeArgs, and several other library keep-rules.
 
 ---
 
-## Polish Differentiators (What Separates Good from Great)
+## Feature Landscape
 
-Quality attributes that top scanner apps (Adobe Scan, Microsoft Lens, Google Drive) exhibit. Users notice these and they drive higher ratings.
+### Table Stakes (Non-Negotiable for Any Quality Android App)
 
-| Quality Attribute | Value Proposition | Complexity | Notes |
-|-------------------|-------------------|------------|-------|
-| Haptic feedback on capture | Adobe Scan and Lens provide a satisfying tactile click when capturing. Creates a "premium" feel | LOW | Simple `HapticFeedbackConstants.CONFIRM` on capture button. SoundManager exists but haptics are missing |
-| Animated transitions between screens | Smooth slide/fade transitions instead of instant cuts look professional | LOW | Navigation Component supports shared element transitions and custom animations. Current app likely uses default instant transitions |
-| Loading skeleton screens | Show content placeholders while loading instead of spinner-then-content jump | MEDIUM | Recent documents and history could show shimmer/skeleton placeholders during load |
-| Undo for destructive actions (delete) | Snackbar with "Undo" instead of confirmation dialog is faster and more forgiving | LOW | Currently uses MaterialAlertDialogBuilder for delete confirmation. Snackbar with undo is the Material Design recommended pattern |
-| Proper Material 3 motion | Material motion principles (container transform, shared axis) make navigation feel connected | MEDIUM | Current bounce animations are playful but navigation transitions should follow Material motion guidelines |
-| Thumbnail caching with Glide or Coil | Fast image loading with memory/disk cache prevents re-loading on scroll | MEDIUM | No image loading library detected in dependencies. Bitmaps are likely loaded manually which means no caching, no smooth loading |
-| Onboarding / first-launch experience | 2-3 screen walkthrough showing key features helps first-time users and looks professional | MEDIUM | No onboarding detected. Top scanner apps show a quick intro on first launch |
-| Predictive back gesture animation (Android 14+) | Shows a peek of the previous screen during back gesture. Modern Android quality signal | MEDIUM | Requires `android:enableOnBackInvokedCallback="true"` in manifest and proper back handling |
-| Edge-to-edge display | Content renders behind system bars with proper insets. Standard on Android 15+, expected on modern apps | MEDIUM | No evidence of `WindowCompat.setDecorFitsSystemWindows(false)` or inset handling. Status bar area is likely wasted space |
-| Proper Material 3 dynamic color theming | Support device wallpaper-based dynamic colors while maintaining brand identity | LOW | App uses custom coral/turquoise palette. Could support dynamic color as an option while keeping mascot theme |
+These are what a reviewer, interviewer, or technical user expects to see. Missing these signals that the app is not release-ready.
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Test dependency setup** (TEST-01) | No tests can exist without the testing scaffold. All other test tasks depend on this. | LOW | Add: MockK, kotlinx-coroutines-test, Robolectric, AndroidX Arch Core testing (InstantTaskExecutorRule), FragmentScenario, Espresso Contrib/Intents. The existing JUnit 4 + Espresso Core is bare minimum and insufficient. |
+| **ViewModel unit tests** (TEST-02) | ScannerViewModel is the core of the app — page CRUD, filter state, PDF naming, SavedStateHandle. Untested ViewModel = untested business logic. | MEDIUM | Requires MockK + kotlinx-coroutines-test + InstantTaskExecutorRule. Testable without Android device (pure JVM). Min 15 tests per PROJECT.md. |
+| **DocumentEntry JSON round-trip** (TEST-03) | DocumentEntry.toJson() + fromJson() is the persistence serialization. Any JSON regression silently corrupts user history. | LOW | Pure Kotlin/JVM test — no Android dependencies needed. Easiest test to write, high bug-catch value. |
+| **ImageProcessor filter tests** (TEST-04) | ImageProcessor creates Bitmaps — can only be tested with Robolectric (needs Android graphics stack). Output pixel verification catches silent regressions. | MEDIUM | Requires Robolectric. Tests run on JVM but with Android framework emulated. Min 8 tests. |
+| **DocumentHistoryRepository CRUD** (TEST-05) | SharedPreferences-backed repository — real persistence layer. getAllDocuments(), addDocument(), removeDocument(), clearHistory() must be verified. | MEDIUM | Requires Robolectric for Context + SharedPreferences. Robolectric provides in-memory SharedPreferences. Min 8 tests. |
+| **Android Lint configuration** (RELEASE-02) | Play Store reviewers and Android Studio both run Lint. `contentDescription` issues, accessibility violations, and hardcoded strings are Lint errors. The project already had 13 `contentDescription="@null"` and emoji in strings that Lint would flag. A lint.xml that promotes accessibility checks to errors is the standard approach. | LOW | Configure lint.xml with `abortOnError = true` in build.gradle.kts. Treat `ContentDescription`, `HardcodedText`, and `TouchTargetSizeCheck` as errors. |
+| **ProGuard/R8 rules for libraries** (RELEASE-03) | Current proguard-rules.pro only covers CameraX and CanHub. ML Kit and Navigation SafeArgs are both confirmed to break in release builds without explicit keep rules. The app targets minifyEnabled = true for release. | MEDIUM | ML Kit: `-keep class com.google.mlkit.** { *; }`. Navigation SafeArgs: `-keepnames class * implements androidx.navigation.NavArgs`. Coil and coroutines also need verification. |
+| **Backup rules configured** (RELEASE-06) | `android:allowBackup="true"` (current manifest) triggers a Lint warning and will back up private scan files, processed images, and cached PDFs — up to 25 MB limit. For a document scanner, private file paths backed up to Google and then restored to a different device path are broken on restore. | LOW | For Android 12+: add `dataExtractionRules` attribute pointing to `data_extraction_rules.xml`. Exclude `scans/`, `processed/`, `cache/` paths. Keep SharedPreferences (history metadata) included. For pre-12 compatibility also add `fullBackupContent` pointing to same exclusions. |
+| **FileProvider scope audit** (RELEASE-07) | Current file_paths.xml exposes `scans/`, `processed/`, `pdfs/`, and the entire cache directory. The cache-path with `path="/"` is overly broad — any file in cache is potentially shareable. | LOW | Tighten cache-path to only the subdirectories actually used for temp crop files. Document the rationale. |
+| **Camera uses-feature flag** (RELEASE-05) | `android:required="true"` (current manifest) blocks installation on devices without a camera — tablets, Chromebooks, foldables with no rear camera. The app has PDF viewer, history, and import features that work fine without a camera. | LOW | Change to `android:required="false"`. Add runtime camera availability check in CameraFragment before attempting to use CameraX. |
+| **Release APK E2E verification** (RELEASE-04) | Release builds with R8 + ProGuard behave differently than debug builds. Known failure modes: reflection-dependent code stripped (ML Kit, Navigation), class names obfuscated in error messages, resources stripped incorrectly. Must verify on a real device, not emulator. | MEDIUM | Requires host machine with Android Studio + connected device. Cannot run in WSL2 environment. Blocked until build environment is available. |
+
+### Differentiators (Competitive Advantage for Portfolio Quality)
+
+These are what separates a "it has some tests" portfolio app from a demonstrably well-engineered one.
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| **PdfUtils instrumented tests** (TEST-06) | PdfUtils.mergePdfs(), splitPdf(), compressPdf() use PdfRenderer which requires actual Android SDK — cannot be Robolectric'd for real PDF rendering. Instrumented tests on device verify the core PDF manipulation pipeline. | HIGH | Requires an emulator or device. Need to bundle test PDF assets. Min 8 tests per PROJECT.md. Highest complexity of all test tasks because PdfRenderer is not fully emulated by Robolectric. |
+| **Fragment smoke tests** (TEST-07) | FragmentScenario with launchFragmentInContainer() — verify each of the 8 fragments inflates without crash, key views are present, and nothing NPEs on launch. Not deep UI testing — existence and visibility checks only. | MEDIUM | Requires FragmentScenario + Espresso. Catches layout inflation errors, missing string resources, and View Binding issues that only surface at runtime. Min 5 fragments covered. |
+| **Navigation flow test** (TEST-08) | Test the critical happy path: Camera launch -> capture -> Preview -> "Add Page" -> PagesFragment -> "Create PDF" -> PDF created. Uses TestNavHostController to verify navigation actions fire correctly. | HIGH | Most complex test — requires coordinating CameraX (usually mocked), navigation, and ViewModel state. TestNavHostController (Navigation 2.3+) is the official approach. |
+| **JaCoCo coverage reporting** (RELEASE-09) | Coverage reports make the quality claim concrete and visible on GitHub. 70% line coverage for `util/` (ImageProcessor, PdfUtils, PdfPageExtractor) and 50% for `viewmodel/` are the PROJECT.md targets. | MEDIUM | Add `testCoverageEnabled = true` to debug buildType. Configure JaCoCo task in build.gradle.kts. Coverage enforcement can be a soft gate (report only) to avoid blocking builds on legitimate uncoverable code. |
+| **LeakCanary in debug builds** (RELEASE-08) | Memory leak detection during manual testing. ActivityLeakWatcher and FragmentAndViewModelWatcher auto-detect retained instances. Zero retained Activity/Fragment leaks is the bar. | LOW | Add `debugImplementation("com.squareup.leakcanary:leakcanary-android:...")`. No code changes needed — LeakCanary installs itself via ContentProvider. Does NOT appear in release builds. |
+| **Detekt static analysis** (RELEASE-01) | Detekt catches Kotlin-specific code smells: complex functions, magic numbers, unused variables, naming violations. With `detekt-formatting` plugin, also enforces consistent code style. Baseline file captures existing violations so only new code is gated. | MEDIUM | Add detekt Gradle plugin. Generate baseline.xml so existing issues don't block initial setup. Run as part of CI or pre-commit check. Zero NEW blocking errors is the target. |
+
+### Anti-Features (Commonly Pursued, Wrong for This Scope)
+
+Features that seem like good testing practice but are wrong for this project's constraints and goals.
+
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| **Screenshot regression tests (Roborazzi/Paparazzi)** | Visual regressions are hard to catch manually; screenshot tests automate this. | Explicitly out of scope in PROJECT.md. Tooling confidence is LOW — Paparazzi has known issues with Compose, and Roborazzi requires a specific test runner setup. Flakiness risk is high with the mascot/cartoon theme that involves custom drawing. Both require significant ongoing maintenance for golden images. | Manual dark mode verification in Phase 5 real-device E2E test covers the visual regression concern adequately for v1.1. |
+| **JUnit 5 (Jupiter)** | JUnit 5 is the modern standard with better test APIs and nested test support. | Android's integration with JUnit 5 is non-trivial — requires an additional Gradle plugin (`de.mannodermaus.android-junit5`) and does not work with Robolectric without extra configuration. JUnit 4 with MockK is idiomatic for this project. No benefit justifies the migration cost. | JUnit 4 + MockK covers all needed patterns. |
+| **Mockito instead of MockK** | Mockito is the industry-dominant mocking library. | Mockito-Kotlin has rough edges with Kotlin `suspend` functions, default arguments, and extension functions. MockK is Kotlin-native and handles coroutines, `object` mocking, and top-level functions correctly. | MockK throughout. |
+| **100% test coverage enforcement** | High coverage = high quality signal. | JaCoCo with strict coverage enforcement on an Android project blocks builds on legitimate uncoverable code (generated View Binding classes, Parcelable implementations, Android lifecycle methods). The 70%/50% targets in PROJECT.md are appropriate thresholds; strict enforcement should be report-only, not build-breaking. | Enforce with reporting, not build failure. Fail only if coverage drops significantly below threshold. |
+| **UI Automator cross-process tests** | Testing the share flow requires leaving the app process to verify system share sheet. | UI Automator tests are brittle across Android versions and OEM shells. The share intent can be verified with Espresso Intents (`intending(hasAction(Intent.ACTION_SEND))`). Full cross-process testing is disproportionate for a portfolio app. | Espresso Intents for intent verification; skip full cross-process UI Automator tests. |
+| **Turbine for Flow testing** | Turbine provides clean Flow emission assertions. | The app uses LiveData exclusively, not Flow. There is no Flow to test in the current codebase. Adding Turbine adds a dependency that tests nothing until a Flow migration happens. | `InstantTaskExecutorRule` + direct LiveData value inspection is sufficient for all LiveData testing. |
 
 ---
 
-## Anti-Patterns to Eliminate
-
-Quality gaps commonly found in indie document scanner apps that this app should specifically avoid.
-
-| Anti-Pattern | Why Problematic | What to Do Instead |
-|--------------|-----------------|-------------------|
-| Toast spam for every action | App shows 70 Toast calls across 7 files. Toasts stack up, are not accessible, and feel cheap | Use Snackbar for actionable messages (with undo), inline UI feedback for status, and Toast only for confirmations that need no action |
-| Hardcoded content descriptions | Strings like `"Share"`, `"Undo"`, `"Document preview"` are not in string resources. Breaks i18n and accessibility tooling | Move ALL contentDescription strings to `strings.xml` |
-| Emoji in user-facing strings | Code uses `"Imported $totalPages pages"` with emoji in Toast. Looks unprofessional in production | Remove emoji from programmatic strings. Use proper icons/illustrations instead |
-| Loading indicator via Toast | `showImportProgress()` in HomeFragment shows a Toast as loading indicator and disables root view. This is a broken UX pattern | Use a proper loading overlay (which exists in the layout!) or a progress dialog |
-| Catching generic Exception everywhere | 52 catch blocks across 19 files. Many catch `Exception` broadly, which masks bugs and makes debugging impossible | Catch specific exceptions. Log unexpected ones to a crash reporter. Show appropriate user messages per exception type |
-| No image loading library | Manual bitmap loading without caching causes: repeated disk reads, OOM on large images, no smooth loading transitions, no placeholder/error images | Add Coil (Kotlin-first, lightweight) for all image/thumbnail loading. It provides caching, transitions, and proper lifecycle handling |
-| Inconsistent section header styling | Some headers use `textStyle="bold"`, others `fontFamily="@font/nunito_bold"`, text sizes vary (18sp, 16sp, 14sp for similar-level elements) | Define text appearance styles in `styles.xml` and apply consistently |
-| No ProGuard rules for libraries | R8/ProGuard is enabled for release but no custom rules file content verified. ML Kit, CanHub cropper, and Navigation SafeArgs may break in release builds | Add and test ProGuard keep rules for all third-party libraries |
-| `uses-feature android:required="true"` for camera | Prevents installation on devices without cameras (tablets). Users may want to use import-only features on tablets | Set `android:required="false"` and check camera availability at runtime |
-
----
-
-## Feature Dependencies (Polish Order)
+## Feature Dependencies
 
 ```
-[Crash fixes & error handling]
+[TEST-01: Test dependencies]
     |
-    v
-[UI consistency audit] ----requires----> [Typography/spacing system defined]
+    +--requires--> [TEST-02: ScannerViewModel unit tests]
+    |                  (needs MockK + coroutines-test + InstantTaskExecutorRule)
     |
-    v
-[Performance optimization] ----requires----> [Image loading library added]
+    +--requires--> [TEST-03: DocumentEntry JSON tests]
+    |                  (pure JVM, but logically grouped with test setup)
     |
-    v
-[Accessibility audit] ----requires----> [Content descriptions fixed]
-    |                                         |
-    v                                         v
-[Animation & transitions] ----enhances----> [Edge-to-edge + Material motion]
+    +--requires--> [TEST-04: ImageProcessor Robolectric tests]
+    |                  (needs Robolectric from TEST-01 deps)
     |
-    v
-[Test coverage] ----requires----> [All above fixes stable]
+    +--requires--> [TEST-05: DocumentHistoryRepository Robolectric tests]
+    |                  (needs Robolectric + Context from TEST-01 deps)
+    |
+    +--requires--> [TEST-07: Fragment smoke tests]
+    |                  (needs FragmentScenario from TEST-01 deps)
+    |
+    +--requires--> [TEST-08: Navigation flow test]
+                       (needs FragmentScenario + TestNavHostController)
+
+[TEST-06: PdfUtils instrumented tests]
+    (independent — needs device/emulator, not JVM)
+
+[RELEASE-01: Detekt]
+    (independent — static analysis, no test dependency)
+
+[RELEASE-02: Lint config]
+    (independent — but reveals issues that tests should cover)
+
+[RELEASE-03: ProGuard rules]
+    |
+    +--requires--> [RELEASE-04: Release E2E on real device]
+                       (ProGuard rules must be in place before E2E test is meaningful)
+
+[RELEASE-05: Camera uses-feature]
+    (independent — manifest change only)
+
+[RELEASE-06: Backup rules]
+    (independent — manifest + XML change only)
+
+[RELEASE-07: FileProvider scope]
+    (independent — XML change only)
+
+[RELEASE-08: LeakCanary]
+    (independent — debugImplementation only, no code changes)
+
+[RELEASE-09: JaCoCo coverage]
+    |
+    +--requires--> [TEST-02 through TEST-08]
+                       (coverage reports are meaningless without tests to measure)
 ```
 
 ### Dependency Notes
 
-- **Crash fixes before UI polish:** No point polishing UI if app crashes on core flows. Fix stability first.
-- **Typography system before UI audit:** Define the type scale and spacing constants, then apply everywhere. Doing it screen-by-screen without a system creates new inconsistencies.
-- **Image loading library before performance:** Adding Coil/Glide solves thumbnail caching, memory management, and smooth loading in one step. Many "performance" issues disappear when proper image loading is in place.
-- **Content descriptions before accessibility audit:** Fix the string resource issues first, then do a comprehensive TalkBack walkthrough.
-- **All fixes before test coverage:** Write tests against the fixed behavior, not the broken behavior. Tests written first would all need rewriting.
+- **TEST-01 blocks everything:** No test can be written until the test dependencies are in build.gradle.kts. This is Day 1 of Phase 4.
+- **RELEASE-03 before RELEASE-04:** ProGuard rules must be complete before release build E2E testing — a broken release build wastes device testing time.
+- **RELEASE-04 is environment-blocked:** The WSL2 build environment cannot run `./gradlew assembleRelease` or connect to a physical device. This task requires the host machine with Android Studio. This is the single highest-risk task in the milestone.
+- **TEST-06 requires emulator or device:** PdfUtils tests cannot run on JVM via Robolectric because PdfRenderer needs actual hardware rendering context. This is the second-highest complexity task.
+- **RELEASE-09 (JaCoCo) is an output of tests, not an input:** Configure it during Phase 4 alongside the tests so coverage reports generate automatically.
 
 ---
 
-## Priority Definition (Polish-Only Context)
+## MVP Definition
 
-Since the app is feature-complete, "MVP" means "minimum viable polish" -- the least work to reach Play Store quality.
+### Phase 4: Test Coverage (Launch With)
 
-### P1: Must Fix for Play Store (Launch Blockers)
+The minimum viable test suite — demonstrates engineering discipline, catches the highest-value bugs.
 
-- [ ] Crash freedom on all core flows (scan, import, PDF generation, history, share) -- stability is non-negotiable
-- [ ] Memory management for bitmap operations (OOM = 1-star review) -- add image loading library
-- [ ] Fix Toast-as-loading-indicator pattern in HomeFragment -- broken UX
-- [ ] Remove emoji from programmatic strings -- unprofessional
-- [ ] Hardcoded contentDescription strings moved to resources -- Play Store accessibility flagging
-- [ ] ProGuard/R8 rules verified for release builds -- release builds must not crash
-- [ ] Process death recovery for in-progress scans -- lost work = uninstall
+- [x] TEST-01: Test dependencies configured in build.gradle.kts
+- [x] TEST-02: ScannerViewModel unit tests (page CRUD, filter state, SavedStateHandle, PDF naming) — min 15 tests
+- [x] TEST-03: DocumentEntry JSON round-trip (toJson + fromJson) — min 6 tests
+- [x] TEST-04: ImageProcessor filter tests via Robolectric — min 8 tests
+- [x] TEST-05: DocumentHistoryRepository CRUD via Robolectric — min 8 tests
+- [x] RELEASE-09: JaCoCo configured and reporting (report-only, no hard gate)
 
-### P2: Should Fix for Portfolio Quality
+### Phase 4: Stretch (Add If Tests Are Running Cleanly)
 
-- [ ] Consistent typography scale defined and applied across all screens
-- [ ] Consistent spacing system (8dp grid) applied across all layouts
-- [ ] Replace Toast spam with Snackbar/inline feedback pattern
-- [ ] Add proper loading overlays with determinate progress where applicable
-- [ ] Navigation transitions (Material motion patterns)
-- [ ] Haptic feedback on capture and key interactions
-- [ ] Edge-to-edge display with proper inset handling
-- [ ] Snackbar with undo for destructive actions (delete)
-- [ ] Camera `uses-feature required="false"` for tablet compatibility
-- [ ] Dark mode visual verification on all screens
+- [ ] TEST-07: Fragment smoke tests (5 fragments minimum)
+- [ ] TEST-08: Navigation flow test (Camera -> Preview -> Pages -> PDF)
 
-### P3: Nice to Have for Wow Factor
+### Phase 5: Release Readiness (All Non-Negotiable)
 
-- [ ] First-launch onboarding (2-3 screens)
-- [ ] Skeleton/shimmer loading for document lists
-- [ ] Predictive back gesture support (Android 14+)
-- [ ] Dynamic color theming option
-- [ ] Proper splash screen using Android 12+ SplashScreen API
+- [x] RELEASE-01: Detekt with baseline — zero new blocking errors
+- [x] RELEASE-02: lint.xml with accessibility errors promoted to errors
+- [x] RELEASE-03: ProGuard/R8 rules for ML Kit, NavSafeArgs, Coil
+- [x] RELEASE-04: Release APK E2E on real device (requires host machine)
+- [x] RELEASE-05: Camera `uses-feature required="false"` in manifest
+- [x] RELEASE-06: dataExtractionRules + fullBackupContent excluding private files
+- [x] RELEASE-07: FileProvider scope tightened to actual needed paths
+- [x] RELEASE-08: LeakCanary added as debugImplementation
 
-### Defer: Not in Scope
+### Future Consideration (v2+)
 
-- [ ] Searchable PDFs, cloud sync, new export formats -- Phase 11+
-- [ ] Internationalization / multiple languages -- future milestone
-- [ ] Tablet-optimized layouts -- future milestone (but camera required="false" is P2)
-- [ ] In-app review prompt -- add after Play Store launch validation
+- [ ] TEST-06: PdfUtils instrumented tests — HIGH complexity, needs emulator setup. Can be added in v1.1 if emulator is available, but deferred if environment setup takes time.
+- [ ] Screenshot regression tests — OUT OF SCOPE per PROJECT.md. Revisit in v2.
+- [ ] CI/CD pipeline with automatic test runs — not in v1.1 scope.
+- [ ] JaCoCo hard enforcement gate — add only after coverage is established and stable.
 
 ---
 
-## Competitor Quality Comparison
+## Feature Prioritization Matrix
 
-| Quality Attribute | Adobe Scan | Microsoft Lens | Google Drive Scanner | This App (Current) |
-|-------------------|------------|----------------|---------------------|-------------------|
-| Crash-free rate | 99.9%+ | 99.9%+ | 99.9%+ | Unknown (no testing) |
-| Camera startup | <1s | <1s | <1.5s | Unknown (no benchmarks) |
-| Haptic on capture | Yes | Yes | Yes | No |
-| Navigation animation | Smooth shared element | Material motion | Standard Material | None (instant cuts) |
-| Loading indicators | Determinate progress | Progress with cancel | Determinate | Mix of Toast + indeterminate |
-| Empty states | Illustrated + CTA | Illustrated + CTA | Minimal | Basic text only |
-| Accessibility | Full TalkBack | Full TalkBack | Full TalkBack | Partial (many @null descriptions) |
-| Back gesture | Predictive back | Predictive back | Predictive back | Standard (no animation) |
-| Edge-to-edge | Yes | Yes | Yes | No |
-| Offline capability | Partial (OCR needs download) | Full | Partial | Full (ML Kit bundled) |
-| Onboarding | Yes (quick) | Yes (3 screens) | None (integrated) | None |
+| Feature | Portfolio/Reviewer Value | Implementation Cost | Priority |
+|---------|--------------------------|---------------------|----------|
+| TEST-01: Test dependencies | HIGH (enables everything) | LOW | P1 |
+| TEST-02: ViewModel unit tests | HIGH (business logic) | MEDIUM | P1 |
+| TEST-03: JSON round-trip | MEDIUM (data integrity) | LOW | P1 |
+| TEST-04: ImageProcessor filter tests | MEDIUM (core algorithm) | MEDIUM | P1 |
+| TEST-05: Repository CRUD | MEDIUM (data persistence) | MEDIUM | P1 |
+| RELEASE-02: Lint config | HIGH (blocks store submission) | LOW | P1 |
+| RELEASE-03: ProGuard rules | HIGH (release builds break without) | MEDIUM | P1 |
+| RELEASE-05: Camera uses-feature | HIGH (device reach) | LOW | P1 |
+| RELEASE-06: Backup rules | HIGH (data security) | LOW | P1 |
+| RELEASE-07: FileProvider scope | MEDIUM (security hygiene) | LOW | P1 |
+| RELEASE-08: LeakCanary | HIGH (portfolio signal) | LOW | P1 |
+| RELEASE-04: E2E release build | HIGH (non-negotiable before publish) | MEDIUM | P1 (env-blocked) |
+| RELEASE-01: Detekt | MEDIUM (code quality) | MEDIUM | P2 |
+| RELEASE-09: JaCoCo coverage | MEDIUM (metrics) | MEDIUM | P2 |
+| TEST-07: Fragment smoke tests | MEDIUM (UI sanity) | MEDIUM | P2 |
+| TEST-08: Navigation flow test | MEDIUM (happy path) | HIGH | P2 |
+| TEST-06: PdfUtils instrumented | MEDIUM (PDF core) | HIGH | P3 |
+
+**Priority key:**
+- P1: Non-negotiable for v1.1 milestone
+- P2: Should complete in v1.1, can slip to early v1.2 if blocked
+- P3: Deferred — environment constraints or effort-to-value ratio
+
+---
+
+## Play Store Reality vs. Idealism
+
+### What Play Store Actually Requires
+
+Play Store does NOT check for test coverage, Lint scores, or Detekt output. The actual enforced requirements as of 2026-03:
+
+1. **Target API level**: Must target Android 14 (API 34) or higher. Current targetSdk = 34. Already compliant.
+2. **New personal developer accounts**: 14 days of closed testing with 12+ testers before production access. Applies if account was created after November 2023.
+3. **AAB format**: Google Play requires Android App Bundle (.aab), not APK. The `./gradlew bundleRelease` task generates this. No configuration change needed.
+4. **64-bit support**: Required. Kotlin/Gradle handles this automatically for modern targets.
+5. **Privacy policy**: Required if app requests dangerous permissions (CAMERA). A hosted privacy policy URL must be provided in Play Console.
+
+### What Play Store Indirectly Enforces via Policy
+
+- **Crash rate**: Google Play Console "vitals" flags apps with crash rates above 1.09% (bad behavior threshold). LeakCanary helps catch crashes before release.
+- **ANR rate**: Flagged above 0.47%. Ensuring PDF operations happen on Dispatchers.IO (already done in v1.0) is the mitigation.
+- **Accessibility**: Not strictly enforced at submission, but Lint errors for accessibility (missing content descriptions, small touch targets) indicate real user issues.
+
+### What Is Portfolio-Required But Not Store-Required
+
+Everything in the table stakes and differentiators sections above beyond the Play Store requirements is a **portfolio quality signal** — what a technical interviewer or code reviewer expects to see in a well-engineered app. The test suite, Detekt, JaCoCo, and release build verification are for demonstrating engineering discipline, not for passing automated Play Store checks.
+
+---
+
+## Non-Negotiable vs. Nice-to-Have Summary
+
+### Absolutely Non-Negotiable (Cannot Ship Without)
+
+| Task | Reason |
+|------|--------|
+| TEST-01 | All other tests depend on it |
+| TEST-02 | ScannerViewModel is untested business logic |
+| TEST-03 | Silent JSON regression = user data corruption |
+| RELEASE-03 | ML Kit and NavSafeArgs break in release without keep rules |
+| RELEASE-04 | Unverified release build = unknown quantity |
+| RELEASE-05 | Tablet/Chromebook users blocked without this manifest change |
+| RELEASE-06 | Private scan files backed up to Google = security issue |
+| RELEASE-07 | Overly broad FileProvider = potential file exfiltration |
+
+### High Value, Low Effort (Do These First After Blockers)
+
+| Task | Reason |
+|------|--------|
+| TEST-03 | Easiest test to write, catches real serialization bugs |
+| RELEASE-08 | Zero code changes — just a dependency addition |
+| RELEASE-05 | One line in AndroidManifest.xml |
+| RELEASE-02 | lint.xml + one build.gradle.kts line |
+
+### High Value, Medium Effort (Core of Phase 4)
+
+| Task | Reason |
+|------|--------|
+| TEST-02 | The payoff test — 15 ViewModel tests covering all public methods |
+| TEST-04 | Robolectric setup pays off for TEST-05 too |
+| TEST-05 | Repository is production persistence — must be verified |
+| RELEASE-03 | Known-broken libraries without it |
+| RELEASE-09 | Configure alongside tests; no extra setup if tests exist |
+
+### Deferrable Without Shame (Scope Management)
+
+| Task | Reason to Defer |
+|------|-----------------|
+| TEST-06 | HIGH complexity (needs device/emulator), environment uncertainty |
+| TEST-07 | Medium effort, can add during Phase 5 if Phase 4 ahead of schedule |
+| TEST-08 | HIGH complexity (camera mock + nav coordination) |
+| RELEASE-01 | Detekt is useful but not a blocker; baseline approach means low risk |
 
 ---
 
 ## Sources
 
-- **Google Core App Quality Guidelines** (https://developer.android.com/docs/quality-guidelines/core-app-quality) -- HIGH confidence. Defines Play Store quality bar including performance, stability, accessibility, and visual quality requirements. Verified via WebFetch.
-- **Codebase audit** -- HIGH confidence. Direct inspection of all source files, layouts, manifest, and build configuration.
-- **Material Design 3 Guidelines** -- HIGH confidence. Industry-standard Android design system from Google (training data, well-established).
-- **Competitor analysis (Adobe Scan, Microsoft Lens, Google Drive)** -- MEDIUM confidence. Based on widely known UX patterns of market-leading scanner apps (training data, but these apps are well-documented).
-- **Android accessibility guidelines** -- HIGH confidence. Google-mandated requirements for 48dp touch targets, contrast ratios, content descriptions.
+- **Android Developers: Local Unit Tests** — HIGH confidence. Current official guidance on JVM vs. instrumented test split, Robolectric recommendation.
+  URL: https://developer.android.com/training/testing/local-tests
+- **Android Developers: Test Navigation** — HIGH confidence. Official guidance on TestNavHostController for Fragment navigation testing.
+  URL: https://developer.android.com/guide/navigation/testing
+- **Android Developers: Auto Backup** — HIGH confidence. dataExtractionRules for Android 12+, fullBackupContent for pre-12.
+  URL: https://developer.android.com/identity/data/autobackup
+- **Android Developers: Lint** — HIGH confidence. lint.xml configuration, severity levels, abortOnError.
+  URL: https://developer.android.com/studio/write/lint
+- **Google Play: Target API requirements** — HIGH confidence. API 34 requirement confirmed for 2025+.
+  URL: https://support.google.com/googleplay/android-developer/answer/11926878
+- **Google Play: New personal developer accounts** — HIGH confidence. 12-tester closed testing requirement.
+  URL: https://support.google.com/googleplay/android-developer/answer/14151465
+- **Droidsonroids: ProGuard rules for Navigation SafeArgs** — MEDIUM confidence. Specific keep rule for NavArgs.
+  URL: https://www.thedroidsonroids.com/blog/how-to-generate-proguard-r8-rules-for-navigation-component-arguments
+- **Android Developers Blog: R8 Keep Rules** — HIGH confidence. Official guidance on keep rule configuration.
+  URL: https://android-developers.googleblog.com/2025/11/configure-and-troubleshoot-r8-keep-rules.html
+- **Detekt project** — HIGH confidence. Official docs for setup, baseline generation.
+  URL: https://detekt.dev/
+- **Direct codebase inspection** — HIGH confidence. Manifest, build.gradle.kts, proguard-rules.pro, file_paths.xml, ScannerViewModel.kt, DocumentHistory.kt, ImageProcessor.kt, PdfUtils.kt all read directly.
 
 ---
 
-## Key Observations from Code Audit
-
-1. **No test suite exists.** Zero test files found. Testing infrastructure is in build.gradle (JUnit, Espresso) but no tests written.
-
-2. **Toast is the primary feedback mechanism.** 70 Toast calls across 7 files is excessive. Some are used as loading indicators (HomeFragment `showImportProgress`), which is a broken pattern.
-
-3. **Accessibility is partially implemented.** Many elements have `contentDescription="@null"` (acceptable for decorative), but interactive elements in the PDF editor use hardcoded English strings instead of string resources.
-
-4. **No image loading library.** All bitmap loading is manual. This means no memory caching, no disk caching, no smooth loading transitions, and potential OOM on high-resolution images.
-
-5. **The cartoon/mascot theme is a strong differentiator** but needs to be consistently applied. Mixed use of Nunito font weights and inconsistent spacing undermine the playful brand.
-
-6. **ViewModel usage is correct** but lacks SavedStateHandle for process death survival. A user who switches to another app during a scan session may lose all pages.
-
----
-*Feature quality research for: Android Document Scanner Polish Pass*
-*Researched: 2026-02-28*
+*Feature research for: Android Document Scanner v1.1 — Testing & Release Readiness*
+*Researched: 2026-03-01*
