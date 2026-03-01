@@ -48,11 +48,14 @@ Plans:
   3. All images and thumbnails load smoothly via Coil with proper placeholders — no blank frames or recycled bitmap artifacts in lists
   4. Dark mode renders correctly on every screen — no unreadable text, invisible icons, or wrong background colors
   5. All user-facing strings (including content descriptions) come from strings.xml — no hardcoded English text in code or layouts
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Manifest theme switch + dimens.xml + TextAppearance dark mode fix + typography enforcement (DSYS-01, DSYS-02)
+- [ ] 02-02-PLAN.md — Coil integration: PagesAdapter manual loading replaced, HistoryAdapter thumbnail added (DSYS-03)
+- [ ] 02-03-PLAN.md — Toast-to-Snackbar migration across all 7 fragments (68 call sites) (DSYS-04)
+- [ ] 02-04-PLAN.md — Hardcoded strings + emoji moved to strings.xml across layouts (DSYS-05, DSYS-06)
+- [ ] 02-05-PLAN.md — Dark mode visual verification checkpoint on all 7 screens (DSYS-07)
 
 ### Phase 3: Performance & Polish
 **Goal**: The app feels responsive and delightful — smooth transitions, tactile feedback, modern edge-to-edge display, and clear progress indicators
@@ -110,7 +113,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Stability | 4/4 | Complete    | 2026-03-01 |
-| 2. Design System | 0/? | Not started | - |
+| 2. Design System | 0/5 | Not started | - |
 | 3. Performance & Polish | 0/? | Not started | - |
 | 4. Test Coverage | 0/? | Not started | - |
 | 5. Release Readiness | 0/? | Not started | - |
