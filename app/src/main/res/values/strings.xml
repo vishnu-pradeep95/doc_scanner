@@ -184,4 +184,9 @@
     <string name="error_rendering_page">Error rendering page</string>
     <string name="open_externally">Open externally</string>
     <string name="view_in_app">View in app</string>
+
+    <!-- PDF Editor errors (extracted from hardcoded strings in PdfEditorFragment) -->
+    <string name="error_failed_to_load_pdf">Failed to load PDF file</string>
+    <string name="error_could_not_access_pdf">Could not access PDF file</string>
+    <string name="error_loading_pdf">Error loading PDF: %s</string>
 </resources>
