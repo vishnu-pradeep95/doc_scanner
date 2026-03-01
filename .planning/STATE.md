@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T02:56:54.156Z"
+last_updated: "2026-03-01T03:57:00Z"
 progress:
-  total_phases: 1
+  total_phases: 5
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 9
+  completed_plans: 5
 ---
 
 # Project State
@@ -23,9 +23,9 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (Design System)
-Plan: 0 of 5 in current phase — Phase 2 PLANNED, ready to execute
-Status: Phase 1 complete, Phase 2 planned (5 plans, 2 waves)
-Last activity: 2026-02-28 — Phase 2 planning complete (research + 5 plans + verification)
+Plan: 2 of 5 in current phase — 02-02 complete, 02-03 next
+Status: Phase 1 complete, Phase 2 in progress (2 of 5 plans done)
+Last activity: 2026-03-01 — 02-02 complete (Coil image loading integration)
 
 Progress: [████░░░░░░] 20%
 
@@ -41,9 +41,10 @@ Progress: [████░░░░░░] 20%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-stability | 4 | 18 min | 5 min |
+| 02-design-system | 2 | 2 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 5 min, 5 min, 6 min
+- Last 5 plans: 2 min, 5 min, 5 min, 6 min, 2 min
 - Trend: -
 
 *Updated after each plan completion*
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - 01-04: Pass ctx as explicit parameter to loadFullResBitmap and createProcessedFile — enables IO-thread safe access without context capture in IO block
 - 01-04: inSampleSize two-pass decode (2380x3368 max) for PreviewFragment bitmap loading — hardware-accelerated downsampling, prevents 192MB+ OOM on 48MP cameras
 - 01-04: createScaledBitmap + conditional recycle in ImageProcessor — caps pixel array allocation before IntArray(w*h) ops without modifying callers
+- 02-02: Use Coil 3.4.0 base artifact only — no coil-compose or coil-network (View-based app, local file URIs only)
+- 02-02: HistoryAdapter PDF thumbnail loads file URI with error drawable fallback — Coil cannot render PDF pages (PdfRenderer thumbnail is Phase 3 scope)
+- 02-02: Remove adapterScope CoroutineScope from PagesAdapter — Coil manages its own coroutines and auto-cancels on ImageView detach
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-28
-Stopped at: Phase 2 planning complete — 5 plans ready for execution
+Last session: 2026-03-01
+Stopped at: 02-02-PLAN.md complete — Coil integration done, 02-03 (Toast-to-Snackbar) next
 Resume file: None
