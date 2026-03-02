@@ -59,12 +59,13 @@ Plans:
   3. AndroidManifest.xml declares `uses-feature android:required="false"` for camera, `dataExtractionRules` and `fullBackupContent` excluding private scan directories, and FileProvider paths scoped only to actually-used subdirectories
   4. Release APK installs on a physical Android device and every screen and feature path (camera capture, gallery import, ML Kit OCR, PDF generation, share/export) completes without crash — confirming ProGuard keep rules for ML Kit and Navigation SafeArgs are correct (ENVIRONMENT-BLOCKED: requires host machine with Android Studio)
   5. LeakCanary reports zero retained Activity/Fragment/ViewModel leaks after exercising all 8 fragment flows — Navigation 2.7.x AbstractAppBarOnDestinationChangedListener leak documented as library bug and triaged
-**Plans**: TBD
+
+**Plans**: 3 plans
 
 Plans:
-- [ ] 05-01: Detekt baseline + LeakCanary integration + binding nullification audit
-- [ ] 05-02: Android Lint with accessibility-as-errors + manifest hardening (uses-feature, dataExtractionRules, fullBackupContent, FileProvider scope)
-- [ ] 05-03: ProGuard/R8 keep rules (ML Kit, Navigation SafeArgs, Coil, coroutines) + release APK E2E on device
+- [ ] 05-01-PLAN.md — Detekt 1.23.8 plugin + baseline generation + LeakCanary 2.14 dependency + Navigation leak triage doc [Wave 1]
+- [ ] 05-02-PLAN.md — Android Lint accessibility-as-errors + manifest hardening (camera uses-feature, dataExtractionRules, fullBackupContent, FileProvider scope) [Wave 1]
+- [ ] 05-03-PLAN.md — ProGuard/R8 keep rules (ML Kit, GMS, SafeArgs) + release APK E2E checkpoint [Wave 2]
 
 ## Progress
 
@@ -73,5 +74,5 @@ Plans:
 | 1. Stability | v1.0 | 4/4 | Complete | 2026-03-01 |
 | 2. Design System | v1.0 | 8/8 | Complete | 2026-03-01 |
 | 3. Performance & Polish | v1.0 | 3/3 | Complete | 2026-03-01 |
-| 4. Test Coverage | 7/7 | Complete   | 2026-03-02 | - |
+| 4. Test Coverage | v1.1 | 7/7 | Complete | 2026-03-02 |
 | 5. Release Readiness | v1.1 | 0/3 | Not started | - |
