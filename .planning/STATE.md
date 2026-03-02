@@ -96,7 +96,6 @@ Decisions from 05-02 execution (2026-03-02):
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
-- **RELEASE-08 device checkpoint (05-01 Task 4)**: LeakCanary setup complete; physical device verification required to confirm zero retained app-code leaks across all 8 fragment flows. Type "approved" or "environment-blocked" to resume.
 
 ### Pending Todos
 
@@ -104,6 +103,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed 05-02-PLAN.md — lint gate + manifest hardening; commits a3050db, 138e514; next is 05-03 (signing + release build)
+Last session: 2026-03-01
+Stopped at: Completed 05-01 checkpoint resolution — RELEASE-08 user-approved; SUMMARY.md updated; next is 05-03 (ProGuard/R8 keep rules + release APK E2E)
 Resume file: None

@@ -71,7 +71,7 @@
 | RELEASE-05 | Phase 5 | 05-02 | Pending |
 | RELEASE-06 | Phase 5 | 05-02 | Pending |
 | RELEASE-07 | Phase 5 | 05-02 | Pending |
-| RELEASE-08 | Phase 5 | 05-01 | Pending |
+| RELEASE-08 | Phase 5 | 05-01 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 16 total
