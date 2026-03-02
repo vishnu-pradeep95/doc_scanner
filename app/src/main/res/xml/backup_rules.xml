@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="file" path="scans/" />
+    <exclude domain="file" path="processed/" />
+    <exclude domain="file" path="pdfs/" />
+    <!-- cacheDir (domain="external-cache") is automatically excluded by Android
+         per AOSP backup documentation. No explicit rule is needed for cache/. -->
+</full-backup-content>

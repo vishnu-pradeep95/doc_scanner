@@ -45,5 +45,5 @@
         Cache directory for temporary files (crop results, etc.)
         Maps: context.cacheDir/ → content://...fileprovider/cache/
     -->
-    <cache-path name="cache" path="/" />
+    <cache-path name="cache" path="." />
 </paths>
