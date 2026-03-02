@@ -43,6 +43,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:background="@color/cartoon_surface_variant"
+                android:contentDescription="@string/content_desc_document_preview"
                 tools:src="@drawable/ic_cartoon_document" />
 
         </com.google.android.material.card.MaterialCardView>

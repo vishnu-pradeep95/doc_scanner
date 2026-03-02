@@ -91,7 +91,8 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_history"
-                    app:tint="@color/primary" />
+                    app:tint="@color/primary"
+                    android:contentDescription="@string/content_desc_history_icon" />
 
                 <TextView
                     android:id="@+id/tvSavedLabel"
@@ -128,7 +129,8 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_empty_annotations_mascot"
-                    android:alpha="0.6" />
+                    android:alpha="0.6"
+                    android:contentDescription="@string/content_desc_empty_annotations" />
 
                 <TextView
                     android:id="@+id/tvEmptySignatures"
@@ -159,7 +161,8 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_draw_mascot" />
+                    android:src="@drawable/ic_draw_mascot"
+                    android:contentDescription="@string/content_desc_draw_icon" />
 
                 <TextView
                     android:id="@+id/tvDrawLabel"

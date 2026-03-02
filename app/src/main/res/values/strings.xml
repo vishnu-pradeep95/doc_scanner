@@ -282,6 +282,46 @@
     <string name="content_desc_pdf_badge">PDF badge</string>
     <string name="content_desc_scanned_preview">Scanned page preview</string>
 
+    <!-- Content descriptions: home screen action icons -->
+    <string name="content_desc_new_scan">New scan</string>
+    <string name="content_desc_auto_scan">Auto scan</string>
+    <string name="content_desc_import_image">Import image</string>
+    <string name="content_desc_merge">Merge PDFs</string>
+    <string name="content_desc_split">Split PDF</string>
+    <string name="content_desc_compress">Compress PDF</string>
+    <string name="content_desc_no_documents">No documents</string>
+    <string name="content_desc_arrow_right">Navigate</string>
+    <string name="content_desc_ocr">Extract text</string>
+
+    <!-- Content descriptions: settings screen icons -->
+    <string name="content_desc_dark_mode">Dark mode</string>
+    <string name="content_desc_filter">Default filter</string>
+    <string name="content_desc_version_info">App information</string>
+    <string name="content_desc_share_app">Share app</string>
+
+    <!-- Content descriptions: PDF editor toolbar icons -->
+    <string name="content_desc_editor_select">Select tool</string>
+    <string name="content_desc_editor_signature">Signature tool</string>
+    <string name="content_desc_editor_text">Text tool</string>
+    <string name="content_desc_editor_highlight">Highlight tool</string>
+    <string name="content_desc_editor_stamp">Stamp tool</string>
+    <string name="content_desc_editor_draw">Draw tool</string>
+    <string name="content_desc_editor_shapes">Shapes tool</string>
+    <string name="content_desc_editor_checkmark">Checkmark tool</string>
+    <string name="content_desc_editor_eraser">Eraser tool</string>
+    <string name="content_desc_editor_color">Color picker</string>
+    <string name="content_desc_editor_font_size">Font size</string>
+    <string name="content_desc_editor_stroke_width">Stroke width</string>
+
+    <!-- Content descriptions: signature dialog icons -->
+    <string name="content_desc_history_icon">Saved signatures</string>
+    <string name="content_desc_draw_icon">Draw new signature</string>
+    <string name="content_desc_empty_annotations">No annotations</string>
+
+    <!-- Content descriptions: text input dialog icons -->
+    <string name="content_desc_font_size_icon">Font size</string>
+    <string name="content_desc_color_icon">Text color</string>
+
     <!-- Plural strings for bulk page operations -->
     <plurals name="pages_deleted">
         <item quantity="one">%d page deleted</item>

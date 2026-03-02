@@ -197,9 +197,9 @@ class SignaturePadView @JvmOverloads constructor(
      */
     fun undo(): Boolean {
         if (paths.isNotEmpty()) {
-            undoStack.add(paths.removeLast())
+            undoStack.add(paths.removeAt(paths.lastIndex))
             if (allStrokes.isNotEmpty()) {
-                allStrokes.removeLast()
+                allStrokes.removeAt(allStrokes.lastIndex)
             }
             invalidate()
             onSignatureChanged?.invoke(hasSignature())
@@ -213,7 +213,7 @@ class SignaturePadView @JvmOverloads constructor(
      */
     fun redo(): Boolean {
         if (undoStack.isNotEmpty()) {
-            val pathData = undoStack.removeLast()
+            val pathData = undoStack.removeAt(undoStack.lastIndex)
             paths.add(pathData)
             allStrokes.add(pathData.points.toMutableList())
             invalidate()

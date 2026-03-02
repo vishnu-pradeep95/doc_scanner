@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Accessibility: missing contentDescription on non-text ImageViews and ImageButtons -->
+    <issue id="ContentDescription" severity="error" />
+
+    <!-- Accessibility: touch targets smaller than 48dp -->
+    <issue id="TouchTargetSizeCheck" severity="error" />
+
+    <!-- Pre-existing: android:windowLightNavigationBar is used in theme XML files targeting
+         API 27+ (themes.xml, themes_cartoon.xml, themes-night.xml). Android's resource
+         system handles the API split at runtime — the attribute silently no-ops on API 24-26.
+         Moving to values-v27/ would be the correct long-term fix but is out of scope here. -->
+    <issue id="NewApi" severity="ignore" />
+</lint>

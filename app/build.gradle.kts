@@ -156,6 +156,16 @@ android {
         // Provides type-safe access to views (no more findViewById)
         viewBinding = true
     }
+
+    // ===== LINT CONFIGURATION (RELEASE-02) =====
+    // abortOnError = true — treat ContentDescription and TouchTargetSizeCheck as build errors
+    // lintConfig points to app/lint.xml which sets those issue severities
+    lint {
+        abortOnError = true
+        lintConfig = file("lint.xml")
+        htmlReport = true
+        htmlOutput = file("${project.buildDir}/reports/lint/lint-results.html")
+    }
 }
 
 // ===== DETEKT STATIC ANALYSIS (RELEASE-01) =====

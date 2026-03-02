@@ -262,7 +262,8 @@
                     android:id="@+id/iconSelect"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_select_mascot" />
+                    android:src="@drawable/ic_select_mascot"
+                    android:contentDescription="@string/content_desc_editor_select" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -286,7 +287,8 @@
                     android:id="@+id/iconSignature"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_signature_mascot" />
+                    android:src="@drawable/ic_signature_mascot"
+                    android:contentDescription="@string/content_desc_editor_signature" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -310,7 +312,8 @@
                     android:id="@+id/iconText"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_text_mascot" />
+                    android:src="@drawable/ic_text_mascot"
+                    android:contentDescription="@string/content_desc_editor_text" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -334,7 +337,8 @@
                     android:id="@+id/iconHighlight"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_highlight_mascot" />
+                    android:src="@drawable/ic_highlight_mascot"
+                    android:contentDescription="@string/content_desc_editor_highlight" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -358,7 +362,8 @@
                     android:id="@+id/iconStamp"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_stamp_mascot" />
+                    android:src="@drawable/ic_stamp_mascot"
+                    android:contentDescription="@string/content_desc_editor_stamp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -382,7 +387,8 @@
                     android:id="@+id/iconDraw"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_draw_mascot" />
+                    android:src="@drawable/ic_draw_mascot"
+                    android:contentDescription="@string/content_desc_editor_draw" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -406,7 +412,8 @@
                     android:id="@+id/iconShapes"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_shapes_mascot" />
+                    android:src="@drawable/ic_shapes_mascot"
+                    android:contentDescription="@string/content_desc_editor_shapes" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -430,7 +437,8 @@
                     android:id="@+id/iconCheckmark"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_checkmark_mascot" />
+                    android:src="@drawable/ic_checkmark_mascot"
+                    android:contentDescription="@string/content_desc_editor_checkmark" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -454,7 +462,8 @@
                     android:id="@+id/iconEraser"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_eraser_mascot" />
+                    android:src="@drawable/ic_eraser_mascot"
+                    android:contentDescription="@string/content_desc_editor_eraser" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -488,7 +497,8 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_color_mascot" />
+                        android:src="@drawable/ic_color_mascot"
+                        android:contentDescription="@string/content_desc_editor_color" />
 
                     <View
                         android:id="@+id/colorPreview"
@@ -521,7 +531,8 @@
                     android:id="@+id/iconFontSize"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_font_size_mascot" />
+                    android:src="@drawable/ic_font_size_mascot"
+                    android:contentDescription="@string/content_desc_editor_font_size" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -545,7 +556,8 @@
                     android:id="@+id/iconStrokeWidth"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_stroke_width_mascot" />
+                    android:src="@drawable/ic_stroke_width_mascot"
+                    android:contentDescription="@string/content_desc_editor_stroke_width" />
 
                 <TextView
                     android:layout_width="wrap_content"

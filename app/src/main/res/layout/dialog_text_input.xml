@@ -86,7 +86,8 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_font_size_mascot" />
+                android:src="@drawable/ic_font_size_mascot"
+                android:contentDescription="@string/content_desc_font_size_icon" />
 
             <TextView
                 android:id="@+id/tvSizeLabel"
@@ -136,7 +137,8 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_color_mascot" />
+                android:src="@drawable/ic_color_mascot"
+                android:contentDescription="@string/content_desc_color_icon" />
 
             <TextView
                 android:id="@+id/tvColorLabel"

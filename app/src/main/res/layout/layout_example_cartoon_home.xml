@@ -160,7 +160,8 @@
                             android:layout_width="52dp"
                             android:layout_height="52dp"
                             android:src="@drawable/ic_cartoon_camera"
-                            app:tint="@color/cartoon_on_primary" />
+                            app:tint="@color/cartoon_on_primary"
+                            android:contentDescription="@string/content_desc_new_scan" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -201,7 +202,8 @@
                             android:layout_width="52dp"
                             android:layout_height="52dp"
                             android:src="@drawable/ic_auto_scan_cute"
-                            app:tint="@color/cartoon_on_secondary" />
+                            app:tint="@color/cartoon_on_secondary"
+                            android:contentDescription="@string/content_desc_auto_scan" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -242,7 +244,8 @@
                             android:layout_width="52dp"
                             android:layout_height="52dp"
                             android:src="@drawable/ic_gallery_cute"
-                            app:tint="@color/cartoon_on_accent" />
+                            app:tint="@color/cartoon_on_accent"
+                            android:contentDescription="@string/content_desc_import_image" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -307,7 +310,8 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@drawable/ic_merge_cute"
-                            app:tint="@color/cartoon_primary" />
+                            app:tint="@color/cartoon_primary"
+                            android:contentDescription="@string/content_desc_merge" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -348,7 +352,8 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@drawable/ic_split_cute"
-                            app:tint="@color/cartoon_secondary" />
+                            app:tint="@color/cartoon_secondary"
+                            android:contentDescription="@string/content_desc_split" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -389,7 +394,8 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@drawable/ic_compress_cute"
-                            app:tint="@color/cartoon_tertiary" />
+                            app:tint="@color/cartoon_tertiary"
+                            android:contentDescription="@string/content_desc_compress" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -430,7 +436,8 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@drawable/ic_ocr_cute"
-                            app:tint="@color/cartoon_accent" />
+                            app:tint="@color/cartoon_accent"
+                            android:contentDescription="@string/content_desc_ocr" />
 
                         <TextView
                             android:layout_width="wrap_content"
