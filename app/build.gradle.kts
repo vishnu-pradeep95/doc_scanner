@@ -18,13 +18,16 @@ plugins {
     // Android Application Plugin - required for Android apps
     // Provides tasks like assembleDebug, installDebug, etc.
     id("com.android.application")
-    
+
     // Kotlin Android Plugin - enables Kotlin for Android
     id("org.jetbrains.kotlin.android")
-    
+
     // Safe Args Plugin - generates type-safe classes for navigation arguments
     // After adding this, rebuild to generate *Directions and *Args classes
     id("androidx.navigation.safeargs.kotlin")
+
+    // Detekt - static analysis for Kotlin
+    id("io.gitlab.arturbosch.detekt")
 }
 
 /**
@@ -153,6 +156,32 @@ android {
         // Provides type-safe access to views (no more findViewById)
         viewBinding = true
     }
+}
+
+// ===== DETEKT STATIC ANALYSIS (RELEASE-01) =====
+// Detekt 1.23.8 — MUST stay at 1.23.x (2.x requires Kotlin 2.x; project uses Kotlin 1.9.21)
+// autoCorrect is NOT set — detekt-formatting runs as check/report only (not auto-formatter)
+// to avoid conflicts with baseline generation.
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
+    source.setFrom(
+        "src/main/java",
+        "src/test/java",
+        "src/androidTest/java"
+    )
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
+    reports {
+        html.required.set(true)
+        xml.required.set(false)
+    }
+    exclude("**/build/**")
+    exclude("**/generated/**")
 }
 
 // ===== ROBOLECTRIC JACOCO COVERAGE FIX =====
@@ -380,6 +409,15 @@ dependencies {
     // ===== NAVIGATION TESTING (TEST-07/TEST-08) =====
     // Provides TestNavHostController for navigation flow tests
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.6")       // ADD
+
+    // ===== STATIC ANALYSIS (RELEASE-01) =====
+    // Detekt formatting plugin — runs as check/report only (no autoCorrect) to avoid baseline conflicts
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
+
+    // ===== MEMORY LEAK DETECTION (RELEASE-08) =====
+    // LeakCanary auto-installs via ContentProvider — no Application subclass changes needed
+    // Navigation 2.7.x AbstractAppBarOnDestinationChangedListener leak is documented in KNOWN_LEAKS.md
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }
 
 // ===== JACOCO COVERAGE REPORT (RELEASE-09) =====
