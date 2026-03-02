@@ -7,3 +7,27 @@
 
 # Keep CanHub Image Cropper
 -keep class com.canhub.cropper.** { *; }
+
+# ===== Phase 5: Release Readiness — ProGuard/R8 Keep Rules =====
+
+# ML Kit Text Recognition (com.google.mlkit:text-recognition:16.0.0)
+# ML Kit loads model processors via reflection — R8 would strip these without explicit keeps.
+-keep class com.google.mlkit.** { *; }
+-dontwarn com.google.mlkit.**
+
+# ML Kit Document Scanner (com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1)
+# GMS-based scanner uses internal GMS task machinery loaded by class name.
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+
+# Navigation SafeArgs Generated Classes
+# SafeArgs generates *Args and *Directions classes referenced by class name in the nav graph.
+# All nav graph arguments in this project use primitive types (string, integer) — confirmed.
+-keepnames class com.pdfscanner.app.**.*Args { *; }
+-keepnames class com.pdfscanner.app.**.*Directions { *; }
+
+# Coil 2.7.0 — consumer rules are AUTO-BUNDLED in the AAR via R8.
+# No explicit rules needed when using R8 (default since AGP 3.4.0).
+
+# Kotlin Coroutines 1.7.3 — consumer rules are AUTO-BUNDLED in kotlinx-coroutines-android.
+# No explicit rules needed.
