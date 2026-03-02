@@ -1,0 +1,539 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:AnnotationCanvasView.kt$AnnotationCanvasView$( lastX * width, lastY * height, (x + lastX * width) / 2, (y + lastY * height) / 2 )</ID>
+    <ID>ArgumentListWrapping:AnnotationCanvasView.kt$AnnotationCanvasView$( prev.x * viewWidth, prev.y * viewHeight, (curr.x + prev.x) / 2 * viewWidth, (curr.y + prev.y) / 2 * viewHeight )</ID>
+    <ID>ArgumentListWrapping:AnnotationCanvasView.kt$AnnotationCanvasView$( x2, y2, (x2 - arrowSize * Math.cos(arrowAngle1)).toFloat(), (y2 - arrowSize * Math.sin(arrowAngle1)).toFloat(), paint )</ID>
+    <ID>ArgumentListWrapping:AnnotationCanvasView.kt$AnnotationCanvasView$( x2, y2, (x2 - arrowSize * Math.cos(arrowAngle2)).toFloat(), (y2 - arrowSize * Math.sin(arrowAngle2)).toFloat(), paint )</ID>
+    <ID>ArgumentListWrapping:CameraFragment.kt$CameraFragment.&lt;no name provided&gt;$(R.string.error_failed_to_capture, exception.message ?: "")</ID>
+    <ID>ArgumentListWrapping:CameraFragment.kt$CameraFragment.&lt;no name provided&gt;$(getString(R.string.error_failed_to_capture, exception.message ?: ""))</ID>
+    <ID>ArgumentListWrapping:PagesFragment.kt$PagesFragment$( bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true )</ID>
+    <ID>ArgumentListWrapping:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$( prev.x * pageWidth, prev.y * pageHeight, (curr.x + prev.x) / 2 * pageWidth, (curr.y + prev.y) / 2 * pageHeight )</ID>
+    <ID>ArgumentListWrapping:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$( x2, y2, (x2 - arrowSize * Math.cos(arrowAngle1)).toFloat(), (y2 - arrowSize * Math.sin(arrowAngle1)).toFloat(), paint )</ID>
+    <ID>ArgumentListWrapping:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$( x2, y2, (x2 - arrowSize * Math.cos(arrowAngle2)).toFloat(), (y2 - arrowSize * Math.sin(arrowAngle2)).toFloat(), paint )</ID>
+    <ID>ArgumentListWrapping:PdfEditorFragment.kt$PdfEditorFragment$(R.string.error_loading_pdf, e.message ?: "")</ID>
+    <ID>ArgumentListWrapping:PdfEditorFragment.kt$PdfEditorFragment$(getString(R.string.error_loading_pdf, e.message ?: ""), com.google.android.material.snackbar.Snackbar.LENGTH_LONG)</ID>
+    <ID>ArgumentListWrapping:PdfViewerFragment.kt$PdfViewerFragment$("PdfViewerFragment", "Error closing fd", e)</ID>
+    <ID>ArgumentListWrapping:PdfViewerFragment.kt$PdfViewerFragment$("PdfViewerFragment", "Error closing renderer", e)</ID>
+    <ID>CommentWrapping:HistoryFragment.kt$HistoryFragment$/* Selection mode started */</ID>
+    <ID>ComplexCondition:AnnotationCanvasView.kt$AnnotationCanvasView$x &gt;= item.x &amp;&amp; x &lt;= item.x + item.width &amp;&amp; y &gt;= item.y &amp;&amp; y &lt;= item.y + item.height</ID>
+    <ID>CyclomaticComplexMethod:AnnotationCanvasView.kt$AnnotationCanvasView$override fun onTouchEvent(event: MotionEvent): Boolean</ID>
+    <ID>CyclomaticComplexMethod:AnnotationCanvasView.kt$AnnotationCanvasView$private fun drawAnnotation(canvas: Canvas, item: AnnotationItem, viewWidth: Float, viewHeight: Float)</ID>
+    <ID>CyclomaticComplexMethod:HomeFragment.kt$HomeFragment$private fun handleImportResult(uris: List&lt;Uri&gt;)</ID>
+    <ID>CyclomaticComplexMethod:ImageUtils.kt$ImageUtils$fun correctExifOrientation(context: Context, sourceUri: Uri): Uri</ID>
+    <ID>CyclomaticComplexMethod:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$private fun drawAnnotation( canvas: Canvas, item: AnnotationCanvasView.AnnotationItem, pageWidth: Float, pageHeight: Float )</ID>
+    <ID>CyclomaticComplexMethod:PdfUtils.kt$PdfUtils$suspend fun compressPdf( context: Context, pdfUri: Uri, level: CompressionLevel = CompressionLevel.MEDIUM, outputName: String? = null ): PdfOperationResult</ID>
+    <ID>EmptyFunctionBlock:PagesAdapter.kt$PagesAdapter.DragCallback${}</ID>
+    <ID>FunctionOnlyReturningConstant:OcrProcessor.kt$OcrProcessor$fun isAvailable(): Boolean</ID>
+    <ID>ImplicitDefaultLocale:DocumentHistory.kt$DocumentEntry$String.format("%.1f MB", fileSize / (1024.0 * 1024.0))</ID>
+    <ID>ImportOrdering:CameraFragment.kt$import android.app.Activity import android.Manifest // Permission constants import android.content.pm.PackageManager // Permission check results import android.net.Uri import android.os.Bundle import android.util.Log import android.view.LayoutInflater // Converts XML to View objects import android.view.View import android.view.ViewGroup // Base class for UI containers import com.google.android.material.snackbar.Snackbar // Activity Result API - modern way to handle permission requests and activity results import androidx.activity.result.ActivityResult import androidx.activity.result.IntentSenderRequest import androidx.activity.result.contract.ActivityResultContracts // CameraX imports - Google's camera library import androidx.camera.core.CameraSelector // Choose front/back camera import androidx.camera.core.ImageCapture // Capture still images import androidx.camera.core.ImageCaptureException // Capture error handling import androidx.camera.core.Preview // Live camera preview import androidx.camera.lifecycle.ProcessCameraProvider // Manages camera lifecycle // AndroidX utilities import androidx.core.content.ContextCompat // Permission checking helper import androidx.core.net.toUri // Extension function: File.toUri() import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import androidx.core.view.updatePadding import androidx.fragment.app.Fragment // Base Fragment class import androidx.fragment.app.activityViewModels // Shared ViewModel injection import androidx.navigation.fragment.findNavController // Navigation helper // ML Kit Document Scanner import com.google.mlkit.vision.documentscanner.GmsDocumentScanner // Project-specific imports import com.pdfscanner.app.R // Generated resource references (R.id.xxx, R.string.xxx) import com.pdfscanner.app.databinding.FragmentCameraBinding // View Binding for fragment_camera.xml import com.pdfscanner.app.util.DocumentScanner import com.pdfscanner.app.viewmodel.ScannerViewModel // Java utilities import java.io.File import java.text.SimpleDateFormat import java.util.Locale import java.util.concurrent.ExecutorService // Thread pool for background work import java.util.concurrent.Executors</ID>
+    <ID>ImportOrdering:HistoryFragment.kt$import android.content.Intent import android.net.Uri import android.os.Bundle import android.util.Log import android.view.LayoutInflater import android.view.View import android.view.ViewGroup import com.google.android.material.snackbar.Snackbar import androidx.core.content.FileProvider import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import androidx.core.view.updatePadding import androidx.fragment.app.Fragment import androidx.lifecycle.lifecycleScope import androidx.navigation.fragment.findNavController import com.google.android.material.dialog.MaterialAlertDialogBuilder import com.pdfscanner.app.R import com.pdfscanner.app.adapter.HistoryAdapter import com.pdfscanner.app.data.DocumentEntry import com.pdfscanner.app.data.DocumentHistoryRepository import com.pdfscanner.app.databinding.FragmentHistoryBinding import com.pdfscanner.app.util.PdfUtils import kotlinx.coroutines.launch import java.io.File</ID>
+    <ID>ImportOrdering:HomeFragment.kt$import android.app.Activity import android.net.Uri import android.os.Bundle import android.view.LayoutInflater import android.view.View import android.view.ViewGroup import com.google.android.material.snackbar.Snackbar import androidx.activity.result.ActivityResult import androidx.activity.result.IntentSenderRequest import androidx.activity.result.contract.ActivityResultContracts import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import androidx.core.view.updatePadding import androidx.fragment.app.Fragment import androidx.fragment.app.activityViewModels import androidx.lifecycle.lifecycleScope import androidx.navigation.fragment.findNavController import androidx.recyclerview.widget.LinearLayoutManager import com.google.android.material.dialog.MaterialAlertDialogBuilder import com.google.mlkit.vision.documentscanner.GmsDocumentScanner import com.pdfscanner.app.R import com.pdfscanner.app.adapter.RecentDocumentsAdapter import com.pdfscanner.app.data.DocumentEntry import com.pdfscanner.app.data.DocumentHistoryRepository import com.pdfscanner.app.databinding.FragmentHomeBinding import com.pdfscanner.app.util.DocumentScanner import com.pdfscanner.app.util.PdfPageExtractor import com.pdfscanner.app.util.PdfUtils import com.pdfscanner.app.viewmodel.ScannerViewModel import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.launch import kotlinx.coroutines.withContext</ID>
+    <ID>ImportOrdering:MainActivity.kt$import android.os.Bundle // Bundle is like a dictionary/map for passing data import androidx.appcompat.app.AppCompatActivity // Base class for Activities import androidx.appcompat.app.AppCompatDelegate // For theme switching import androidx.core.view.WindowCompat // For edge-to-edge display import androidx.navigation.fragment.NavHostFragment // Handles Fragment navigation import java.io.File // View Binding - auto-generated class from activity_main.xml // Naming convention: ActivityMainBinding comes from activity_main.xml import com.pdfscanner.app.databinding.ActivityMainBinding import com.pdfscanner.app.util.AppPreferences</ID>
+    <ID>ImportOrdering:PagesAdapter.kt$import android.net.Uri import android.view.LayoutInflater import android.view.MotionEvent import android.view.View import android.view.ViewGroup import androidx.recyclerview.widget.DiffUtil import androidx.recyclerview.widget.ItemTouchHelper import androidx.recyclerview.widget.ListAdapter import androidx.recyclerview.widget.RecyclerView import coil.load import com.pdfscanner.app.R import com.pdfscanner.app.databinding.ItemPageBinding</ID>
+    <ID>ImportOrdering:PagesFragment.kt$import android.content.Context import android.content.Intent // For launching other apps/activities import android.graphics.Bitmap import android.graphics.BitmapFactory import android.graphics.pdf.PdfDocument // Android's built-in PDF API import android.net.Uri import android.os.Bundle import android.view.LayoutInflater import android.view.View import android.view.ViewGroup import android.widget.EditText import android.widget.TextView import androidx.core.content.FileProvider // Secure file URI provider import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import androidx.core.view.updatePadding import androidx.fragment.app.Fragment import androidx.fragment.app.activityViewModels // Coroutines for async/background work import androidx.lifecycle.lifecycleScope // Coroutine scope tied to lifecycle import androidx.navigation.fragment.findNavController import androidx.recyclerview.widget.GridLayoutManager // Grid layout for RecyclerView import androidx.recyclerview.widget.ItemTouchHelper // Drag &amp; drop support // Material design components import com.google.android.material.dialog.MaterialAlertDialogBuilder import com.google.android.material.snackbar.Snackbar import com.google.android.material.textfield.TextInputEditText import com.google.android.material.textfield.TextInputLayout // Project imports import com.pdfscanner.app.R import com.pdfscanner.app.adapter.PagesAdapter import com.pdfscanner.app.data.DocumentHistoryRepository import com.pdfscanner.app.databinding.FragmentPagesBinding import com.pdfscanner.app.ocr.OcrProcessor import com.pdfscanner.app.viewmodel.ScannerViewModel // Coroutine imports import kotlinx.coroutines.Dispatchers // Thread dispatchers import kotlinx.coroutines.launch // Start a coroutine import kotlinx.coroutines.withContext // Switch threads // Java utilities import java.io.File import java.io.FileOutputStream import java.text.SimpleDateFormat import java.util.Locale</ID>
+    <ID>ImportOrdering:PdfEditorFragment.kt$import android.graphics.Bitmap import android.graphics.Color import android.graphics.drawable.GradientDrawable import android.net.Uri import android.os.Bundle import android.view.LayoutInflater import android.view.View import android.view.ViewGroup import android.view.animation.AnimationUtils import android.widget.ImageView import com.pdfscanner.app.ui.showSnackbar import androidx.core.content.ContextCompat import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import androidx.core.view.updatePadding import androidx.fragment.app.Fragment import androidx.fragment.app.activityViewModels import androidx.lifecycle.lifecycleScope import androidx.navigation.fragment.findNavController import androidx.navigation.fragment.navArgs import com.google.android.material.dialog.MaterialAlertDialogBuilder import com.google.android.material.snackbar.Snackbar import com.pdfscanner.app.R import com.pdfscanner.app.databinding.FragmentPdfEditorBinding import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.launch import kotlinx.coroutines.withContext import java.io.File</ID>
+    <ID>ImportOrdering:PdfEditorViewModel.kt$import android.app.Application import android.graphics.Bitmap import android.graphics.BitmapFactory import android.net.Uri import androidx.lifecycle.AndroidViewModel import androidx.lifecycle.LiveData import androidx.lifecycle.MutableLiveData import androidx.lifecycle.viewModelScope import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.launch import kotlinx.coroutines.withContext import java.io.File import java.io.FileOutputStream import org.json.JSONArray import org.json.JSONObject</ID>
+    <ID>ImportOrdering:PdfViewerFragment.kt$import android.graphics.Bitmap import android.graphics.pdf.PdfRenderer import android.net.Uri import android.os.Bundle import android.os.ParcelFileDescriptor import android.util.SparseArray import android.view.LayoutInflater import android.view.View import android.view.ViewGroup import com.pdfscanner.app.ui.showSnackbar import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import androidx.core.view.updatePadding import androidx.fragment.app.Fragment import androidx.lifecycle.lifecycleScope import androidx.navigation.fragment.findNavController import androidx.navigation.fragment.navArgs import com.pdfscanner.app.R import com.pdfscanner.app.databinding.FragmentPdfViewerBinding import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.launch import kotlinx.coroutines.withContext import java.io.File</ID>
+    <ID>ImportOrdering:PreviewFragment.kt$import android.content.Context import android.graphics.Bitmap import android.graphics.BitmapFactory // Decode image files import android.net.Uri // Universal Resource Identifier for files import android.os.Bundle import android.view.LayoutInflater import android.view.View import android.view.ViewGroup import com.google.android.material.snackbar.Snackbar // Activity Result API for handling crop result import androidx.activity.result.contract.ActivityResultContracts import androidx.core.content.FileProvider // Secure file sharing import androidx.core.net.toUri // Extension to convert File to Uri import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import androidx.core.view.updatePadding import androidx.fragment.app.Fragment import androidx.fragment.app.activityViewModels // Shared ViewModel import androidx.lifecycle.lifecycleScope import androidx.navigation.fragment.findNavController import androidx.navigation.fragment.navArgs // Safe Args navigation arguments // CanHub Image Cropper library import com.canhub.cropper.CropImageContract // Activity result contract for cropping import com.canhub.cropper.CropImageContractOptions // Options to pass to cropper import com.canhub.cropper.CropImageOptions // Crop configuration // Project imports import com.pdfscanner.app.R import com.pdfscanner.app.databinding.FragmentPreviewBinding import com.pdfscanner.app.util.ImageProcessor import com.pdfscanner.app.viewmodel.ScannerViewModel // Coroutines import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.launch import kotlinx.coroutines.withContext // Java utilities import java.io.File import java.text.SimpleDateFormat import java.util.Locale</ID>
+    <ID>ImportOrdering:RecentDocumentsAdapter.kt$import android.graphics.pdf.PdfRenderer import android.os.ParcelFileDescriptor import android.view.LayoutInflater import android.view.ViewGroup import android.widget.PopupMenu import androidx.recyclerview.widget.DiffUtil import androidx.recyclerview.widget.ListAdapter import androidx.recyclerview.widget.RecyclerView import com.pdfscanner.app.R import com.pdfscanner.app.data.DocumentEntry import com.pdfscanner.app.databinding.ItemRecentDocumentBinding import java.io.File import java.text.SimpleDateFormat import java.util.Date import java.util.Locale import android.graphics.Bitmap import kotlinx.coroutines.CoroutineScope import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.launch import kotlinx.coroutines.withContext</ID>
+    <ID>Indentation:CameraFragment.kt$CameraFragment$ </ID>
+    <ID>Indentation:HistoryFragment.kt$HistoryFragment$ </ID>
+    <ID>Indentation:PagesAdapter.kt$PagesAdapter.DragCallback$ </ID>
+    <ID>LargeClass:AnnotationCanvasView.kt$AnnotationCanvasView : View</ID>
+    <ID>LargeClass:PagesFragment.kt$PagesFragment : Fragment</ID>
+    <ID>LongMethod:AnnotationCanvasView.kt$AnnotationCanvasView$override fun onTouchEvent(event: MotionEvent): Boolean</ID>
+    <ID>LongMethod:AnnotationCanvasView.kt$AnnotationCanvasView$private fun drawAnnotation(canvas: Canvas, item: AnnotationItem, viewWidth: Float, viewHeight: Float)</ID>
+    <ID>LongMethod:HistoryAdapter.kt$HistoryAdapter.DocumentViewHolder$fun bind(document: DocumentEntry)</ID>
+    <ID>LongMethod:ImageProcessor.kt$ImageProcessor$fun applyMagicFilter(inputBitmap: Bitmap): Bitmap</ID>
+    <ID>LongMethod:PagesAdapter.kt$PagesAdapter.PageViewHolder$fun bind(uri: Uri, position: Int)</ID>
+    <ID>LongMethod:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$private fun drawAnnotation( canvas: Canvas, item: AnnotationCanvasView.AnnotationItem, pageWidth: Float, pageHeight: Float )</ID>
+    <ID>LongMethod:PdfUtils.kt$PdfUtils$suspend fun compressPdf( context: Context, pdfUri: Uri, level: CompressionLevel = CompressionLevel.MEDIUM, outputName: String? = null ): PdfOperationResult</ID>
+    <ID>LongMethod:PdfUtils.kt$PdfUtils$suspend fun mergePdfs( context: Context, pdfUris: List&lt;Uri&gt;, outputName: String = "Merged" ): PdfOperationResult</ID>
+    <ID>LongMethod:PdfUtils.kt$PdfUtils$suspend fun splitPdf( context: Context, pdfUri: Uri, baseName: String = "Page" ): PdfOperationResult</ID>
+    <ID>LongParameterList:AnnotationCanvasView.kt$AnnotationCanvasView$(canvas: Canvas, stamp: StampType, x: Float, y: Float, w: Float, h: Float)</ID>
+    <ID>LongParameterList:AnnotationCanvasView.kt$AnnotationCanvasView$(canvas: Canvas, x1: Float, y1: Float, x2: Float, y2: Float, paint: Paint)</ID>
+    <ID>LongParameterList:AnnotationCanvasView.kt$AnnotationCanvasView$(canvas: Canvas, x: Float, y: Float, w: Float, h: Float, color: Int)</ID>
+    <ID>LongParameterList:AnnotationCanvasView.kt$AnnotationCanvasView$(canvas: Canvas, x: Float, y: Float, w: Float, h: Float, paint: Paint)</ID>
+    <ID>LongParameterList:DocumentEntryTest.kt$DocumentEntryTest$( id: String = "entry-123", name: String = "My Scan", filePath: String = "/data/pdfs/my_scan.pdf", pageCount: Int = 3, createdAt: Long = 1740000000L, fileSize: Long = 512000L )</ID>
+    <ID>LongParameterList:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$(canvas: Canvas, stamp: StampType, x: Float, y: Float, w: Float, h: Float)</ID>
+    <ID>LongParameterList:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$(canvas: Canvas, x1: Float, y1: Float, x2: Float, y2: Float, paint: Paint)</ID>
+    <ID>LongParameterList:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$(canvas: Canvas, x: Float, y: Float, w: Float, h: Float, color: Int)</ID>
+    <ID>LongParameterList:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$(canvas: Canvas, x: Float, y: Float, w: Float, h: Float, paint: Paint)</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$0.5f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$0.85f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$0.9f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$1.15f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$1.1f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$1.2f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$1.3f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$100f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$10f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$200</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$300</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$350</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$400</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$4f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$500</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$5f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$600</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$6f</ID>
+    <ID>MagicNumber:AnimationHelper.kt$AnimationHelper$8f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.01f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.02f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.05f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.06f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.15f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.1f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.25f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.2f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.4f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.5f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.6f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.75f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.85f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$0.8f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$100</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$1000f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$10f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$12f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$15f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$16f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$200f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$255</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$3</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$30f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$3f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$48f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$4f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$5</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$6</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$6f</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$77</ID>
+    <ID>MagicNumber:AnnotationCanvasView.kt$AnnotationCanvasView$999</ID>
+    <ID>MagicNumber:AppPreferences.kt$AppPreferences$3</ID>
+    <ID>MagicNumber:AppPreferences.kt$AppPreferences$4</ID>
+    <ID>MagicNumber:CameraFragment.kt$CameraFragment$0.6f</ID>
+    <ID>MagicNumber:DocumentHistory.kt$DocumentEntry$1024</ID>
+    <ID>MagicNumber:DocumentHistory.kt$DocumentEntry$1024.0</ID>
+    <ID>MagicNumber:HistoryAdapter.kt$HistoryAdapter.DocumentViewHolder$0.7f</ID>
+    <ID>MagicNumber:HomeFragment.kt$HomeFragment$0.95f</ID>
+    <ID>MagicNumber:HomeFragment.kt$HomeFragment$10</ID>
+    <ID>MagicNumber:HomeFragment.kt$HomeFragment$100</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.114</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.114f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.299</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.299f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.3</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.587</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.587f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$0.5f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$1.15f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$1.3f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$1.5</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$128f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$150</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$200</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$20f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$255</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$256</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$30f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$3368</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$3f</ID>
+    <ID>MagicNumber:ImageProcessor.kt$ImageProcessor$5f</ID>
+    <ID>MagicNumber:ImageUtils.kt$ImageUtils$180f</ID>
+    <ID>MagicNumber:ImageUtils.kt$ImageUtils$270f</ID>
+    <ID>MagicNumber:ImageUtils.kt$ImageUtils$90</ID>
+    <ID>MagicNumber:ImageUtils.kt$ImageUtils$90f</ID>
+    <ID>MagicNumber:MainActivity.kt$MainActivity$1000</ID>
+    <ID>MagicNumber:MainActivity.kt$MainActivity$60</ID>
+    <ID>MagicNumber:NativePdfView.kt$NativePdfView$1.25f</ID>
+    <ID>MagicNumber:NativePdfView.kt$NativePdfView$1080</ID>
+    <ID>MagicNumber:NativePdfView.kt$NativePdfView$1920</ID>
+    <ID>MagicNumber:NativePdfView.kt$NativePdfView.GestureListener$1.5f</ID>
+    <ID>MagicNumber:PagesAdapter.kt$PagesAdapter.DragCallback$0.7f</ID>
+    <ID>MagicNumber:PagesAdapter.kt$PagesAdapter.DragCallback$1.05f</ID>
+    <ID>MagicNumber:PagesFragment.kt$PagesFragment$16</ID>
+    <ID>MagicNumber:PagesFragment.kt$PagesFragment$48</ID>
+    <ID>MagicNumber:PagesFragment.kt$PagesFragment$595</ID>
+    <ID>MagicNumber:PagesFragment.kt$PagesFragment$842</ID>
+    <ID>MagicNumber:PagesFragment.kt$PagesFragment$90</ID>
+    <ID>MagicNumber:PagesFragment.kt$PagesFragment$90f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.15f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.25f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.2f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.4f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.5f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.75f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.85f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$0.8f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$1000f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$20f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$3</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$3f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$4f</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$6</ID>
+    <ID>MagicNumber:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$80</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$0.85f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$1.15f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$12f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$24f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$3</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$36f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$4</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$48f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$4f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$64f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$6f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$8f</ID>
+    <ID>MagicNumber:PdfEditorFragment.kt$PdfEditorFragment$96f</ID>
+    <ID>MagicNumber:PdfEditorViewModel.kt$PdfEditorViewModel$100</ID>
+    <ID>MagicNumber:PdfEditorViewModel.kt$PdfEditorViewModel$48f</ID>
+    <ID>MagicNumber:PdfEditorViewModel.kt$PdfEditorViewModel$4f</ID>
+    <ID>MagicNumber:PdfPageExtractor.kt$PdfPageExtractor$72f</ID>
+    <ID>MagicNumber:PdfPageExtractor.kt$PdfPageExtractor$90</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$0.5f</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$0.7f</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$0.9f</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$100</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$1024</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$1024.0</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$40</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$60</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$72f</ID>
+    <ID>MagicNumber:PdfUtils.kt$PdfUtils$80</ID>
+    <ID>MagicNumber:PdfViewerFragment.kt$PdfViewerFragment$0.4f</ID>
+    <ID>MagicNumber:PdfViewerFragment.kt$PdfViewerFragment$3</ID>
+    <ID>MagicNumber:PreviewFragment.kt$PreviewFragment$1080</ID>
+    <ID>MagicNumber:PreviewFragment.kt$PreviewFragment$1920</ID>
+    <ID>MagicNumber:PreviewFragment.kt$PreviewFragment$90</ID>
+    <ID>MagicNumber:SignaturePadView.kt$SignaturePadView$20</ID>
+    <ID>MagicNumber:SignaturePadView.kt$SignaturePadView$4f</ID>
+    <ID>MagicNumber:SignaturePadView.kt$SignaturePadView$6f</ID>
+    <ID>MagicNumber:SoundManager.kt$SoundManager$100</ID>
+    <ID>MagicNumber:SoundManager.kt$SoundManager$150</ID>
+    <ID>MagicNumber:SoundManager.kt$SoundManager$200</ID>
+    <ID>MagicNumber:SoundManager.kt$SoundManager$50</ID>
+    <ID>MagicNumber:TextInputDialogFragment.kt$TextInputDialogFragment$24f</ID>
+    <ID>MagicNumber:TextInputDialogFragment.kt$TextInputDialogFragment$3</ID>
+    <ID>MagicNumber:TextInputDialogFragment.kt$TextInputDialogFragment$6</ID>
+    <ID>MaxLineLength:CameraFragment.kt$CameraFragment$enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:CameraFragment.kt$CameraFragment$exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }</ID>
+    <ID>MaxLineLength:CameraFragment.kt$CameraFragment$reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }</ID>
+    <ID>MaxLineLength:CameraFragment.kt$CameraFragment$returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:CameraFragment.kt$CameraFragment.&lt;no name provided&gt;$exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }</ID>
+    <ID>MaxLineLength:CameraFragment.kt$CameraFragment.&lt;no name provided&gt;$reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }</ID>
+    <ID>MaxLineLength:CameraFragment.kt$CameraFragment.&lt;no name provided&gt;$this@CameraFragment.showSnackbar(getString(R.string.error_failed_to_capture, exception.message ?: ""))</ID>
+    <ID>MaxLineLength:HistoryFragment.kt$HistoryFragment$enterTransition = com.google.android.material.transition.MaterialFadeThrough().apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:HistoryFragment.kt$HistoryFragment$exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }</ID>
+    <ID>MaxLineLength:HistoryFragment.kt$HistoryFragment$reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }</ID>
+    <ID>MaxLineLength:HistoryFragment.kt$HistoryFragment$returnTransition = com.google.android.material.transition.MaterialFadeThrough().apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:HomeFragment.kt$HomeFragment$exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }</ID>
+    <ID>MaxLineLength:HomeFragment.kt$HomeFragment$reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$exitTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$exitTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$reenterTransition = com.google.android.material.transition.MaterialFadeThrough().apply { duration = dur }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { duration = dur }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$reenterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { duration = dur }</ID>
+    <ID>MaxLineLength:PagesFragment.kt$PagesFragment$returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$(tool in listOf(EditorTool.RECTANGLE, EditorTool.CIRCLE, EditorTool.LINE, EditorTool.ARROW) &amp;&amp; iconTool == EditorTool.RECTANGLE)</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$android.util.Log.d("PdfEditor", "Copied to temp file: ${tempFile.absolutePath}, size: ${tempFile.length()}")</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$showSnackbar(R.string.error_could_not_access_pdf, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$showSnackbar(R.string.error_failed_to_load_pdf, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$showSnackbar(getString(R.string.error_loading_pdf, e.message ?: ""), com.google.android.material.snackbar.Snackbar.LENGTH_LONG)</ID>
+    <ID>MaxLineLength:PdfEditorFragment.kt$PdfEditorFragment$showSnackbar(getString(R.string.error_loading_pdf, exception.message ?: ""), com.google.android.material.snackbar.Snackbar.LENGTH_LONG)</ID>
+    <ID>MaxLineLength:PdfViewerFragment.kt$PdfViewerFragment$enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:PdfViewerFragment.kt$PdfViewerFragment$returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:PdfViewerFragment.kt$PdfViewerFragment$try { fileDescriptor?.close() } catch (e: Exception) { android.util.Log.e("PdfViewerFragment", "Error closing fd", e) }</ID>
+    <ID>MaxLineLength:PdfViewerFragment.kt$PdfViewerFragment$try { pdfRenderer?.close() } catch (e: Exception) { android.util.Log.e("PdfViewerFragment", "Error closing renderer", e) }</ID>
+    <ID>MaxLineLength:PreviewFragment.kt$PreviewFragment$enterTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, true).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:PreviewFragment.kt$PreviewFragment$returnTransition = com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.Z, false).apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:SettingsFragment.kt$SettingsFragment$enterTransition = com.google.android.material.transition.MaterialFadeThrough().apply { this.duration = duration }</ID>
+    <ID>MaxLineLength:SettingsFragment.kt$SettingsFragment$returnTransition = com.google.android.material.transition.MaterialFadeThrough().apply { this.duration = duration }</ID>
+    <ID>MaximumLineLength:CameraFragment.kt$CameraFragment$ </ID>
+    <ID>MaximumLineLength:CameraFragment.kt$CameraFragment.&lt;no name provided&gt;$ </ID>
+    <ID>MaximumLineLength:HistoryFragment.kt$HistoryFragment$ </ID>
+    <ID>MaximumLineLength:HomeFragment.kt$HomeFragment$ </ID>
+    <ID>MaximumLineLength:PagesFragment.kt$PagesFragment$ </ID>
+    <ID>MaximumLineLength:PdfEditorFragment.kt$PdfEditorFragment$ </ID>
+    <ID>MaximumLineLength:PdfViewerFragment.kt$PdfViewerFragment$ </ID>
+    <ID>MaximumLineLength:PreviewFragment.kt$PreviewFragment$ </ID>
+    <ID>MaximumLineLength:SettingsFragment.kt$SettingsFragment$ </ID>
+    <ID>MultiLineIfElse:HistoryFragment.kt$HistoryFragment$"Compressed $successCount files"</ID>
+    <ID>MultiLineIfElse:HistoryFragment.kt$HistoryFragment$lastMessage</ID>
+    <ID>MultiLineIfElse:PdfUtils.kt$PdfUtils$0</ID>
+    <ID>NestedBlockDepth:ImageProcessor.kt$ImageProcessor$private fun applyConvolutionKernel( bitmap: Bitmap, kernel: FloatArray, divisor: Float ): Bitmap</ID>
+    <ID>NestedBlockDepth:MainActivity.kt$MainActivity$private fun cleanupStaleTempFiles()</ID>
+    <ID>NestedBlockDepth:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$fun renderAnnotatedPdf( inputUri: Uri, pageAnnotations: Map&lt;Int, List&lt;AnnotationCanvasView.AnnotationItem&gt;&gt; ): File?</ID>
+    <ID>NestedBlockDepth:PdfEditorViewModel.kt$PdfEditorViewModel$private fun removeSignatureMetadata(signatureId: String)</ID>
+    <ID>NoBlankLineBeforeRbrace:HistoryFragment.kt$HistoryFragment$ </ID>
+    <ID>NoBlankLineBeforeRbrace:HomeFragment.kt$HomeFragment$ </ID>
+    <ID>NoBlankLineBeforeRbrace:NativePdfView.kt$NativePdfView$ </ID>
+    <ID>NoBlankLineBeforeRbrace:OcrProcessor.kt$OcrProcessor$ </ID>
+    <ID>NoBlankLineBeforeRbrace:PdfPageExtractor.kt$PdfPageExtractor$ </ID>
+    <ID>NoBlankLineBeforeRbrace:PdfUtils.kt$PdfUtils$ </ID>
+    <ID>NoBlankLineBeforeRbrace:PdfViewerFragment.kt$PdfViewerFragment$ </ID>
+    <ID>NoEmptyFirstLineInMethodBlock:PdfUtils.kt$PdfUtils$ </ID>
+    <ID>NoMultipleSpaces:AnnotationCanvasView.kt$AnnotationCanvasView.AnnotationItem$ </ID>
+    <ID>NoMultipleSpaces:AppPreferences.kt$AppPreferences$ </ID>
+    <ID>NoMultipleSpaces:AppPreferences.kt$AppPreferences.Companion$ </ID>
+    <ID>NoMultipleSpaces:CameraFragment.kt$ </ID>
+    <ID>NoMultipleSpaces:CameraFragment.kt$CameraFragment$ </ID>
+    <ID>NoMultipleSpaces:DocumentHistory.kt$DocumentEntry$ </ID>
+    <ID>NoMultipleSpaces:DocumentHistory.kt$DocumentHistoryRepository.Companion$ </ID>
+    <ID>NoMultipleSpaces:HistoryFragment.kt$HistoryFragment$ </ID>
+    <ID>NoMultipleSpaces:HomeFragment.kt$HomeFragment$ </ID>
+    <ID>NoMultipleSpaces:ImageProcessor.kt$ImageProcessor$ </ID>
+    <ID>NoMultipleSpaces:MainActivity.kt$ </ID>
+    <ID>NoMultipleSpaces:NativePdfView.kt$NativePdfView$ </ID>
+    <ID>NoMultipleSpaces:OcrProcessor.kt$OcrProcessor$ </ID>
+    <ID>NoMultipleSpaces:PagesAdapter.kt$PagesAdapter.DragCallback$ </ID>
+    <ID>NoMultipleSpaces:PagesAdapter.kt$PagesAdapter.PageViewHolder$ </ID>
+    <ID>NoMultipleSpaces:PagesFragment.kt$ </ID>
+    <ID>NoMultipleSpaces:PagesFragment.kt$PagesFragment$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$DrawingAnnotation$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.ARROW$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.CHECKMARK$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.CIRCLE$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.CROSS$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.DRAW$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.ERASER$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.HIGHLIGHT$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.LINE$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.RECTANGLE$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.SELECT$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.SIGNATURE$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.STAMP$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$EditorTool.TEXT$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$PdfAnnotation$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$ShapeAnnotation$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$SignatureAnnotation$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.APPROVED$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.CONFIDENTIAL$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.COPY$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.CUSTOM$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.DRAFT$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.FINAL$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.PAID$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.RECEIVED$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.REJECTED$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.SIGN_HERE$ </ID>
+    <ID>NoMultipleSpaces:PdfAnnotation.kt$StampType.VOID$ </ID>
+    <ID>NoMultipleSpaces:PdfEditorFragment.kt$PdfEditorFragment$ </ID>
+    <ID>NoMultipleSpaces:PdfPageExtractor.kt$PdfPageExtractor$ </ID>
+    <ID>NoMultipleSpaces:PdfUtils.kt$PdfUtils$ </ID>
+    <ID>NoMultipleSpaces:PdfUtils.kt$PdfUtils.CompressionLevel.HIGH$ </ID>
+    <ID>NoMultipleSpaces:PdfUtils.kt$PdfUtils.CompressionLevel.LOW$ </ID>
+    <ID>NoMultipleSpaces:PdfUtils.kt$PdfUtils.CompressionLevel.MEDIUM$ </ID>
+    <ID>NoMultipleSpaces:PdfViewerFragment.kt$PdfViewerFragment$ </ID>
+    <ID>NoMultipleSpaces:PreviewFragment.kt$ </ID>
+    <ID>NoMultipleSpaces:PreviewFragment.kt$PreviewFragment$ </ID>
+    <ID>NoMultipleSpaces:ScannerViewModel.kt$ </ID>
+    <ID>NoTrailingSpaces:AnimationHelper.kt$ </ID>
+    <ID>NoTrailingSpaces:AnimationHelper.kt$AnimationHelper$ </ID>
+    <ID>NoTrailingSpaces:AnnotationCanvasView.kt$ </ID>
+    <ID>NoTrailingSpaces:AnnotationCanvasView.kt$AnnotationCanvasView$ </ID>
+    <ID>NoTrailingSpaces:AppPreferences.kt$ </ID>
+    <ID>NoTrailingSpaces:AppPreferences.kt$AppPreferences.Companion$ </ID>
+    <ID>NoTrailingSpaces:CameraFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:CameraFragment.kt$CameraFragment$ </ID>
+    <ID>NoTrailingSpaces:DocumentHistory.kt$ </ID>
+    <ID>NoTrailingSpaces:DocumentHistory.kt$DocumentEntry$ </ID>
+    <ID>NoTrailingSpaces:DocumentHistory.kt$DocumentHistoryRepository$ </ID>
+    <ID>NoTrailingSpaces:DocumentHistory.kt$DocumentHistoryRepository.Companion$ </ID>
+    <ID>NoTrailingSpaces:DocumentScanner.kt$ </ID>
+    <ID>NoTrailingSpaces:DocumentScanner.kt$DocumentScanner$ </ID>
+    <ID>NoTrailingSpaces:DocumentScanner.kt$DocumentScanner.ScanResult$ </ID>
+    <ID>NoTrailingSpaces:HistoryAdapter.kt$ </ID>
+    <ID>NoTrailingSpaces:HistoryAdapter.kt$HistoryAdapter$ </ID>
+    <ID>NoTrailingSpaces:HistoryAdapter.kt$HistoryAdapter.DocumentDiffCallback$ </ID>
+    <ID>NoTrailingSpaces:HistoryAdapter.kt$HistoryAdapter.DocumentViewHolder$ </ID>
+    <ID>NoTrailingSpaces:HistoryFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:HistoryFragment.kt$HistoryFragment$ </ID>
+    <ID>NoTrailingSpaces:HomeFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:HomeFragment.kt$HomeFragment$ </ID>
+    <ID>NoTrailingSpaces:ImageProcessor.kt$ </ID>
+    <ID>NoTrailingSpaces:ImageProcessor.kt$ImageProcessor$ </ID>
+    <ID>NoTrailingSpaces:ImageProcessor.kt$ImageProcessor.FilterType$ </ID>
+    <ID>NoTrailingSpaces:MainActivity.kt$ </ID>
+    <ID>NoTrailingSpaces:MainActivity.kt$MainActivity$ </ID>
+    <ID>NoTrailingSpaces:NativePdfView.kt$ </ID>
+    <ID>NoTrailingSpaces:NativePdfView.kt$NativePdfView$ </ID>
+    <ID>NoTrailingSpaces:NativePdfView.kt$NativePdfView.GestureListener$ </ID>
+    <ID>NoTrailingSpaces:OcrProcessor.kt$ </ID>
+    <ID>NoTrailingSpaces:OcrProcessor.kt$OcrProcessor$ </ID>
+    <ID>NoTrailingSpaces:OcrProcessor.kt$OcrResult$ </ID>
+    <ID>NoTrailingSpaces:OcrProcessor.kt$OcrResult.Companion$ </ID>
+    <ID>NoTrailingSpaces:OcrProcessor.kt$OcrTextBlock$ </ID>
+    <ID>NoTrailingSpaces:PagesFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:PagesFragment.kt$PagesFragment$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotation.kt$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotation.kt$PdfAnnotation$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotation.kt$PdfAnnotations$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotation.kt$SignatureAnnotation$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotation.kt$StampAnnotation$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotation.kt$TextAnnotation$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotationRenderer.kt$ </ID>
+    <ID>NoTrailingSpaces:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$ </ID>
+    <ID>NoTrailingSpaces:PdfEditorFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:PdfEditorFragment.kt$PdfEditorFragment$ </ID>
+    <ID>NoTrailingSpaces:PdfEditorViewModel.kt$ </ID>
+    <ID>NoTrailingSpaces:PdfEditorViewModel.kt$PdfEditorViewModel$ </ID>
+    <ID>NoTrailingSpaces:PdfPageExtractor.kt$ </ID>
+    <ID>NoTrailingSpaces:PdfPageExtractor.kt$PdfPageExtractor$ </ID>
+    <ID>NoTrailingSpaces:PdfUtils.kt$ </ID>
+    <ID>NoTrailingSpaces:PdfUtils.kt$PdfUtils$ </ID>
+    <ID>NoTrailingSpaces:PdfViewerFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:PdfViewerFragment.kt$PdfViewerFragment$ </ID>
+    <ID>NoTrailingSpaces:PreviewFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:PreviewFragment.kt$PreviewFragment$ </ID>
+    <ID>NoTrailingSpaces:RecentDocumentsAdapter.kt$ </ID>
+    <ID>NoTrailingSpaces:RecentDocumentsAdapter.kt$RecentDocumentsAdapter.ViewHolder$ </ID>
+    <ID>NoTrailingSpaces:SettingsFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:SettingsFragment.kt$SettingsFragment$ </ID>
+    <ID>NoTrailingSpaces:SignatureDialogFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:SignatureDialogFragment.kt$SavedSignaturesAdapter$ </ID>
+    <ID>NoTrailingSpaces:SignatureDialogFragment.kt$SavedSignaturesAdapter.ViewHolder$ </ID>
+    <ID>NoTrailingSpaces:SignatureDialogFragment.kt$SignatureDialogFragment$ </ID>
+    <ID>NoTrailingSpaces:SignatureDialogFragment.kt$SignatureDialogFragment.Companion$ </ID>
+    <ID>NoTrailingSpaces:SignaturePadView.kt$ </ID>
+    <ID>NoTrailingSpaces:SignaturePadView.kt$SignaturePadView$ </ID>
+    <ID>NoTrailingSpaces:SoundManager.kt$ </ID>
+    <ID>NoTrailingSpaces:SoundManager.kt$SoundManager$ </ID>
+    <ID>NoTrailingSpaces:StampPickerDialogFragment.kt$StampAdapter$ </ID>
+    <ID>NoTrailingSpaces:StampPickerDialogFragment.kt$StampAdapter.ViewHolder$ </ID>
+    <ID>NoTrailingSpaces:StampPickerDialogFragment.kt$StampPickerDialogFragment$ </ID>
+    <ID>NoTrailingSpaces:StampPickerDialogFragment.kt$StampPickerDialogFragment.Companion$ </ID>
+    <ID>NoTrailingSpaces:TextInputDialogFragment.kt$ </ID>
+    <ID>NoTrailingSpaces:TextInputDialogFragment.kt$TextInputDialogFragment$ </ID>
+    <ID>NoTrailingSpaces:TextInputDialogFragment.kt$TextInputDialogFragment.Companion$ </ID>
+    <ID>NoUnusedImports:AnimationHelper.kt$com.pdfscanner.app.util.AnimationHelper.kt</ID>
+    <ID>NoUnusedImports:AppPreferencesTest.kt$com.pdfscanner.app.util.AppPreferencesTest.kt</ID>
+    <ID>NoUnusedImports:CameraFragment.kt$com.pdfscanner.app.ui.CameraFragment.kt</ID>
+    <ID>NoUnusedImports:DocumentScanner.kt$com.pdfscanner.app.util.DocumentScanner.kt</ID>
+    <ID>NoUnusedImports:HomeFragment.kt$com.pdfscanner.app.ui.HomeFragment.kt</ID>
+    <ID>NoUnusedImports:ImageProcessor.kt$com.pdfscanner.app.util.ImageProcessor.kt</ID>
+    <ID>NoUnusedImports:PagesFragment.kt$com.pdfscanner.app.ui.PagesFragment.kt</ID>
+    <ID>NoUnusedImports:PdfAnnotation.kt$com.pdfscanner.app.editor.PdfAnnotation.kt</ID>
+    <ID>NoUnusedImports:PdfAnnotationRenderer.kt$com.pdfscanner.app.editor.PdfAnnotationRenderer.kt</ID>
+    <ID>NoUnusedImports:PdfEditorFragment.kt$com.pdfscanner.app.editor.PdfEditorFragment.kt</ID>
+    <ID>NoUnusedImports:PdfPageExtractor.kt$com.pdfscanner.app.util.PdfPageExtractor.kt</ID>
+    <ID>NoUnusedImports:PdfUtils.kt$com.pdfscanner.app.util.PdfUtils.kt</ID>
+    <ID>NoUnusedImports:PdfViewerFragment.kt$com.pdfscanner.app.ui.PdfViewerFragment.kt</ID>
+    <ID>NoUnusedImports:PreviewFragment.kt$com.pdfscanner.app.ui.PreviewFragment.kt</ID>
+    <ID>NoUnusedImports:SignatureDialogFragment.kt$com.pdfscanner.app.editor.SignatureDialogFragment.kt</ID>
+    <ID>NoUnusedImports:SoundManager.kt$com.pdfscanner.app.util.SoundManager.kt</ID>
+    <ID>NoWildcardImports:AnnotationCanvasView.kt$import android.graphics.*</ID>
+    <ID>NoWildcardImports:PdfAnnotationRenderer.kt$import android.graphics.*</ID>
+    <ID>NoWildcardImports:SignaturePadView.kt$import android.graphics.*</ID>
+    <ID>ParameterListWrapping:PdfViewerFragment.kt$PdfViewerFragment$(e: Exception)</ID>
+    <ID>PrintStackTrace:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$e</ID>
+    <ID>PrintStackTrace:PdfEditorViewModel.kt$PdfEditorViewModel$e</ID>
+    <ID>ReturnCount:AnnotationCanvasView.kt$AnnotationCanvasView$override fun onTouchEvent(event: MotionEvent): Boolean</ID>
+    <ID>ReturnCount:DocumentScanner.kt$DocumentScanner$fun parseResult(resultCode: Int, data: Intent?): ScanResult?</ID>
+    <ID>ReturnCount:HistoryFragment.kt$HistoryFragment$private fun performSplit()</ID>
+    <ID>ReturnCount:HomeFragment.kt$HomeFragment$private fun handleImportResult(uris: List&lt;Uri&gt;)</ID>
+    <ID>ReturnCount:ImageUtils.kt$ImageUtils$fun correctExifOrientation(context: Context, sourceUri: Uri): Uri</ID>
+    <ID>ReturnCount:SignaturePadView.kt$SignaturePadView$override fun onTouchEvent(event: MotionEvent): Boolean</ID>
+    <ID>SpacingBetweenDeclarationsWithComments:PdfAnnotation.kt$EditorTool.RECTANGLE$// Shape tools</ID>
+    <ID>StringTemplate:NativePdfView.kt$NativePdfView$${bitmapHeight}</ID>
+    <ID>StringTemplate:PagesFragment.kt$PagesFragment$${timestamp}</ID>
+    <ID>StringTemplate:PdfPageExtractor.kt$PdfPageExtractor$${height}</ID>
+    <ID>SwallowedException:DocumentEntryTest.kt$DocumentEntryTest$e: JSONException</ID>
+    <ID>SwallowedException:DocumentHistory.kt$DocumentHistoryRepository$e: Exception</ID>
+    <ID>SwallowedException:HomeFragment.kt$HomeFragment$e: Exception</ID>
+    <ID>SwallowedException:ImageProcessor.kt$ImageProcessor$e: Exception</ID>
+    <ID>SwallowedException:PagesFragment.kt$PagesFragment$e: Exception</ID>
+    <ID>SwallowedException:PdfEditorViewModel.kt$PdfEditorViewModel$e: Exception</ID>
+    <ID>SwallowedException:PdfUtils.kt$PdfUtils$e: Exception</ID>
+    <ID>SwallowedException:PdfViewerFragment.kt$PdfViewerFragment$e: Exception</ID>
+    <ID>SwallowedException:PreviewFragment.kt$PreviewFragment$e: Exception</ID>
+    <ID>SwallowedException:RecentDocumentsAdapter.kt$RecentDocumentsAdapter.ViewHolder$e: Exception</ID>
+    <ID>SwallowedException:SettingsFragment.kt$SettingsFragment$e: Exception</ID>
+    <ID>SwallowedException:SoundManager.kt$SoundManager$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:CameraFragment.kt$CameraFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DocumentHistory.kt$DocumentHistoryRepository$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HistoryFragment.kt$HistoryFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HomeFragment.kt$HomeFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ImageProcessor.kt$ImageProcessor$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ImageUtils.kt$ImageUtils$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MainActivity.kt$MainActivity$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:NativePdfView.kt$NativePdfView$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:OcrProcessor.kt$OcrProcessor$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PagesFragment.kt$PagesFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PdfAnnotationRenderer.kt$PdfAnnotationRenderer$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PdfEditorFragment.kt$PdfEditorFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PdfEditorViewModel.kt$PdfEditorViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PdfPageExtractor.kt$PdfPageExtractor$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PdfUtils.kt$PdfUtils$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PdfViewerFragment.kt$PdfViewerFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PreviewFragment.kt$PreviewFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RecentDocumentsAdapter.kt$RecentDocumentsAdapter.ViewHolder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SettingsFragment.kt$SettingsFragment$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SoundManager.kt$SoundManager$e: Exception</ID>
+    <ID>TooGenericExceptionThrown:PagesFragment.kt$PagesFragment$throw Exception("Failed to decode page ${index + 1}")</ID>
+    <ID>TooGenericExceptionThrown:PreviewFragment.kt$PreviewFragment$throw Exception("Failed to load image")</ID>
+    <ID>TooGenericExceptionThrown:PreviewFragment.kt$PreviewFragment$throw Exception("Failed to save processed image")</ID>
+    <ID>TooManyFunctions:AnnotationCanvasView.kt$AnnotationCanvasView : View</ID>
+    <ID>TooManyFunctions:CameraFragment.kt$CameraFragment : Fragment</ID>
+    <ID>TooManyFunctions:HistoryFragment.kt$HistoryFragment : Fragment</ID>
+    <ID>TooManyFunctions:HomeFragment.kt$HomeFragment : Fragment</ID>
+    <ID>TooManyFunctions:ImageProcessor.kt$ImageProcessor</ID>
+    <ID>TooManyFunctions:NativePdfView.kt$NativePdfView : View</ID>
+    <ID>TooManyFunctions:PagesAdapter.kt$PagesAdapter : ListAdapter</ID>
+    <ID>TooManyFunctions:PagesFragment.kt$PagesFragment : Fragment</ID>
+    <ID>TooManyFunctions:PdfEditorFragment.kt$PdfEditorFragment : Fragment</ID>
+    <ID>TooManyFunctions:PdfEditorViewModel.kt$PdfEditorViewModel : AndroidViewModel</ID>
+    <ID>TooManyFunctions:PdfViewerFragment.kt$PdfViewerFragment : Fragment</ID>
+    <ID>TooManyFunctions:PreviewFragment.kt$PreviewFragment : Fragment</ID>
+    <ID>TooManyFunctions:ScannerViewModel.kt$ScannerViewModel : ViewModel</ID>
+    <ID>TooManyFunctions:SignaturePadView.kt$SignaturePadView : View</ID>
+    <ID>TooManyFunctions:SoundManager.kt$SoundManager</ID>
+    <ID>UnusedParameter:MainActivity.kt$MainActivity$prefs: AppPreferences</ID>
+    <ID>UnusedParameter:PagesFragment.kt$PagesFragment$count: Int</ID>
+    <ID>UnusedPrivateProperty:AnnotationCanvasView.kt$AnnotationCanvasView$// Resizing state private var isResizing = false</ID>
+    <ID>UnusedPrivateProperty:AnnotationCanvasView.kt$AnnotationCanvasView$private val fillPaint = Paint().apply { isAntiAlias = true style = Paint.Style.FILL }</ID>
+    <ID>UnusedPrivateProperty:AnnotationCanvasView.kt$AnnotationCanvasView$private var annotationStartHeight = 0f</ID>
+    <ID>UnusedPrivateProperty:AnnotationCanvasView.kt$AnnotationCanvasView$private var annotationStartWidth = 0f</ID>
+    <ID>UnusedPrivateProperty:AnnotationCanvasView.kt$AnnotationCanvasView$private var resizeCorner: Int = -1 // 0=TL, 1=TR, 2=BL, 3=BR</ID>
+    <ID>UnusedPrivateProperty:HistoryFragment.kt$HistoryFragment$val currentCtx = context ?: return@launch</ID>
+    <ID>UnusedPrivateProperty:HomeFragment.kt$HomeFragment$// Activity result launcher for gallery import private val galleryLauncher = registerForActivityResult( ActivityResultContracts.GetMultipleContents() ) { uris: List&lt;Uri&gt; -&gt; handleGalleryResult(uris) }</ID>
+    <ID>UnusedPrivateProperty:HomeFragment.kt$HomeFragment$val currentCtx = context ?: return@launch</ID>
+    <ID>UnusedPrivateProperty:PagesFragment.kt$/** * Extension property to get package ID * * Kotlin extension properties add properties to existing classes * This adds 'packageId' to Context class for cleaner code */ private val android.content.Context.packageId: String get() = packageName</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$// Compression scale factors (multiply page dimensions) private const val HIGH_QUALITY_SCALE = 1.5f</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$// JPEG quality for compression (0-100) private const val HIGH_QUALITY = 90</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$private const val COMPRESSED_DPI = 72 // Much lower for aggressive compression</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$private const val HIGH_QUALITY_DPI = 200</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$private const val LOW_QUALITY = 50</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$private const val LOW_SCALE = 0.6f</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$private const val MEDIUM_QUALITY = 70</ID>
+    <ID>UnusedPrivateProperty:PdfUtils.kt$PdfUtils$private const val MEDIUM_SCALE = 1.0f</ID>
+    <ID>WildcardImport:AnnotationCanvasView.kt$import android.graphics.*</ID>
+    <ID>WildcardImport:PdfAnnotationRenderer.kt$import android.graphics.*</ID>
+    <ID>WildcardImport:SignaturePadView.kt$import android.graphics.*</ID>
+    <ID>Wrapping:AnnotationCanvasView.kt$AnnotationCanvasView$(</ID>
+    <ID>Wrapping:CameraFragment.kt$CameraFragment$duration = dur</ID>
+    <ID>Wrapping:CameraFragment.kt$CameraFragment$this.duration = duration</ID>
+    <ID>Wrapping:CameraFragment.kt$CameraFragment.&lt;no name provided&gt;$duration = dur</ID>
+    <ID>Wrapping:HistoryFragment.kt$HistoryFragment$(</ID>
+    <ID>Wrapping:HistoryFragment.kt$HistoryFragment$duration = dur</ID>
+    <ID>Wrapping:HomeFragment.kt$HomeFragment$duration = dur</ID>
+    <ID>Wrapping:ImageProcessor.kt$ImageProcessor$(</ID>
+    <ID>Wrapping:ImageUtils.kt$ImageUtils$(</ID>
+    <ID>Wrapping:MainActivity.kt$MainActivity$(</ID>
+    <ID>Wrapping:PagesFragment.kt$PagesFragment$duration = dur</ID>
+    <ID>Wrapping:PagesFragment.kt$PagesFragment$this.duration = duration</ID>
+    <ID>Wrapping:PdfEditorFragment.kt$PdfEditorFragment$this.duration = duration</ID>
+    <ID>Wrapping:PdfEditorViewModel.kt$PdfEditorViewModel$(</ID>
+    <ID>Wrapping:PdfViewerFragment.kt$PdfViewerFragment$this.duration = duration</ID>
+    <ID>Wrapping:PdfViewerFragment.kt$PdfViewerFragment${ android.util.Log.e("PdfViewerFragment", "Error closing renderer", e) }</ID>
+    <ID>Wrapping:PdfViewerFragment.kt$PdfViewerFragment${ pdfRenderer?.close() }</ID>
+    <ID>Wrapping:PreviewFragment.kt$PreviewFragment$this.duration = duration</ID>
+    <ID>Wrapping:SignaturePadView.kt$SignaturePadView$(</ID>
+  </CurrentIssues>
+</SmellBaseline>
