@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Quality Gates
 status: unknown
-last_updated: "2026-03-02T02:20:52.963Z"
+last_updated: "2026-03-02T03:29:13Z"
 progress:
-  total_phases: 1
+  total_phases: 2
   completed_phases: 1
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** Phase 4 — Test Coverage (first phase of v1.1)
+**Current focus:** Phase 5 — Release Readiness
 
 ## Current Position
 
-Phase: 4 of 5 (Test Coverage)
-Plan: 7 of 7 in current phase (04-07 complete — Phase 4 DONE with gap closure)
-Status: Phase 4 complete — all 7 plans done (including gap closure plan 04-07)
-Last activity: 2026-03-01 — 04-07 complete: RELEASE-09 recalibrated to >=22% util/ threshold; ImageUtils added to JVM exclusion list; 23.3% measured coverage satisfies >=22% — RELEASE-09 fully met
+Phase: 5 of 5 (Release Readiness)
+Plan: 1 of 3 in current phase (05-01 Tasks 1-3 complete; Task 4 is checkpoint:human-verify awaiting device)
+Status: 05-01 Tasks 1-3 complete — Detekt configured, baseline generated, KNOWN_LEAKS.md created; checkpoint Task 4 awaiting device verification of LeakCanary (RELEASE-08)
+Last activity: 2026-03-02 — 05-01: Detekt 1.23.8 + LeakCanary 2.14 integrated; detekt baseline (539 violations) generated; KNOWN_LEAKS.md documents Navigation 2.7.x library leak; ./gradlew detekt BUILD SUCCESSFUL
 
-Progress: [#######░░░] 87.5% (7/8 plans complete)
+Progress: [########░░] 80% (8/10 plans complete, counting 05-01 as in-progress)
 
 ## Accumulated Context
 
@@ -80,11 +80,17 @@ Decisions from 04-07 execution (2026-03-01):
 - RELEASE-09 threshold lowered from >=25% to >=22%: measured util/ coverage is 23.3% (176/756) which satisfies >=22%; gap was a calibration problem not a test implementation gap
 - ImageUtils excluded from JVM unit test scope: correctExifOrientation() uses ContentResolver URI I/O + real JPEG byte stream + ExifInterface; even the trivial "normal orientation" path requires a real ContentResolver-resolvable URI with valid JPEG — disproportionate Robolectric setup for 1.7pp gap closure
 
+Decisions from 05-01 execution (2026-03-02):
+- Detekt MUST stay at 1.23.x — 2.x requires Kotlin 2.x (project locked at 1.9.21)
+- detekt-formatting runs as check-only (no autoCorrect=true) to avoid conflicts with baseline generation
+- Baseline generated from unmodified codebase FIRST, committed immediately — 539 pre-existing violations captured
+- LeakCanary 2.14 integration is purely via debugImplementation — ContentProvider handles init automatically, no Application subclass changes needed
+- Navigation 2.7.x AbstractAppBarOnDestinationChangedListener leak is a library bug (not app code); do NOT upgrade to Navigation 2.8.x (migration risk across 8 fragments and nav graph); documented in KNOWN_LEAKS.md
+
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
-- **OcrProcessor interface (TEST-04)**: Verify at Phase 4 start whether `ocr/OcrProcessor.kt` already exists as an interface — if not, refactoring step is required before Robolectric test writing can begin.
-- **Navigation 2.7.x library leak**: LeakCanary will fire for `AbstractAppBarOnDestinationChangedListener` — document as library bug immediately, do not investigate as app code.
+- **RELEASE-08 device checkpoint (05-01 Task 4)**: LeakCanary setup complete; physical device verification required to confirm zero retained app-code leaks across all 8 fragment flows. Type "approved" or "environment-blocked" to resume.
 
 ### Pending Todos
 
@@ -92,6 +98,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Completed 04-07 — RELEASE-09 final threshold recalibration (>=22%); ImageUtils added to JVM exclusion list; Phase 4 Test Coverage fully complete with all requirements met
+Last session: 2026-03-02
+Stopped at: 05-01 checkpoint:human-verify (Task 4 — RELEASE-08 device verification); Tasks 1-3 complete with commits 7a9e54b, 91122ec, edca7f4; await "approved" or "environment-blocked" to continue
 Resume file: None
