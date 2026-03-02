@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Quality Gates
 status: unknown
-last_updated: "2026-03-02T03:29:13Z"
+last_updated: "2026-03-02T03:40:00Z"
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 ## Current Position
 
 Phase: 5 of 5 (Release Readiness)
-Plan: 1 of 3 in current phase (05-01 Tasks 1-3 complete; Task 4 is checkpoint:human-verify awaiting device)
-Status: 05-01 Tasks 1-3 complete — Detekt configured, baseline generated, KNOWN_LEAKS.md created; checkpoint Task 4 awaiting device verification of LeakCanary (RELEASE-08)
-Last activity: 2026-03-02 — 05-01: Detekt 1.23.8 + LeakCanary 2.14 integrated; detekt baseline (539 violations) generated; KNOWN_LEAKS.md documents Navigation 2.7.x library leak; ./gradlew detekt BUILD SUCCESSFUL
+Plan: 2 of 3 complete in current phase (05-02 complete; 05-03 remaining)
+Status: 05-02 complete — Lint gate configured, AndroidManifest hardened, backup exclusion XMLs created
+Last activity: 2026-03-02 — 05-02: lint{} block + lint.xml (ContentDescription/TouchTargetSizeCheck as errors); 43 ContentDescription violations fixed; camera required=false; data_extraction_rules.xml + backup_rules.xml created; file_paths.xml cache-path tightened; ./gradlew lint BUILD SUCCESSFUL
 
-Progress: [########░░] 80% (8/10 plans complete, counting 05-01 as in-progress)
+Progress: [#########░] 90% (9/10 plans complete)
 
 ## Accumulated Context
 
@@ -87,6 +87,12 @@ Decisions from 05-01 execution (2026-03-02):
 - LeakCanary 2.14 integration is purely via debugImplementation — ContentProvider handles init automatically, no Application subclass changes needed
 - Navigation 2.7.x AbstractAppBarOnDestinationChangedListener leak is a library bug (not app code); do NOT upgrade to Navigation 2.8.x (migration risk across 8 fragments and nav graph); documented in KNOWN_LEAKS.md
 
+Decisions from 05-02 execution (2026-03-02):
+- ContentDescription violations fixed in layouts (not suppressed) — plan requires zero violations, not zero errors from suppression
+- NewApi suppressed globally in lint.xml for windowLightNavigationBar in theme XML files — Android resource system handles API split at runtime; moving to values-v27/ is out-of-scope architectural change
+- cache/ omitted from data_extraction_rules.xml and backup_rules.xml — Android automatically excludes cacheDir per AOSP documentation; no explicit rule needed to satisfy RELEASE-06
+- FileProvider cache-path tightened to path="." — all cacheDir writes go to root; none pass through FileProvider.getUriForFile() (which uses files-path)
+
 ### Blockers/Concerns
 
 - **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
@@ -99,5 +105,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: 05-01 checkpoint:human-verify (Task 4 — RELEASE-08 device verification); Tasks 1-3 complete with commits 7a9e54b, 91122ec, edca7f4; await "approved" or "environment-blocked" to continue
+Stopped at: Completed 05-02-PLAN.md — lint gate + manifest hardening; commits a3050db, 138e514; next is 05-03 (signing + release build)
 Resume file: None
