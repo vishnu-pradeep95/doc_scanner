@@ -1,291 +1,400 @@
-# Feature Research: Testing & Release Readiness
+# Feature Research: Security Hardening for High-Sensitivity Document Scanner
 
-**Domain:** Android Document Scanner App — Test Coverage + Play Store Release (v1.1)
-**Researched:** 2026-03-01
-**Confidence:** HIGH (official Android docs, direct codebase inspection, current web sources)
+**Domain:** Android Document Scanner App -- Security Hardening (v1.2)
+**Researched:** 2026-03-03
+**Confidence:** HIGH (official Android docs, OWASP Mobile Top 10 2024, direct codebase inspection, current web sources)
 
 ## Context
 
-This is NOT a "what features to add" research. The app is feature-complete. This research answers: **what testing and release gate capabilities are non-negotiable vs. deferrable for a Kotlin/MVVM Android document scanner aiming for Play Store + portfolio quality?**
+This research answers: **what security features are non-negotiable vs. differentiating vs. counterproductive for an Android document scanner that handles IDs, medical records, and contracts?**
 
-Every item below is a testing or release readiness task, not a product feature. Items are drawn directly from PROJECT.md (TEST-01 through RELEASE-09), then classified by actual necessity vs. gold-plating.
+The app already has:
+- App-private storage (`filesDir` for scans/, processed/, pdfs/)
+- FileProvider with scoped paths (tightened from `/` to `.` in v1.1)
+- Backup exclusion rules (scans, processed, pdfs excluded from cloud/device backup)
+- ProGuard/R8 with minification + obfuscation enabled
+- Single exported component (MainActivity with LAUNCHER intent)
+- No storage permissions (uses app-private dirs only)
 
-The existing test infrastructure is minimal boilerplate only — JUnit 4 + Espresso Core, no tests written. The existing release config has R8/ProGuard enabled, but the rules file covers only CameraX and CanHub; it is missing ML Kit, Navigation SafeArgs, and several other library keep-rules.
+What the app does NOT have:
+- No encryption at rest (files are plaintext in app-private dirs)
+- No FLAG_SECURE (screenshots freely captured)
+- No biometric/PIN app lock
+- No secure file deletion (standard `File.delete()` only)
+- No logging discipline (49 `Log.*` calls across 9 files in production code)
+- No network security configuration XML
+- No clipboard protection
+- No root/tamper detection
+- SharedPreferences storing document history in plaintext JSON
+
+The threat model: a lost/stolen phone with an unlocked bootloader or a rooted device can read all app-private files. A shoulder-surfer can screenshot sensitive documents. A malicious app with accessibility permissions can read screen content. Backup extraction can recover document metadata.
+
+---
+
+## OWASP Mobile Top 10 2024 Coverage Map
+
+Every security feature below is mapped to the relevant OWASP Mobile Top 10 2024 risk category.
+
+| OWASP 2024 | Risk | Relevance to This App | Coverage Status |
+|------------|------|------------------------|----------------|
+| M1 | Improper Credential Usage | LOW -- no backend auth, no API keys in code | N/A |
+| M2 | Inadequate Supply Chain | MEDIUM -- ML Kit, CameraX, CanHub dependencies | Partially covered by R8/ProGuard |
+| M3 | Insecure Authentication/Authorization | HIGH -- no app lock, no biometric gate | **NOT COVERED** |
+| M4 | Insufficient Input/Output Validation | MEDIUM -- navigation args, imported file paths | Partially covered (SafeArgs) |
+| M5 | Insecure Communication | LOW -- offline-only app, no network calls | Partially covered by default |
+| M6 | Inadequate Privacy Controls | HIGH -- document images, PDF metadata, history | **NOT COVERED** |
+| M7 | Insufficient Binary Protections | MEDIUM -- R8 obfuscation exists | Partially covered |
+| M8 | Security Misconfiguration | MEDIUM -- logging in production, no network config | **NOT COVERED** |
+| M9 | Insecure Data Storage | HIGH -- plaintext files, plaintext SharedPrefs | **NOT COVERED** |
+| M10 | Insufficient Cryptography | HIGH -- zero encryption at rest | **NOT COVERED** |
+
+**Coverage gap summary:** M3, M6, M8, M9, M10 are the critical gaps. This milestone must address all five.
 
 ---
 
 ## Feature Landscape
 
-### Table Stakes (Non-Negotiable for Any Quality Android App)
+### Table Stakes (Non-Negotiable for Banking-Grade Document Security)
 
-These are what a reviewer, interviewer, or technical user expects to see. Missing these signals that the app is not release-ready.
+These are what any security-conscious user, enterprise reviewer, or app store security audit expects. Missing these signals the app is unsuitable for sensitive documents.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Test dependency setup** (TEST-01) | No tests can exist without the testing scaffold. All other test tasks depend on this. | LOW | Add: MockK, kotlinx-coroutines-test, Robolectric, AndroidX Arch Core testing (InstantTaskExecutorRule), FragmentScenario, Espresso Contrib/Intents. The existing JUnit 4 + Espresso Core is bare minimum and insufficient. |
-| **ViewModel unit tests** (TEST-02) | ScannerViewModel is the core of the app — page CRUD, filter state, PDF naming, SavedStateHandle. Untested ViewModel = untested business logic. | MEDIUM | Requires MockK + kotlinx-coroutines-test + InstantTaskExecutorRule. Testable without Android device (pure JVM). Min 15 tests per PROJECT.md. |
-| **DocumentEntry JSON round-trip** (TEST-03) | DocumentEntry.toJson() + fromJson() is the persistence serialization. Any JSON regression silently corrupts user history. | LOW | Pure Kotlin/JVM test — no Android dependencies needed. Easiest test to write, high bug-catch value. |
-| **ImageProcessor filter tests** (TEST-04) | ImageProcessor creates Bitmaps — can only be tested with Robolectric (needs Android graphics stack). Output pixel verification catches silent regressions. | MEDIUM | Requires Robolectric. Tests run on JVM but with Android framework emulated. Min 8 tests. |
-| **DocumentHistoryRepository CRUD** (TEST-05) | SharedPreferences-backed repository — real persistence layer. getAllDocuments(), addDocument(), removeDocument(), clearHistory() must be verified. | MEDIUM | Requires Robolectric for Context + SharedPreferences. Robolectric provides in-memory SharedPreferences. Min 8 tests. |
-| **Android Lint configuration** (RELEASE-02) | Play Store reviewers and Android Studio both run Lint. `contentDescription` issues, accessibility violations, and hardcoded strings are Lint errors. The project already had 13 `contentDescription="@null"` and emoji in strings that Lint would flag. A lint.xml that promotes accessibility checks to errors is the standard approach. | LOW | Configure lint.xml with `abortOnError = true` in build.gradle.kts. Treat `ContentDescription`, `HardcodedText`, and `TouchTargetSizeCheck` as errors. |
-| **ProGuard/R8 rules for libraries** (RELEASE-03) | Current proguard-rules.pro only covers CameraX and CanHub. ML Kit and Navigation SafeArgs are both confirmed to break in release builds without explicit keep rules. The app targets minifyEnabled = true for release. | MEDIUM | ML Kit: `-keep class com.google.mlkit.** { *; }`. Navigation SafeArgs: `-keepnames class * implements androidx.navigation.NavArgs`. Coil and coroutines also need verification. |
-| **Backup rules configured** (RELEASE-06) | `android:allowBackup="true"` (current manifest) triggers a Lint warning and will back up private scan files, processed images, and cached PDFs — up to 25 MB limit. For a document scanner, private file paths backed up to Google and then restored to a different device path are broken on restore. | LOW | For Android 12+: add `dataExtractionRules` attribute pointing to `data_extraction_rules.xml`. Exclude `scans/`, `processed/`, `cache/` paths. Keep SharedPreferences (history metadata) included. For pre-12 compatibility also add `fullBackupContent` pointing to same exclusions. |
-| **FileProvider scope audit** (RELEASE-07) | Current file_paths.xml exposes `scans/`, `processed/`, `pdfs/`, and the entire cache directory. The cache-path with `path="/"` is overly broad — any file in cache is potentially shareable. | LOW | Tighten cache-path to only the subdirectories actually used for temp crop files. Document the rationale. |
-| **Camera uses-feature flag** (RELEASE-05) | `android:required="true"` (current manifest) blocks installation on devices without a camera — tablets, Chromebooks, foldables with no rear camera. The app has PDF viewer, history, and import features that work fine without a camera. | LOW | Change to `android:required="false"`. Add runtime camera availability check in CameraFragment before attempting to use CameraX. |
-| **Release APK E2E verification** (RELEASE-04) | Release builds with R8 + ProGuard behave differently than debug builds. Known failure modes: reflection-dependent code stripped (ML Kit, Navigation), class names obfuscated in error messages, resources stripped incorrectly. Must verify on a real device, not emulator. | MEDIUM | Requires host machine with Android Studio + connected device. Cannot run in WSL2 environment. Blocked until build environment is available. |
+| Feature | Why Expected | Complexity | OWASP | Dependencies |
+|---------|--------------|------------|-------|--------------|
+| **SEC-01: FLAG_SECURE on sensitive screens** | Screenshots of scanned IDs/medical docs can be shared maliciously. Every banking and medical app sets FLAG_SECURE. Recents screen also shows thumbnail of sensitive content without this flag. | LOW | M6, M9 | MainActivity.kt -- set on window. Must decide: all screens vs. only document-viewing screens. |
+| **SEC-02: Biometric/PIN app lock** | A lost unlocked phone exposes all scanned documents. BiometricPrompt with DEVICE_CREDENTIAL fallback is the standard approach. Banking apps, HIPAA-compliant scanners (EncryptScan), and password managers all require this. | HIGH | M3 | New: BiometricPrompt dependency (`androidx.biometric:biometric:1.1.0`). New: AppLockActivity or lock overlay in MainActivity. New: Lock state management in EncryptedSharedPreferences or DataStore. SettingsFragment needs toggle. |
+| **SEC-03: Production log stripping** | 49 `Log.*` calls across 9 source files. `Log.d(TAG, "Sharing PDF: ${document.name}, URI: $uri")` in HistoryFragment leaks file paths and document names to logcat. Any app with READ_LOGS (pre-Android 4.1) or ADB access can read these. | LOW | M8 | ProGuard rule: `-assumenosideeffects class android.util.Log { ... }` strips Log.d/Log.v/Log.i in release builds. Keep Log.w and Log.e for crash diagnostics. No code changes needed. |
+| **SEC-04: Network security configuration** | Although the app is offline-only, a network_security_config.xml that explicitly disables cleartext traffic is defense-in-depth. Prevents accidental HTTP if network features are added later. Also stops library dependencies from making cleartext requests. Android 9+ disables cleartext by default, but explicit config documents intent and covers API 24-28. | LOW | M5, M8 | New XML file: `res/xml/network_security_config.xml`. One line in AndroidManifest: `android:networkSecurityConfig="@xml/network_security_config"`. |
+| **SEC-05: Secure temp file handling** | Temp files in cacheDir (crop results, PDF compression intermediates) contain document images. Current cleanup is best-effort with 1-hour threshold. Temp files should be cleaned immediately after use and use randomized names to prevent prediction. | LOW | M9 | Audit PdfUtils.kt (pdf_compress_temp), CropImageActivity cache usage, PdfPageExtractor temp files. Ensure `finally` blocks delete temps. Use `File.createTempFile()` for randomized names. |
+| **SEC-06: Exported component audit** | Only MainActivity should be exported. CropImageActivity (CanHub) has no `android:exported` attribute -- Android 12+ defaults to `false` for activities without intent-filters, but explicit is better. FileProvider is correctly `exported="false"`. Verify no implicit exports. | LOW | M4, M8 | Manifest review. Add explicit `android:exported="false"` to CropImageActivity. Verify all components. |
+| **SEC-07: Intent data validation** | Navigation arguments (pdfPath, pdfName) pass file paths as strings via SafeArgs. PdfViewerFragment opens `File(args.pdfPath)` without validating the path is within app-private storage. A crafted navigation argument could theoretically point to any readable file. Import flows accept URIs from external apps without validating MIME types. | MEDIUM | M4 | Add path validation in PdfViewerFragment, PdfEditorFragment. Verify imported URIs resolve to expected content types. Validate all SafeArgs string parameters that become file paths. |
+| **SEC-08: SharedPreferences metadata protection** | `document_history` SharedPreferences stores JSON with document names, file paths, page counts, and timestamps in plaintext. On a rooted device, this reveals what documents exist and where they are stored. `pdf_scanner_prefs` stores theme/filter preferences (low sensitivity). | MEDIUM | M9, M10 | Migrate `document_history` prefs to encrypted storage. Options: (1) Tink with Android Keystore for direct encryption, (2) community fork `encryptedprefs` library for drop-in EncryptedSharedPreferences replacement, (3) DataStore with Tink encryption layer. `pdf_scanner_prefs` can remain plaintext (no sensitive data). |
 
-### Differentiators (Competitive Advantage for Portfolio Quality)
+### Differentiators (Competitive Advantage for Security-Focused Scanner)
 
-These are what separates a "it has some tests" portfolio app from a demonstrably well-engineered one.
+These separate a "has basic security" app from one that demonstrates banking-grade security posture. Valued by security-conscious users and enterprise deployment.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **PdfUtils instrumented tests** (TEST-06) | PdfUtils.mergePdfs(), splitPdf(), compressPdf() use PdfRenderer which requires actual Android SDK — cannot be Robolectric'd for real PDF rendering. Instrumented tests on device verify the core PDF manipulation pipeline. | HIGH | Requires an emulator or device. Need to bundle test PDF assets. Min 8 tests per PROJECT.md. Highest complexity of all test tasks because PdfRenderer is not fully emulated by Robolectric. |
-| **Fragment smoke tests** (TEST-07) | FragmentScenario with launchFragmentInContainer() — verify each of the 8 fragments inflates without crash, key views are present, and nothing NPEs on launch. Not deep UI testing — existence and visibility checks only. | MEDIUM | Requires FragmentScenario + Espresso. Catches layout inflation errors, missing string resources, and View Binding issues that only surface at runtime. Min 5 fragments covered. |
-| **Navigation flow test** (TEST-08) | Test the critical happy path: Camera launch -> capture -> Preview -> "Add Page" -> PagesFragment -> "Create PDF" -> PDF created. Uses TestNavHostController to verify navigation actions fire correctly. | HIGH | Most complex test — requires coordinating CameraX (usually mocked), navigation, and ViewModel state. TestNavHostController (Navigation 2.3+) is the official approach. |
-| **JaCoCo coverage reporting** (RELEASE-09) | Coverage reports make the quality claim concrete and visible on GitHub. 70% line coverage for `util/` (ImageProcessor, PdfUtils, PdfPageExtractor) and 50% for `viewmodel/` are the PROJECT.md targets. | MEDIUM | Add `testCoverageEnabled = true` to debug buildType. Configure JaCoCo task in build.gradle.kts. Coverage enforcement can be a soft gate (report only) to avoid blocking builds on legitimate uncoverable code. |
-| **LeakCanary in debug builds** (RELEASE-08) | Memory leak detection during manual testing. ActivityLeakWatcher and FragmentAndViewModelWatcher auto-detect retained instances. Zero retained Activity/Fragment leaks is the bar. | LOW | Add `debugImplementation("com.squareup.leakcanary:leakcanary-android:...")`. No code changes needed — LeakCanary installs itself via ContentProvider. Does NOT appear in release builds. |
-| **Detekt static analysis** (RELEASE-01) | Detekt catches Kotlin-specific code smells: complex functions, magic numbers, unused variables, naming violations. With `detekt-formatting` plugin, also enforces consistent code style. Baseline file captures existing violations so only new code is gated. | MEDIUM | Add detekt Gradle plugin. Generate baseline.xml so existing issues don't block initial setup. Run as part of CI or pre-commit check. Zero NEW blocking errors is the target. |
+| Feature | Value Proposition | Complexity | OWASP | Dependencies |
+|---------|-------------------|------------|-------|--------------|
+| **SEC-09: File encryption at rest** | App-private storage is only protected by Linux filesystem permissions. On rooted devices or via ADB backup, document images and PDFs are fully readable. Encryption at rest with AES-256-GCM using Android Keystore-backed keys makes files unreadable even with physical device access. | HIGH | M9, M10 | Google Tink library (`com.google.crypto.tink:tink-android:1.15.0`) for Streaming AEAD encryption. All file read/write paths in the app must be wrapped with encrypt/decrypt streams. Impacts: CameraFragment (save), ImageProcessor (filter output), PdfUtils (PDF generation), PdfViewerFragment (read), sharing flow (decrypt-to-temp for FileProvider). Existing files need migration path. |
+| **SEC-10: Secure file deletion (overwrite before delete)** | Standard `File.delete()` only removes the filesystem reference. Data remains on flash storage until overwritten. For documents containing SSNs, medical info, or legal contracts, recoverable deletion is a liability. | MEDIUM | M6, M9 | Utility function that overwrites file content with random bytes before deletion. Must handle: document deletion (HistoryFragment), temp file cleanup (MainActivity), page removal (PagesFragment). Note: Flash storage wear-leveling means overwrite is not 100% guaranteed on modern NAND, but it defeats casual forensics and is the standard mobile approach. |
+| **SEC-11: Clipboard protection** | Document names and text from OCR results could be copied to clipboard, where other apps can read it. Android 12+ shows a toast when clipboard is accessed. Android 13+ auto-clears clipboard after 1 hour. Marking clipboard content as sensitive prevents keyboard preview. | LOW | M6 | Use `ClipDescription.EXTRA_IS_SENSITIVE` flag when placing text on clipboard. For views containing document content, consider disabling long-press copy where appropriate. Minimal code change. |
+| **SEC-12: Accessibility data protection** | Accessibility services can read all on-screen text. Malicious accessibility apps can extract document names, file sizes, and metadata from the history list. Android's `accessibilityDataSensitive` attribute (API 34+) blocks untrusted accessibility services from reading view content. | LOW | M6 | Add `android:accessibilityDataSensitive="auto"` to sensitive views in layouts (document names, file paths, page counts). Gracefully degrades on older APIs. |
+| **SEC-13: Auto-lock on background** | If app is backgrounded (user switches to another app), it should re-require authentication after a configurable timeout. Without this, an app lock is trivially bypassed by anyone who picks up a phone with the app already open in recents. | MEDIUM | M3 | Requires: lifecycle observer on Application or ProcessLifecycleOwner to detect app going to background. Timer-based re-lock (configurable: immediate, 30s, 1min, 5min). State persistence for lock timestamp. Depends on SEC-02 (app lock). |
+| **SEC-14: Debug/root detection** | On rooted devices, app-private files are accessible to any app with root. Debug builds with `isDebuggable = true` allow ADB data extraction. Detecting these conditions and warning the user (not blocking -- that causes false positives) is a security signal. | MEDIUM | M7 | Check `Build.TAGS.contains("test-keys")`, check for su binary, check `Settings.Secure.ADB_ENABLED`. Show one-time warning dialog, not a hard block. Store dismissal in prefs. No external dependency needed. |
 
 ### Anti-Features (Commonly Pursued, Wrong for This Scope)
 
-Features that seem like good testing practice but are wrong for this project's constraints and goals.
+Features that seem like good security practice but are wrong for this project's constraints and goals.
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| **Screenshot regression tests (Roborazzi/Paparazzi)** | Visual regressions are hard to catch manually; screenshot tests automate this. | Explicitly out of scope in PROJECT.md. Tooling confidence is LOW — Paparazzi has known issues with Compose, and Roborazzi requires a specific test runner setup. Flakiness risk is high with the mascot/cartoon theme that involves custom drawing. Both require significant ongoing maintenance for golden images. | Manual dark mode verification in Phase 5 real-device E2E test covers the visual regression concern adequately for v1.1. |
-| **JUnit 5 (Jupiter)** | JUnit 5 is the modern standard with better test APIs and nested test support. | Android's integration with JUnit 5 is non-trivial — requires an additional Gradle plugin (`de.mannodermaus.android-junit5`) and does not work with Robolectric without extra configuration. JUnit 4 with MockK is idiomatic for this project. No benefit justifies the migration cost. | JUnit 4 + MockK covers all needed patterns. |
-| **Mockito instead of MockK** | Mockito is the industry-dominant mocking library. | Mockito-Kotlin has rough edges with Kotlin `suspend` functions, default arguments, and extension functions. MockK is Kotlin-native and handles coroutines, `object` mocking, and top-level functions correctly. | MockK throughout. |
-| **100% test coverage enforcement** | High coverage = high quality signal. | JaCoCo with strict coverage enforcement on an Android project blocks builds on legitimate uncoverable code (generated View Binding classes, Parcelable implementations, Android lifecycle methods). The 70%/50% targets in PROJECT.md are appropriate thresholds; strict enforcement should be report-only, not build-breaking. | Enforce with reporting, not build failure. Fail only if coverage drops significantly below threshold. |
-| **UI Automator cross-process tests** | Testing the share flow requires leaving the app process to verify system share sheet. | UI Automator tests are brittle across Android versions and OEM shells. The share intent can be verified with Espresso Intents (`intending(hasAction(Intent.ACTION_SEND))`). Full cross-process testing is disproportionate for a portfolio app. | Espresso Intents for intent verification; skip full cross-process UI Automator tests. |
-| **Turbine for Flow testing** | Turbine provides clean Flow emission assertions. | The app uses LiveData exclusively, not Flow. There is no Flow to test in the current codebase. Adding Turbine adds a dependency that tests nothing until a Flow migration happens. | `InstantTaskExecutorRule` + direct LiveData value inspection is sufficient for all LiveData testing. |
+| Anti-Feature | Why Tempting | Why Problematic | What to Do Instead |
+|--------------|-------------|-----------------|-------------------|
+| **Full-disk encryption reliance** | "Android already encrypts the disk, so app-level encryption is redundant." | Android FDE/FBE only protects when the device is powered off. Once the user unlocks their phone, all app-private files are readable. FBE credential-encrypted storage requires the device to be locked, but app-private `filesDir` uses device-encrypted (DE) storage by default. App-level encryption is needed for at-rest protection while the phone is unlocked. | Implement SEC-09 (file encryption at rest) using Tink + Android Keystore. |
+| **Certificate pinning** | Prevents MITM attacks by pinning server certificates. | The app is offline-only with zero network calls. Certificate pinning adds complexity (pin rotation, backup pins, expiration) with zero security benefit. Even Google's 2025 guidance recommends against pinning for most use cases. | Skip entirely. SEC-04 (network security config) that disables cleartext is sufficient defense-in-depth. |
+| **Custom encryption implementation** | "Roll AES encryption directly for full control." | Custom crypto is the #1 cause of M10 (Insufficient Cryptography). Off-by-one in IV generation, ECB mode instead of GCM, key derivation mistakes -- all common in custom implementations. | Use Google Tink, which is maintained by Google Security engineers, battle-tested in Google Pay and Firebase, and handles key management, IV generation, and mode selection correctly. |
+| **Blocking rooted devices entirely** | Banks sometimes refuse to run on rooted devices. | False positives from custom ROMs, developer devices, and enterprise MDM solutions. Blocking users who chose to root their device is hostile UX for a document scanner (unlike banking where regulatory compliance mandates it). | SEC-14: Warn about root detection, do not block. Let the user make an informed decision. |
+| **DRM-style content protection** | Prevent any export/sharing of scanned documents. | The app's core value proposition includes sharing PDFs via email, messaging, and cloud storage. Restricting sharing defeats the purpose. Users need to get their documents out of the app. | FLAG_SECURE (SEC-01) prevents screenshots. The share flow itself is intentional user action and should not be restricted. |
+| **Biometric-only auth (no PIN fallback)** | "Biometric is more secure than PIN." | Not all devices have biometric hardware. Users with accessibility needs may not be able to use fingerprint/face recognition. Android BiometricPrompt with `DEVICE_CREDENTIAL` fallback is the correct approach -- it allows PIN/pattern/password as an alternative. | SEC-02: BiometricPrompt with `setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)`. |
+| **Per-document passwords** | Each PDF gets its own password, like password-protected PDFs. | Android's native PdfDocument API cannot create encrypted PDFs (requires iTextPDF or PDFBox, both out of scope per PROJECT.md). App-level encryption (SEC-09) protects all files uniformly. Per-document passwords add UX friction without meaningful security improvement over whole-app encryption. | SEC-02 (app lock) + SEC-09 (encryption at rest) provide uniform protection. Individual PDF passwords are a v2+ feature when a real PDF library is added. |
+| **Encrypted database (SQLCipher/Room)** | Encrypt the document history database. | The app uses SharedPreferences, not SQLite/Room. Adding Room + SQLCipher for 50 document entries is massive over-engineering. The migration effort and dependency overhead are disproportionate. | SEC-08: Encrypt SharedPreferences using Tink or the community `encryptedprefs` fork. Same protection, 1/10th the effort. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-[TEST-01: Test dependencies]
+[SEC-01: FLAG_SECURE]
+    (independent -- single line in MainActivity.onCreate())
+
+[SEC-02: Biometric/PIN app lock]
     |
-    +--requires--> [TEST-02: ScannerViewModel unit tests]
-    |                  (needs MockK + coroutines-test + InstantTaskExecutorRule)
+    +--enables--> [SEC-13: Auto-lock on background]
+    |                  (auto-lock is meaningless without app lock)
     |
-    +--requires--> [TEST-03: DocumentEntry JSON tests]
-    |                  (pure JVM, but logically grouped with test setup)
+    +--uses-----> [SEC-08: SharedPreferences encryption]
+                       (lock enabled/timeout stored in encrypted prefs)
+
+[SEC-03: Log stripping]
+    (independent -- ProGuard rule only, no code changes)
+
+[SEC-04: Network security config]
+    (independent -- XML + manifest attribute)
+
+[SEC-05: Secure temp file handling]
+    (independent -- code audit + finally blocks)
+
+[SEC-06: Exported component audit]
+    (independent -- manifest review)
+
+[SEC-07: Intent data validation]
+    (independent -- code changes in fragments)
+
+[SEC-08: SharedPreferences encryption]
     |
-    +--requires--> [TEST-04: ImageProcessor Robolectric tests]
-    |                  (needs Robolectric from TEST-01 deps)
+    +--required-by--> [SEC-02: App lock state storage]
+    +--required-by--> [SEC-09: Encryption key preference storage]
+
+[SEC-09: File encryption at rest]
     |
-    +--requires--> [TEST-05: DocumentHistoryRepository Robolectric tests]
-    |                  (needs Robolectric + Context from TEST-01 deps)
-    |
-    +--requires--> [TEST-07: Fragment smoke tests]
-    |                  (needs FragmentScenario from TEST-01 deps)
-    |
-    +--requires--> [TEST-08: Navigation flow test]
-                       (needs FragmentScenario + TestNavHostController)
+    +--requires--> [SEC-08: Encrypted prefs for key metadata]
+    +--impacts---> ALL file I/O paths (camera save, filter, PDF gen,
+                   PDF view, share, import, temp files)
+    +--requires--> Migration path for existing unencrypted files
 
-[TEST-06: PdfUtils instrumented tests]
-    (independent — needs device/emulator, not JVM)
+[SEC-10: Secure file deletion]
+    (independent -- utility function, called from delete paths)
 
-[RELEASE-01: Detekt]
-    (independent — static analysis, no test dependency)
+[SEC-11: Clipboard protection]
+    (independent -- flag on ClipData)
 
-[RELEASE-02: Lint config]
-    (independent — but reveals issues that tests should cover)
+[SEC-12: Accessibility data protection]
+    (independent -- layout XML attribute, API 34+)
 
-[RELEASE-03: ProGuard rules]
-    |
-    +--requires--> [RELEASE-04: Release E2E on real device]
-                       (ProGuard rules must be in place before E2E test is meaningful)
+[SEC-13: Auto-lock on background]
+    +--requires--> [SEC-02: App lock must exist first]
 
-[RELEASE-05: Camera uses-feature]
-    (independent — manifest change only)
-
-[RELEASE-06: Backup rules]
-    (independent — manifest + XML change only)
-
-[RELEASE-07: FileProvider scope]
-    (independent — XML change only)
-
-[RELEASE-08: LeakCanary]
-    (independent — debugImplementation only, no code changes)
-
-[RELEASE-09: JaCoCo coverage]
-    |
-    +--requires--> [TEST-02 through TEST-08]
-                       (coverage reports are meaningless without tests to measure)
+[SEC-14: Root/debug detection]
+    (independent -- utility check + dialog)
 ```
 
-### Dependency Notes
+### Critical Dependency Chain
 
-- **TEST-01 blocks everything:** No test can be written until the test dependencies are in build.gradle.kts. This is Day 1 of Phase 4.
-- **RELEASE-03 before RELEASE-04:** ProGuard rules must be complete before release build E2E testing — a broken release build wastes device testing time.
-- **RELEASE-04 is environment-blocked:** The WSL2 build environment cannot run `./gradlew assembleRelease` or connect to a physical device. This task requires the host machine with Android Studio. This is the single highest-risk task in the milestone.
-- **TEST-06 requires emulator or device:** PdfUtils tests cannot run on JVM via Robolectric because PdfRenderer needs actual hardware rendering context. This is the second-highest complexity task.
-- **RELEASE-09 (JaCoCo) is an output of tests, not an input:** Configure it during Phase 4 alongside the tests so coverage reports generate automatically.
+The most complex dependency is **SEC-09 (file encryption)**, which:
+1. Requires SEC-08 (encrypted prefs) to store encryption metadata
+2. Touches every file I/O path in the app (camera, filter, PDF, viewer, share)
+3. Requires a migration strategy for existing unencrypted files
+4. Must be done AFTER simpler security features are stable
+5. Is the single highest-risk feature in the milestone
+
+**Recommended build order:**
+1. Low-risk, independent features first (SEC-01, SEC-03, SEC-04, SEC-05, SEC-06)
+2. Input validation (SEC-07)
+3. SharedPreferences encryption (SEC-08) -- enables SEC-02
+4. App lock (SEC-02) + auto-lock (SEC-13)
+5. File encryption at rest (SEC-09) -- highest risk, do last
+6. Polish features (SEC-10, SEC-11, SEC-12, SEC-14)
 
 ---
 
-## MVP Definition
+## MVP Recommendation
 
-### Phase 4: Test Coverage (Launch With)
+### Must-Have (Ship-Blocking for Security Milestone)
 
-The minimum viable test suite — demonstrates engineering discipline, catches the highest-value bugs.
+These features must be completed for the security milestone to be considered successful. Without them, the app cannot claim to be suitable for sensitive documents.
 
-- [x] TEST-01: Test dependencies configured in build.gradle.kts
-- [x] TEST-02: ScannerViewModel unit tests (page CRUD, filter state, SavedStateHandle, PDF naming) — min 15 tests
-- [x] TEST-03: DocumentEntry JSON round-trip (toJson + fromJson) — min 6 tests
-- [x] TEST-04: ImageProcessor filter tests via Robolectric — min 8 tests
-- [x] TEST-05: DocumentHistoryRepository CRUD via Robolectric — min 8 tests
-- [x] RELEASE-09: JaCoCo configured and reporting (report-only, no hard gate)
+1. **SEC-01: FLAG_SECURE** -- Prevents screenshots of sensitive documents. Lowest effort, highest immediate impact.
+2. **SEC-02: Biometric/PIN app lock** -- Prevents unauthorized access when phone is unlocked. Table stakes for any document app handling IDs/medical/legal.
+3. **SEC-03: Production log stripping** -- Prevents information leakage via logcat. One ProGuard rule.
+4. **SEC-04: Network security config** -- Defense-in-depth, explicit security posture. One XML file.
+5. **SEC-05: Secure temp file handling** -- Prevents temp files from accumulating sensitive data. Code audit scope.
+6. **SEC-06: Exported component audit** -- Closes potential attack surface. Manifest-only change.
+7. **SEC-07: Intent data validation** -- Prevents path traversal and malformed input. Code changes in 2-3 fragments.
+8. **SEC-08: SharedPreferences encryption** -- Protects document metadata (names, paths, timestamps). Required for SEC-02 state storage.
+9. **SEC-13: Auto-lock on background** -- Makes app lock meaningful (prevents bypass via recents).
 
-### Phase 4: Stretch (Add If Tests Are Running Cleanly)
+### Should-Have (Complete if Time Allows)
 
-- [ ] TEST-07: Fragment smoke tests (5 fragments minimum)
-- [ ] TEST-08: Navigation flow test (Camera -> Preview -> Pages -> PDF)
+10. **SEC-09: File encryption at rest** -- The gold standard for data protection. HIGH complexity due to touching all I/O paths. May require its own focused phase.
+11. **SEC-10: Secure file deletion** -- Overwrite before delete. Medium effort, meaningful for forensics defense.
+12. **SEC-11: Clipboard protection** -- Low effort, covers an edge case.
+13. **SEC-12: Accessibility data protection** -- Low effort, API 34+ only.
 
-### Phase 5: Release Readiness (All Non-Negotiable)
+### Defer to Future Milestone
 
-- [x] RELEASE-01: Detekt with baseline — zero new blocking errors
-- [x] RELEASE-02: lint.xml with accessibility errors promoted to errors
-- [x] RELEASE-03: ProGuard/R8 rules for ML Kit, NavSafeArgs, Coil
-- [x] RELEASE-04: Release APK E2E on real device (requires host machine)
-- [x] RELEASE-05: Camera `uses-feature required="false"` in manifest
-- [x] RELEASE-06: dataExtractionRules + fullBackupContent excluding private files
-- [x] RELEASE-07: FileProvider scope tightened to actual needed paths
-- [x] RELEASE-08: LeakCanary added as debugImplementation
+14. **SEC-14: Root/debug detection** -- Warning-only, low urgency. Nice for enterprise but not user-blocking.
 
-### Future Consideration (v2+)
+---
 
-- [ ] TEST-06: PdfUtils instrumented tests — HIGH complexity, needs emulator setup. Can be added in v1.1 if emulator is available, but deferred if environment setup takes time.
-- [ ] Screenshot regression tests — OUT OF SCOPE per PROJECT.md. Revisit in v2.
-- [ ] CI/CD pipeline with automatic test runs — not in v1.1 scope.
-- [ ] JaCoCo hard enforcement gate — add only after coverage is established and stable.
+## Complexity Budget
+
+| Feature | Lines of Code (est.) | New Dependencies | Files Modified | Risk |
+|---------|---------------------|-----------------|----------------|------|
+| SEC-01 | ~5 | None | 1 (MainActivity) | LOW |
+| SEC-02 | ~300-400 | `androidx.biometric:biometric:1.1.0` | 4-6 new + 2 existing | HIGH |
+| SEC-03 | ~5 | None | 1 (proguard-rules.pro) | LOW |
+| SEC-04 | ~15 | None | 2 (new XML + manifest) | LOW |
+| SEC-05 | ~40-60 | None | 3-4 (PdfUtils, MainActivity, PdfPageExtractor) | LOW |
+| SEC-06 | ~3 | None | 1 (AndroidManifest.xml) | LOW |
+| SEC-07 | ~50-80 | None | 3-4 (PdfViewerFragment, PdfEditorFragment, HomeFragment) | MEDIUM |
+| SEC-08 | ~100-150 | Tink or `encryptedprefs` | 2-3 (DocumentHistory, new EncryptedPrefs wrapper) | MEDIUM |
+| SEC-09 | ~400-600 | `com.google.crypto.tink:tink-android` | 8-12 (every file I/O path) | HIGH |
+| SEC-10 | ~30-50 | None | 3-4 (new utility + delete call sites) | LOW |
+| SEC-11 | ~10-15 | None | 1-2 (clipboard usage sites) | LOW |
+| SEC-12 | ~10-20 | None | 3-4 (layout XMLs) | LOW |
+| SEC-13 | ~100-150 | None | 2-3 (new lifecycle observer + lock check) | MEDIUM |
+| SEC-14 | ~60-80 | None | 2-3 (new utility + dialog) | LOW |
+
+**Total estimate:** ~1,150-1,650 new lines of Kotlin + ~30 lines of XML configuration
+
+---
+
+## Implementation Notes for Key Features
+
+### SEC-01: FLAG_SECURE
+
+```kotlin
+// In MainActivity.onCreate(), BEFORE setContentView()
+window.setFlags(
+    WindowManager.LayoutParams.FLAG_SECURE,
+    WindowManager.LayoutParams.FLAG_SECURE
+)
+```
+
+Decision point: Apply globally (all screens including settings/home) or conditionally (only when viewing documents). Recommendation: **apply globally**. The home screen shows recent document thumbnails and names, which are sensitive. The overhead of conditional FLAG_SECURE (toggling per-fragment) is not worth the complexity.
+
+Consider making this a user-configurable setting in SettingsFragment for users who want to take screenshots of their own documents.
+
+### SEC-02: Biometric App Lock
+
+Use `androidx.biometric:biometric:1.1.0` (stable, Kotlin 1.9 compatible).
+
+```kotlin
+val promptInfo = BiometricPrompt.PromptInfo.Builder()
+    .setTitle("Unlock PDF Scanner")
+    .setSubtitle("Authenticate to access your documents")
+    .setAllowedAuthenticators(
+        BiometricManager.Authenticators.BIOMETRIC_STRONG
+        or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+    )
+    .build()
+```
+
+Architecture: Lock check in `MainActivity.onResume()`. If locked, show full-screen lock overlay that consumes all touch events. On successful auth, remove overlay. Store lock-enabled state and timeout in encrypted prefs (SEC-08).
+
+### SEC-03: ProGuard Log Stripping
+
+```proguard
+# Strip verbose, debug, and info logs in release builds
+# Keep warn and error for crash diagnostics
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}
+```
+
+Note: This strips the method calls but not necessarily the string arguments. For maximum security, also avoid string concatenation in log calls (use lambdas or guard with `if (BuildConfig.DEBUG)`).
+
+### SEC-08: SharedPreferences Encryption
+
+The official `androidx.security:security-crypto` library was deprecated in April 2025. Options:
+
+1. **Google Tink directly** (RECOMMENDED): Use Tink's AEAD primitive with Android Keystore to encrypt/decrypt the JSON string before storing in regular SharedPreferences. Most control, most future-proof.
+2. **Community fork `encryptedprefs`** by Ed Holloway-George: Drop-in EncryptedSharedPreferences replacement. Less maintenance certainty.
+3. **DataStore + Tink**: Modern approach but requires migrating from SharedPreferences API. Higher effort for this scope.
+
+Recommendation: **Tink directly** wrapping the existing SharedPreferences. The `document_history` prefs store a single JSON string -- encrypting that one value with Tink AEAD is straightforward.
+
+### SEC-09: File Encryption at Rest
+
+Use Tink's Streaming AEAD for large files (scanned images, PDFs):
+
+```kotlin
+// Encrypt
+val streamingAead = keysetHandle.getPrimitive(StreamingAead::class.java)
+val ciphertextStream = streamingAead.newEncryptingStream(
+    FileOutputStream(encryptedFile), associatedData
+)
+// Write bitmap/PDF data to ciphertextStream
+
+// Decrypt
+val plaintextStream = streamingAead.newDecryptingStream(
+    FileInputStream(encryptedFile), associatedData
+)
+// Read bitmap/PDF data from plaintextStream
+```
+
+Critical implementation concerns:
+- **Migration**: Existing unencrypted files must be encrypted on first app launch after update. Show progress indicator during migration.
+- **Sharing**: When sharing via FileProvider, decrypt to a temp file, share, then securely delete the temp. The temp file exists only during the share flow.
+- **Performance**: Streaming AEAD processes in chunks. No full-file buffering needed. Overhead is ~5-10% for large files.
+- **Key management**: Use Android Keystore master key. Key is hardware-backed on devices with StrongBox/TEE.
+- **Error handling**: If Keystore is wiped (factory reset, secure boot change), encrypted files become unrecoverable. Need graceful error handling.
+
+---
+
+## OWASP Coverage After Implementation
+
+| OWASP 2024 | Before | After (all features) | Covering Features |
+|------------|--------|---------------------|-------------------|
+| M1 | N/A | N/A | No backend auth needed |
+| M2 | Partial | Partial | R8 obfuscation (existing) |
+| M3 | NOT COVERED | COVERED | SEC-02 (app lock), SEC-13 (auto-lock) |
+| M4 | Partial | COVERED | SEC-07 (intent validation), SEC-06 (export audit) |
+| M5 | Partial | COVERED | SEC-04 (network security config) |
+| M6 | NOT COVERED | COVERED | SEC-01 (FLAG_SECURE), SEC-10 (secure delete), SEC-11 (clipboard), SEC-12 (accessibility) |
+| M7 | Partial | Partial+ | SEC-14 (root detection), existing R8 |
+| M8 | NOT COVERED | COVERED | SEC-03 (log stripping), SEC-04 (network config), SEC-06 (component audit) |
+| M9 | NOT COVERED | COVERED | SEC-05 (temp files), SEC-08 (encrypted prefs), SEC-09 (file encryption) |
+| M10 | NOT COVERED | COVERED | SEC-08 (Tink for prefs), SEC-09 (Tink for files) |
+
+**Result**: 5 critical gaps (M3, M6, M8, M9, M10) fully closed. M7 improved but not fully addressed (full binary protection requires additional obfuscation tools beyond R8, which is out of scope).
 
 ---
 
 ## Feature Prioritization Matrix
 
-| Feature | Portfolio/Reviewer Value | Implementation Cost | Priority |
-|---------|--------------------------|---------------------|----------|
-| TEST-01: Test dependencies | HIGH (enables everything) | LOW | P1 |
-| TEST-02: ViewModel unit tests | HIGH (business logic) | MEDIUM | P1 |
-| TEST-03: JSON round-trip | MEDIUM (data integrity) | LOW | P1 |
-| TEST-04: ImageProcessor filter tests | MEDIUM (core algorithm) | MEDIUM | P1 |
-| TEST-05: Repository CRUD | MEDIUM (data persistence) | MEDIUM | P1 |
-| RELEASE-02: Lint config | HIGH (blocks store submission) | LOW | P1 |
-| RELEASE-03: ProGuard rules | HIGH (release builds break without) | MEDIUM | P1 |
-| RELEASE-05: Camera uses-feature | HIGH (device reach) | LOW | P1 |
-| RELEASE-06: Backup rules | HIGH (data security) | LOW | P1 |
-| RELEASE-07: FileProvider scope | MEDIUM (security hygiene) | LOW | P1 |
-| RELEASE-08: LeakCanary | HIGH (portfolio signal) | LOW | P1 |
-| RELEASE-04: E2E release build | HIGH (non-negotiable before publish) | MEDIUM | P1 (env-blocked) |
-| RELEASE-01: Detekt | MEDIUM (code quality) | MEDIUM | P2 |
-| RELEASE-09: JaCoCo coverage | MEDIUM (metrics) | MEDIUM | P2 |
-| TEST-07: Fragment smoke tests | MEDIUM (UI sanity) | MEDIUM | P2 |
-| TEST-08: Navigation flow test | MEDIUM (happy path) | HIGH | P2 |
-| TEST-06: PdfUtils instrumented | MEDIUM (PDF core) | HIGH | P3 |
+| Feature | Security Impact | Implementation Cost | Priority |
+|---------|----------------|---------------------|----------|
+| SEC-01: FLAG_SECURE | HIGH | LOW | **P0** |
+| SEC-03: Log stripping | HIGH | LOW | **P0** |
+| SEC-04: Network security config | MEDIUM | LOW | **P0** |
+| SEC-06: Exported component audit | MEDIUM | LOW | **P0** |
+| SEC-05: Secure temp files | MEDIUM | LOW | **P1** |
+| SEC-07: Intent validation | HIGH | MEDIUM | **P1** |
+| SEC-08: Encrypted SharedPrefs | HIGH | MEDIUM | **P1** |
+| SEC-02: App lock (biometric/PIN) | HIGH | HIGH | **P1** |
+| SEC-13: Auto-lock on background | HIGH | MEDIUM | **P1** |
+| SEC-11: Clipboard protection | LOW | LOW | **P2** |
+| SEC-12: Accessibility protection | LOW | LOW | **P2** |
+| SEC-10: Secure file deletion | MEDIUM | MEDIUM | **P2** |
+| SEC-09: File encryption at rest | CRITICAL | HIGH | **P2** |
+| SEC-14: Root/debug detection | LOW | MEDIUM | **P3** |
 
 **Priority key:**
-- P1: Non-negotiable for v1.1 milestone
-- P2: Should complete in v1.1, can slip to early v1.2 if blocked
-- P3: Deferred — environment constraints or effort-to-value ratio
-
----
-
-## Play Store Reality vs. Idealism
-
-### What Play Store Actually Requires
-
-Play Store does NOT check for test coverage, Lint scores, or Detekt output. The actual enforced requirements as of 2026-03:
-
-1. **Target API level**: Must target Android 14 (API 34) or higher. Current targetSdk = 34. Already compliant.
-2. **New personal developer accounts**: 14 days of closed testing with 12+ testers before production access. Applies if account was created after November 2023.
-3. **AAB format**: Google Play requires Android App Bundle (.aab), not APK. The `./gradlew bundleRelease` task generates this. No configuration change needed.
-4. **64-bit support**: Required. Kotlin/Gradle handles this automatically for modern targets.
-5. **Privacy policy**: Required if app requests dangerous permissions (CAMERA). A hosted privacy policy URL must be provided in Play Console.
-
-### What Play Store Indirectly Enforces via Policy
-
-- **Crash rate**: Google Play Console "vitals" flags apps with crash rates above 1.09% (bad behavior threshold). LeakCanary helps catch crashes before release.
-- **ANR rate**: Flagged above 0.47%. Ensuring PDF operations happen on Dispatchers.IO (already done in v1.0) is the mitigation.
-- **Accessibility**: Not strictly enforced at submission, but Lint errors for accessibility (missing content descriptions, small touch targets) indicate real user issues.
-
-### What Is Portfolio-Required But Not Store-Required
-
-Everything in the table stakes and differentiators sections above beyond the Play Store requirements is a **portfolio quality signal** — what a technical interviewer or code reviewer expects to see in a well-engineered app. The test suite, Detekt, JaCoCo, and release build verification are for demonstrating engineering discipline, not for passing automated Play Store checks.
-
----
-
-## Non-Negotiable vs. Nice-to-Have Summary
-
-### Absolutely Non-Negotiable (Cannot Ship Without)
-
-| Task | Reason |
-|------|--------|
-| TEST-01 | All other tests depend on it |
-| TEST-02 | ScannerViewModel is untested business logic |
-| TEST-03 | Silent JSON regression = user data corruption |
-| RELEASE-03 | ML Kit and NavSafeArgs break in release without keep rules |
-| RELEASE-04 | Unverified release build = unknown quantity |
-| RELEASE-05 | Tablet/Chromebook users blocked without this manifest change |
-| RELEASE-06 | Private scan files backed up to Google = security issue |
-| RELEASE-07 | Overly broad FileProvider = potential file exfiltration |
-
-### High Value, Low Effort (Do These First After Blockers)
-
-| Task | Reason |
-|------|--------|
-| TEST-03 | Easiest test to write, catches real serialization bugs |
-| RELEASE-08 | Zero code changes — just a dependency addition |
-| RELEASE-05 | One line in AndroidManifest.xml |
-| RELEASE-02 | lint.xml + one build.gradle.kts line |
-
-### High Value, Medium Effort (Core of Phase 4)
-
-| Task | Reason |
-|------|--------|
-| TEST-02 | The payoff test — 15 ViewModel tests covering all public methods |
-| TEST-04 | Robolectric setup pays off for TEST-05 too |
-| TEST-05 | Repository is production persistence — must be verified |
-| RELEASE-03 | Known-broken libraries without it |
-| RELEASE-09 | Configure alongside tests; no extra setup if tests exist |
-
-### Deferrable Without Shame (Scope Management)
-
-| Task | Reason to Defer |
-|------|-----------------|
-| TEST-06 | HIGH complexity (needs device/emulator), environment uncertainty |
-| TEST-07 | Medium effort, can add during Phase 5 if Phase 4 ahead of schedule |
-| TEST-08 | HIGH complexity (camera mock + nav coordination) |
-| RELEASE-01 | Detekt is useful but not a blocker; baseline approach means low risk |
+- **P0**: Zero-effort, high-impact. Do first, in a single plan.
+- **P1**: Core security features. The heart of the milestone.
+- **P2**: Hardening polish. Complete if schedule allows; SEC-09 may warrant its own phase.
+- **P3**: Nice-to-have. Defer if timeline is tight.
 
 ---
 
 ## Sources
 
-- **Android Developers: Local Unit Tests** — HIGH confidence. Current official guidance on JVM vs. instrumented test split, Robolectric recommendation.
-  URL: https://developer.android.com/training/testing/local-tests
-- **Android Developers: Test Navigation** — HIGH confidence. Official guidance on TestNavHostController for Fragment navigation testing.
-  URL: https://developer.android.com/guide/navigation/testing
-- **Android Developers: Auto Backup** — HIGH confidence. dataExtractionRules for Android 12+, fullBackupContent for pre-12.
-  URL: https://developer.android.com/identity/data/autobackup
-- **Android Developers: Lint** — HIGH confidence. lint.xml configuration, severity levels, abortOnError.
-  URL: https://developer.android.com/studio/write/lint
-- **Google Play: Target API requirements** — HIGH confidence. API 34 requirement confirmed for 2025+.
-  URL: https://support.google.com/googleplay/android-developer/answer/11926878
-- **Google Play: New personal developer accounts** — HIGH confidence. 12-tester closed testing requirement.
-  URL: https://support.google.com/googleplay/android-developer/answer/14151465
-- **Droidsonroids: ProGuard rules for Navigation SafeArgs** — MEDIUM confidence. Specific keep rule for NavArgs.
-  URL: https://www.thedroidsonroids.com/blog/how-to-generate-proguard-r8-rules-for-navigation-component-arguments
-- **Android Developers Blog: R8 Keep Rules** — HIGH confidence. Official guidance on keep rule configuration.
-  URL: https://android-developers.googleblog.com/2025/11/configure-and-troubleshoot-r8-keep-rules.html
-- **Detekt project** — HIGH confidence. Official docs for setup, baseline generation.
-  URL: https://detekt.dev/
-- **Direct codebase inspection** — HIGH confidence. Manifest, build.gradle.kts, proguard-rules.pro, file_paths.xml, ScannerViewModel.kt, DocumentHistory.kt, ImageProcessor.kt, PdfUtils.kt all read directly.
+### Official Documentation (HIGH confidence)
+- Android Developers: FLAG_SECURE -- https://developer.android.com/security/fraud-prevention/activities
+- Android Developers: Network Security Configuration -- https://developer.android.com/privacy-and-security/security-config
+- Android Developers: Secure Clipboard Handling -- https://developer.android.com/privacy-and-security/risks/secure-clipboard-handling
+- Android Developers: Log Info Disclosure -- https://developer.android.com/privacy-and-security/risks/log-info-disclosure
+- Android Developers: Secure User Authentication (BiometricPrompt) -- https://developer.android.com/security/fraud-prevention/authentication
+- Android Developers: Deep Link Security -- https://developer.android.com/privacy-and-security/risks/unsafe-use-of-deeplinks
+- Android Developers: Cryptography -- https://developer.android.com/privacy-and-security/cryptography
+- Google Developers: Tink Encryption -- https://developers.google.com/tink/encrypt-data
+- OWASP Mobile Top 10 2024 -- https://owasp.org/www-project-mobile-top-10/
+
+### Library Documentation (HIGH confidence)
+- AndroidX Security Crypto (deprecated notice) -- https://developer.android.com/jetpack/androidx/releases/security
+- EncryptedSharedPreferences API Reference -- https://developer.android.com/reference/androidx/security/crypto/EncryptedSharedPreferences
+- Community fork: encrypted-shared-preferences -- https://github.com/ed-george/encrypted-shared-preferences
+
+### Industry Analysis (MEDIUM confidence)
+- ProGuard Log Stripping (droidcon 2025) -- https://www.droidcon.com/2025/04/01/efficient-logging-in-kotlin-with-proguard-optimization/
+- OWASP MASTG: Remove Logging Code -- https://mas.owasp.org/MASTG/best-practices/MASTG-BEST-0002/
+- Secure Mobile Biometric Auth Best Practices -- https://blog.ostorlab.co/secure-mobile-biometric-authentication.html
+- EncryptedSharedPreferences Migration Guide 2026 -- https://www.droidcon.com/2025/12/16/goodbye-encryptedsharedpreferences-a-2026-migration-guide/
+- Android Intent Security Best Practices -- https://securecodingpractices.com/android-intent-security-best-practices-filters-permissions-validation/
+- Android Clipboard Content Protection (Microsoft) -- https://www.microsoft.com/en-us/security/blog/2023/03/06/protecting-android-clipboard-content-from-unintended-exposure/
+- NowSecure: Secure Deletion Best Practices -- https://books.nowsecure.com/secure-mobile-development/en/coding-practices/understand-secure-deletion-of-data.html
+- HIPAA-Compliant Document Scanning (EncryptScan) -- https://encryptscan.com/
+- Android Security Enhancements 2025 (Google Blog) -- https://android-developers.googleblog.com/2025/12/enhancing-android-security-stop-malware.html
+
+### Codebase Inspection (HIGH confidence)
+- Direct inspection of: AndroidManifest.xml, MainActivity.kt, DocumentHistory.kt, AppPreferences.kt, PdfUtils.kt, ScannerViewModel.kt, PdfViewerFragment.kt, SettingsFragment.kt, HomeFragment.kt, CameraFragment.kt, HistoryFragment.kt, proguard-rules.pro, file_paths.xml, data_extraction_rules.xml, backup_rules.xml, build.gradle.kts
+- Log call count: 49 calls across 9 files (grep verified)
+- Exported components: 1 exported (MainActivity), 1 implicit (CropImageActivity), 1 non-exported (FileProvider)
+- Encryption status: Zero encryption at rest confirmed
+- FLAG_SECURE: Not present anywhere in codebase
 
 ---
 
-*Feature research for: Android Document Scanner v1.1 — Testing & Release Readiness*
-*Researched: 2026-03-01*
+*Feature research for: Android Document Scanner v1.2 -- Security Hardening*
+*Researched: 2026-03-03*

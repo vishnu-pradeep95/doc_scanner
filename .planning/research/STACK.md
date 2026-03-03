@@ -1,349 +1,484 @@
-# Technology Stack: Testing & Release Readiness
+# Technology Stack: Security Hardening Additions
 
-**Project:** PDF Scanner — v1.1 Testing & Release Pass
-**Domain:** Android testing infrastructure + static analysis + release tooling
-**Researched:** 2026-03-01
-**Confidence:** HIGH (versions web-verified March 2026)
+**Project:** PDF Scanner -- Security Hardening (v1.2)
+**Domain:** Android security hardening for high-sensitivity document handling
+**Researched:** 2026-03-03
+**Confidence:** HIGH (versions verified via official docs and Maven Central, March 2026)
 
 ## Scope
 
-This file covers ONLY the new v1.1 additions: testing dependencies, static analysis, and release tooling.
-The existing validated stack (CameraX 1.3.1, Coil 2.7.0, ML Kit, Navigation 2.7.x, Material 3, Kotlin 1.9.21,
-coroutines 1.7.3, MVVM/LiveData) is out of scope — do not re-research those.
+This file covers ONLY the new v1.2 security hardening additions: encryption at rest, screenshot protection, secure logging, dependency vulnerability scanning, network security, clipboard hardening, and tapjacking protection.
 
-## Current State
+The existing validated stack (Kotlin 1.9.21, CameraX 1.3.1, Coil 2.7.0, ML Kit, Navigation 2.7.x, Material 3, coroutines 1.7.3, MVVM/LiveData, MockK 1.14.7, Robolectric 4.16, Espresso 3.7.0, JaCoCo, Detekt 1.23.8, LeakCanary 2.14) is out of scope -- do not re-research those.
 
-Zero tests. Minimal boilerplate in `app/build.gradle.kts`:
+## Current Security Posture
 
-```kotlin
-// Existing (insufficient — update these)
-testImplementation("junit:junit:4.13.2")
-androidTestImplementation("androidx.test.ext:junit:1.1.5")          // outdated
-androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")  // outdated
-```
+What the app already has (from v1.0/v1.1):
 
-The app uses LiveData + ViewModel + Coroutines with NO dependency injection framework. ViewModels must be
-constructed manually in tests; no Hilt/Dagger setup required.
+- App-private storage in `filesDir` (scans/, processed/, pdfs/) -- no storage permissions needed
+- FileProvider with tightened `cache-path` (path="." not path="/")
+- `dataExtractionRules` and `fullBackupContent` excluding document directories
+- R8 minification + resource shrinking enabled for release builds
+- ProGuard/R8 keep rules for ML Kit, GMS, SafeArgs
+- `android:debuggable="false"` in release (AGP default)
 
----
+What the app is missing (v1.2 targets):
 
-## Recommended Stack
-
-### Unit Testing (src/test/ — testImplementation)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| JUnit 4 | 4.13.2 | Test framework | Already present. JUnit 5 requires `android-junit5` plugin with known friction in AndroidX Test. Keep JUnit 4. |
-| MockK | 1.14.7 | Kotlin-first mocking | Handles `suspend fun`, final classes (Kotlin default), sealed classes, coroutines natively. Mockito cannot mock final classes without extra config. |
-| kotlinx-coroutines-test | 1.7.3 | Coroutine test dispatchers | **MUST match app's coroutines version (1.7.3)**. Provides `runTest`, `TestCoroutineDispatcher`, `advanceUntilIdle`. Mismatched versions cause `NoSuchMethodError` at runtime. |
-| androidx.arch.core:core-testing | 2.2.0 | LiveData sync in JVM tests | Provides `InstantTaskExecutorRule` — makes LiveData post synchronously on the main thread. Required since `ScannerViewModel` uses LiveData extensively. |
-| Robolectric | 4.16 | Android APIs on JVM | Allows unit-testing Android-dependent code (Context, Bitmap, SharedPreferences) without a device. Critical for `ImageProcessor`, `PdfUtils`, `DocumentHistoryRepository`, `AppPreferences`. |
-| com.google.truth:truth | 1.4.4 | Fluent assertions | Clearer failure messages than JUnit asserts (`assertThat(x).isEqualTo(y)`). Standard in Android/Google ecosystem. |
-
-### Instrumented Testing (src/androidTest/ — androidTestImplementation)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| androidx.test.ext:junit-ktx | 1.3.0 | JUnit AndroidX runner | Kotlin extensions for `ActivityScenario`, `JUnit4` annotations. Supersedes `junit:1.1.5`. |
-| androidx.test:runner | 1.6.2 | Instrumented test runner | Required — `AndroidJUnitRunner` is the `testInstrumentationRunner`. Already configured. |
-| androidx.test:core-ktx | 1.6.1 | Test utilities | `ApplicationProvider`, `ActivityScenario`. Foundation for all instrumented tests. |
-| androidx.test:rules | 1.6.1 | JUnit rules | `GrantPermissionRule` (camera), `ActivityScenarioRule`. |
-| espresso-core | 3.7.0 | UI interaction testing | Industry standard, auto-synchronizes with UI thread. Replaces existing 3.5.1. |
-| espresso-intents | 3.7.0 | Intent verification | Verify FileProvider share intents, gallery picker intents. App uses these for PDF sharing. |
-| espresso-contrib | 3.7.0 | RecyclerView actions | `RecyclerViewActions.scrollToPosition()` etc. App uses RecyclerView for page list and document history. |
-| MockK Android | 1.14.7 | Mocking in instrumented tests | Same MockK API on device. Use `mockk-android` + `mockk-agent` artifacts for Android instrumented tests. |
-
-### Fragment Testing (debugImplementation)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| androidx.fragment:fragment-testing | 1.8.9 | Isolated fragment launching | `launchFragmentInContainer<HomeFragment>()` — tests each fragment without launching full Activity. Requires `debugImplementation` for manifest merge. |
-
-### Debug-Only Tools (debugImplementation)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| LeakCanary | 2.14 | Memory leak detection | Automatically detects Activity/Fragment/ViewModel leaks during development. Install debug-only — zero production APK impact. Critical for camera lifecycle (CameraX bindings) and 8-fragment navigation stack. |
-
-### Static Analysis (project-level plugin, no APK impact)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Detekt | 1.23.8 | Kotlin static analysis | Compatible with Kotlin 1.9.x. Catches code smells, complexity violations, coroutine anti-patterns. Use `detekt-formatting` plugin to replace ktlint (one tool instead of two). |
-| detekt-formatting | 1.23.8 | Code formatting rules | Sub-library of Detekt — applies ktlint rules via Detekt pipeline. Applied as `detektPlugins(...)` dependency, not `implementation`. |
-| Android Lint | AGP built-in | Platform lint checks | Already present via AGP 8.13.2. Configure `lint.xml` + baseline file. Treat accessibility checks (`ContentDescription`) as errors for RELEASE-02. |
-
-### Code Coverage (AGP built-in — no extra dependency)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| JaCoCo | AGP built-in | Line/branch coverage reports | AGP 8.x bundles JaCoCo. Enable via `enableUnitTestCoverage = true` in debug build type. Run via `./gradlew createDebugUnitTestCoverageReport`. No separate plugin needed. |
+- Zero encryption at rest -- documents stored as plain files
+- 49 raw `android.util.Log` calls that emit in release builds
+- No screenshot/screen recording protection
+- No dependency vulnerability scanning
+- No network security config (cleartext not explicitly blocked on API 24-27)
+- No tapjacking protection
+- No clipboard security for OCR text
+- `android:allowBackup="true"` still enabled
+- No Application subclass (needed for Timber, runtime checks)
 
 ---
 
-## Complete Dependency Configuration
+## Recommended Stack Additions
 
-This is the authoritative diff to apply to `app/build.gradle.kts`.
+### Encryption at Rest -- File-Level
 
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| Google Tink (tink-android) | 1.20.0 | AES-256-GCM streaming encryption for scanned documents in scans/, processed/, pdfs/ | Google's recommended cryptographic library for Android. Fully supported from API 24 (matches minSdk). Shades protobuf-lite internally -- zero dependency conflicts with ML Kit or GMS. Provides `StreamingAead` for encrypting large files via InputStream/OutputStream without loading entire content into memory. No ProGuard rules needed (official docs confirm this). Pure Java library -- no Kotlin version constraints with 1.9.21. Released December 10, 2024. |
+
+**Why Tink and not raw AndroidKeyStore:**
+- Raw AndroidKeyStore requires ~80-120 lines of boilerplate per encrypt/decrypt operation (KeyGenerator, Cipher, IV management, GCM tag handling)
+- Tink wraps AndroidKeyStore with a misuse-resistant API: `StreamingAead` for large files, `Aead` for small data
+- Tink handles IV generation, key rotation, and format versioning -- eliminating the most common cryptographic footguns (IV reuse, wrong padding, missing authentication)
+- No built-in streaming support in raw KeyStore for large files (scanned documents can be 10+ MB)
+
+**Why NOT EncryptedFile from security-crypto:**
+- `EncryptedFile` wraps Tink internally anyway
+- `EncryptedFile` reads the entire file into memory before decrypting -- unacceptable for large multi-page scans
+- Tink's `StreamingAead` operates on streams, keeping memory usage constant regardless of file size
+- security-crypto is deprecated (all APIs deprecated April 2025, stable 1.1.0 released July 2025 as final version)
+
+### Encryption at Rest -- Key-Value Storage
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| androidx.security:security-crypto | 1.1.0 | EncryptedSharedPreferences for document history JSON and app settings | Final stable release (July 30, 2025). All APIs formally deprecated in favor of raw Keystore, but 1.1.0 is fully functional and will remain so -- the library is feature-complete. For simple key-value encryption, EncryptedSharedPreferences is the lowest-friction option: drop-in replacement for SharedPreferences with identical API surface. Wraps Tink internally. |
+
+**Why EncryptedSharedPreferences despite deprecation:**
+- "Deprecated" means "no future features," not "broken" or "removed"
+- 1.1.0 is the first stable release (after years in alpha) -- Google explicitly shipped it to stable before closing the library
+- The alternative (DataStore + manual Tink encryption) adds coroutine complexity and a new storage paradigm for 2-3 key-value entries
+- For document history JSON and settings flags, EncryptedSharedPreferences is exactly right-sized
+- If Google removes it in a future AndroidX release (unlikely for years), migration to DataStore+Tink is straightforward
+
+**Why NOT DataStore + Tink for key-value:**
+- App currently uses SharedPreferences (DocumentHistoryRepository, AppPreferences)
+- Swapping to DataStore changes the concurrency model (suspend/Flow vs synchronous)
+- Ripple effect through ViewModel and repository layers for minimal security benefit over EncryptedSharedPreferences
+- DataStore is the right choice for new projects; EncryptedSharedPreferences is the right choice for migrating existing SharedPreferences
+
+### Secure Logging
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| Timber | 5.0.1 | Replace 49 direct `android.util.Log` calls with centralized, environment-aware logging | Tree-based architecture: plant `DebugTree` in debug builds, plant nothing in release. No logging reaches logcat in production. Tags auto-derived from calling class names. Pure Java library -- no Kotlin version issues. Industry standard (Jake Wharton). |
+
+**Current problem:** 49 `Log.*()` calls across 9 source files (`PdfPageExtractor`, `PdfUtils`, `ImageUtils`, `MainActivity`, `HistoryFragment`, `CameraFragment`, `PdfViewerFragment`, `NativePdfView`, `PdfEditorFragment`) all emit to logcat in release builds. These log file paths, processing steps, and potentially document names -- information useful to an attacker with ADB access.
+
+**Migration plan:**
+1. Add Timber dependency
+2. Create `PdfScannerApp : Application()` (none exists), plant `Timber.DebugTree()` only when `BuildConfig.DEBUG`
+3. Register Application class in AndroidManifest: `android:name=".PdfScannerApp"`
+4. Replace all `Log.d(TAG, msg)` calls with `Timber.d(msg)` (49 replacements across 9 files)
+5. Remove `TAG` companion object constants (Timber auto-generates tags)
+6. Add Detekt `ForbiddenImport` rule for `android.util.Log` to prevent regression
+7. In release: no Tree planted = all Timber calls are no-ops (zero logcat output)
+
+### Dependency Vulnerability Scanning
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| OWASP dependency-check-gradle | 12.2.0 | Scan all dependencies against National Vulnerability Database (NVD) for known CVEs | Industry-standard SCA (Software Composition Analysis) tool. Gradle plugin integrates as `./gradlew dependencyCheckAnalyze`. Reports HTML/JSON. Java 11+ required (project uses Java 17). Published to Gradle Plugin Portal. Latest release January 9, 2026. |
+
+**Configuration recommendations:**
+- `failBuildOnCVSS = 7.0f` -- HIGH severity or above fails the build
+- `suppressionFile` for known false positives (ML Kit and GMS often trigger low-severity findings)
+- Do NOT run on every build (first run downloads NVD data: 5-20 minutes; subsequent runs: 1-3 minutes)
+- Run manually: `./gradlew dependencyCheckAnalyze`
+- Promote to CI task when QUAL-02 (GitHub Actions) lands in v2+
+
+---
+
+## Platform APIs (No Library Needed)
+
+These security hardening features use Android platform APIs directly. No additional dependencies required.
+
+### Screenshot and Screen Recording Prevention
+
+| API | Min SDK | Purpose |
+|-----|---------|---------|
+| `WindowManager.LayoutParams.FLAG_SECURE` | API 1 | Prevent screenshots, screen recording, and Recent Apps thumbnail leaks |
+
+**Implementation:** Single line in `MainActivity.onCreate()` before `setContentView()`:
 ```kotlin
-// =====================================================
-// app/build.gradle.kts — ADDITIONS for v1.1
-// =====================================================
-
-android {
-    defaultConfig {
-        // Already present — verify this is set:
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        debug {
-            isDebuggable = true
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-
-            // ADD: Enable JaCoCo coverage reports for debug builds
-            enableUnitTestCoverage = true
-            enableAndroidTestCoverage = true
-        }
-    }
-
-    testOptions {
-        unitTests {
-            // ADD: Required for Robolectric to access Android resources
-            isIncludeAndroidResources = true
-        }
-    }
-}
-
-dependencies {
-
-    // ===================================================
-    // UNIT TESTING (src/test/) — testImplementation
-    // ===================================================
-
-    // JUnit 4 — already present, no change needed
-    testImplementation("junit:junit:4.13.2")
-
-    // MockK — Kotlin-first mocking (suspend fun, final classes, sealed classes)
-    testImplementation("io.mockk:mockk:1.14.7")
-
-    // Coroutines test — MUST match app's coroutines version (1.7.3)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-
-    // LiveData testing — provides InstantTaskExecutorRule
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-
-    // Robolectric — Android APIs on JVM (Context, Bitmap, SharedPreferences)
-    testImplementation("org.robolectric:robolectric:4.16")
-
-    // AndroidX Test core for Robolectric (ApplicationProvider, etc.)
-    testImplementation("androidx.test:core-ktx:1.6.1")
-
-    // Truth — fluent assertion library
-    testImplementation("com.google.truth:truth:1.4.4")
-
-    // ===================================================
-    // INSTRUMENTED TESTING (src/androidTest/) — androidTestImplementation
-    // ===================================================
-
-    // AndroidX Test foundation
-    androidTestImplementation("androidx.test.ext:junit-ktx:1.3.0")
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("androidx.test:core-ktx:1.6.1")
-    androidTestImplementation("androidx.test:rules:1.6.1")
-
-    // Espresso — UI testing (update from existing 3.5.1)
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.7.0")
-
-    // MockK for Android instrumented tests — two artifacts required
-    androidTestImplementation("io.mockk:mockk-android:1.14.7")
-    androidTestImplementation("io.mockk:mockk-agent:1.14.7")
-
-    // Truth for instrumented tests
-    androidTestImplementation("com.google.truth:truth:1.4.4")
-
-    // ===================================================
-    // FRAGMENT TESTING — debugImplementation
-    // Requires debugImplementation (not androidTestImplementation)
-    // so the test manifest is included in debug builds
-    // ===================================================
-
-    debugImplementation("androidx.fragment:fragment-testing:1.8.9")
-
-    // ===================================================
-    // DEBUG-ONLY TOOLS — debugImplementation
-    // ===================================================
-
-    // LeakCanary — memory leak detection (debug builds only)
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-}
+window.setFlags(
+    WindowManager.LayoutParams.FLAG_SECURE,
+    WindowManager.LayoutParams.FLAG_SECURE
+)
 ```
 
-### Detekt Setup
+**Scope:** One flag on `MainActivity.window` protects ALL 8 fragments because the app uses single-activity architecture with Navigation Component.
 
-Detekt is a project-level plugin — NOT an app dependency.
+**What it prevents:**
+- Standard screenshots (shows black)
+- Screen recording (black region where window appears)
+- Recent Apps thumbnail (blank/solid color instead of document preview)
+- Google Assistant screen capture
+- Media projection capture (Cast, third-party recorders)
 
+**What it does NOT prevent:**
+- Physical camera pointed at screen (out of scope for software)
+- ADB screencap (requires USB debugging -- developer mode only)
+
+### Tapjacking Protection
+
+| API | Min SDK | Purpose |
+|-----|---------|---------|
+| `android:filterTouchesWhenObscured="true"` | API 9 | Block touch events when an overlay covers the view |
+
+**Implementation:** Add attribute to root ViewGroup of sensitive layouts, or apply globally through a base style.
+
+**Priority targets:** Share/export buttons, delete confirmation, camera capture button, any action that processes sensitive document data.
+
+**Note on TapTrap (2025):** A novel animation-based tapjacking attack (presented at USENIX Security 2025) bypasses `filterTouchesWhenObscured` by using activity transition animations rather than overlays. Mitigation requires Android OS-level patches, not app-level code. The traditional overlay defense remains valuable against the vast majority of real-world tapjacking attacks.
+
+### Secure Clipboard Handling
+
+| API | Min SDK | Purpose |
+|-----|---------|---------|
+| `ClipDescription.EXTRA_IS_SENSITIVE` | API 24 (compat) / API 33 (native) | Flag copied content as sensitive to hide clipboard preview |
+
+**Implementation:** When copying OCR text results:
 ```kotlin
-// In ROOT build.gradle.kts — add to existing plugins block:
-plugins {
-    id("com.android.application") version "8.13.2" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.21" apply false
-    id("androidx.navigation.safeargs.kotlin") version "2.7.6" apply false
-    id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false  // ADD
+val clipData = ClipData.newPlainText("OCR Result", recognizedText)
+clipData.description.extras = PersistableBundle().apply {
+    putBoolean("android.content.extra.IS_SENSITIVE", true)
 }
+clipboardManager.setPrimaryClip(clipData)
 ```
 
-```kotlin
-// In app/build.gradle.kts — add to existing plugins block:
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("androidx.navigation.safeargs.kotlin")
-    id("io.gitlab.arturbosch.detekt")  // ADD
-}
+**Effect:** Keyboard apps and clipboard managers will not show the copied text in their preview UI. On API 33+, Android automatically clears sensitive clipboard content after ~60 seconds.
 
-// Add detekt configuration block in app/build.gradle.kts:
-detekt {
-    config.setFrom("$rootDir/config/detekt/detekt.yml")
-    buildUponDefaultConfig = true
-    baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
-}
+**Scope:** OCR text recognition results are the primary clipboard-sensitive data in this app.
 
-// Add detekt-formatting plugin in app/build.gradle.kts dependencies:
-dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
-}
-```
+### Network Security Configuration
 
-### Android Lint Configuration
+| API | Min SDK | Purpose |
+|-----|---------|---------|
+| `res/xml/network_security_config.xml` | API 24 | Block cleartext (HTTP) traffic explicitly |
+
+**Implementation:** Create XML config, reference in AndroidManifest via `android:networkSecurityConfig` attribute.
 
 ```xml
-<!-- app/lint.xml — create this file -->
-<?xml version="1.0" encoding="UTF-8"?>
-<lint>
-    <!-- RELEASE-02: Treat accessibility issues as errors -->
-    <issue id="ContentDescription" severity="error" />
-    <issue id="TouchTargetSizeCheck" severity="error" />
-    <issue id="KeyboardInaccessibleWidget" severity="error" />
-
-    <!-- Hardcoded strings — already cleaned in v1.0 (DSYS-05), keep as warning -->
-    <issue id="HardcodedText" severity="warning" />
-
-    <!-- Unused resources — informational -->
-    <issue id="UnusedResources" severity="warning" />
-</lint>
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Debug-only: allow cleartext to localhost for testing tools -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
 ```
 
+**Why NOT certificate pinning:**
+- App is offline-first -- no app-owned backend server
+- ML Kit models are bundled, not downloaded at runtime
+- Document sharing uses `content://` URIs via FileProvider, not network
+- Only network traffic is Google Play Services (ML Kit initialization), which uses its own internal pinning
+- Pinning Google service certificates would break on cert rotation with zero security benefit
+
+### allowBackup Hardening
+
+| Setting | Current | Recommended | Why |
+|---------|---------|-------------|-----|
+| `android:allowBackup` | `true` | `false` | High-sensitivity documents must not leak via ADB backup or cloud backup. Current exclusion rules (scans/, processed/, pdfs/) help but do not cover SharedPreferences (which will contain encrypted document metadata). Setting `allowBackup="false"` is the most defensive posture. |
+
+**Impact:** Users lose automatic backup of app preferences. Acceptable trade-off for a high-sensitivity document app -- documents are ephemeral working files, not permanent storage.
+
+### Debuggable Runtime Check
+
+| Check | Purpose |
+|-------|---------|
+| `ApplicationInfo.FLAG_DEBUGGABLE` check in `Application.onCreate()` | Detect repackaged APKs with debuggable=true |
+
+**Implementation** (in the new `PdfScannerApp` Application class):
 ```kotlin
-// In app/build.gradle.kts android {} block — add lint config:
-lint {
-    abortOnError = true
-    warningsAsErrors = false
-    xmlReport = true
-    htmlReport = true
-    lintConfig = file("lint.xml")
-    baseline = file("lint-baseline.xml")
+if (!BuildConfig.DEBUG && (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+    // Repackaged APK detected -- terminate or restrict functionality
+    throw SecurityException("Tampered APK detected")
 }
 ```
 
+**Note:** This is a lightweight integrity check, not full tamper detection. A determined attacker can patch out this check. It catches casual repackaging only.
+
 ---
 
-## What NOT to Use
+## What NOT to Add
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| JUnit 5 (Jupiter) | Requires `android-junit5` third-party plugin; known friction with AndroidX Test instrumented runners. No meaningful benefit over JUnit 4 for this project. | JUnit 4 (4.13.2) — works everywhere with zero friction |
-| Mockito / Mockito-Kotlin | Cannot mock Kotlin final classes without `mockito-inline` workaround. `suspend fun` support is bolted on. | MockK 1.14.7 — designed for Kotlin from the ground up |
-| Hilt/Dagger for testing | App has no DI framework. Adding one just for testability is major scope creep. | Construct ViewModels manually with fake dependencies |
-| Compose Testing libs | App uses View-based XML layouts, not Compose. | Espresso + Fragment Testing |
-| Roborazzi / Paparazzi (screenshot testing) | Explicitly called out of scope in PROJECT.md: "Screenshot regression tests — low confidence tooling, pursue in v2" | Not applicable for v1.1 |
-| Turbine (Flow testing) | App uses LiveData, not Flow. `InstantTaskExecutorRule` + `observeForever` is sufficient. | androidx.arch.core:core-testing |
-| Detekt 2.0.x alpha | Still in alpha as of March 2026. Built against Kotlin 2.x — incompatible with project's Kotlin 1.9.21. | Detekt 1.23.8 |
-| LeakCanary 3.0 alpha | Still in alpha. 2.14 is the current stable. | LeakCanary 2.14 |
-| `io.mockk:mockk` for Android instrumented tests | JVM-only artifact fails at runtime on device — missing Android-specific bytecode manipulation. | `io.mockk:mockk-android` + `io.mockk:mockk-agent` (both required) |
-| Third-party JaCoCo plugins | AGP 8.x includes JaCoCo natively via `enableUnitTestCoverage = true`. Third-party plugins (vanniktech, arturdm) add complexity with no benefit for single-module projects. | AGP built-in JaCoCo |
-| ktlint (standalone) | Detekt with `detekt-formatting` covers all ktlint rules plus Kotlin code smell detection. Two tools for the same job. | `detekt-formatting` |
+| Technology | Why Not | What to Do Instead |
+|------------|---------|-------------------|
+| Root detection (RootBeer 0.0.8) | False positives alienate power users; easily bypassed by Magisk Hide; app protects local files (not server accounts) -- a rooted user accessing their own files is not the primary threat | Encryption at rest is the correct defense. Even on a rooted device, encrypted files require the app's key. |
+| Play Integrity API | Requires backend server to verify attestation tokens; no backend exists (offline-first) | Defer to v2+ if backend is added |
+| DexGuard / commercial obfuscation | R8 already enabled; paid product; obfuscation is not security -- encryption of actual data is what matters | R8 minification + Tink encryption |
+| Bouncy Castle / SpongyCastle | Tink provides all needed primitives; Bouncy Castle conflicts with Android's bundled copy; lower-level API increases misuse risk | Tink 1.20.0 |
+| SQLCipher / encrypted database | App uses SharedPreferences + file storage, not SQLite; no database exists to encrypt | EncryptedSharedPreferences for key-value; Tink for files |
+| Frida / runtime instrumentation detection | Same arms-race category as root detection; no DRM or IAP to protect; encryption at rest is the correct defense | Tink encryption |
+| ed-george/encrypted-shared-preferences (community fork) | Unnecessary -- official 1.1.0 stable covers all needs; third-party fork adds supply chain risk for a security-critical dependency | Official security-crypto 1.1.0 |
+| DataStore + Tink for key-value | Adds coroutine complexity and a new storage paradigm for 2-3 key-value entries; migration burden through ViewModel/repository layers | EncryptedSharedPreferences (drop-in replacement for existing SharedPreferences) |
 
 ---
 
 ## Alternatives Considered
 
-| Recommended | Alternative | When to Use Alternative |
-|-------------|-------------|-------------------------|
-| MockK 1.14.7 | Mockito-Kotlin 5.x | If team already has Mockito expertise and the codebase uses Java interop heavily |
-| Robolectric 4.16 | Device-based instrumented tests | For tests that need exact GPU/camera behavior; Robolectric simulates but doesn't perfectly replicate |
-| Detekt 1.23.8 | Android Lint only | If Kotlin-specific smell detection (coroutine anti-patterns, complexity) is not required |
-| JaCoCo (AGP built-in) | Kover (JetBrains) | For KMP or Kotlin-only modules where AGP is not involved |
-| LeakCanary 2.14 | Android Studio Profiler | When you need to investigate a specific allocation path rather than catch unknown leaks automatically |
+| Category | Recommended | Alternative | Why Not Alternative |
+|----------|-------------|-------------|---------------------|
+| File encryption | Tink 1.20.0 (tink-android) | Raw AndroidKeyStore + Cipher | 80-120 lines boilerplate; no streaming; easy IV/GCM misuse |
+| File encryption | Tink 1.20.0 | EncryptedFile (security-crypto) | Loads entire file into memory; unacceptable for large multi-page scans |
+| Key-value encryption | security-crypto 1.1.0 | DataStore + Tink | Overkill for 2-3 SharedPreferences files; changes concurrency model |
+| Key-value encryption | security-crypto 1.1.0 | Raw Keystore + Cipher wrapping SharedPreferences | Reinventing EncryptedSharedPreferences from scratch |
+| Logging | Timber 5.0.1 | Custom Log wrapper class | Timber is battle-tested, auto-generates tags, tree architecture for environment-specific behavior |
+| Logging | Timber 5.0.1 | R8/ProGuard rules to strip `Log.*` calls | Fragile -- depends on exact method signatures; requires `-assumenosideeffects` which R8 may not honor for all call patterns |
+| Dep scanning | OWASP dependency-check 12.2.0 | Snyk / Dependabot | Require cloud accounts or CI infrastructure; OWASP runs locally |
+| Dep scanning | OWASP dependency-check 12.2.0 | Gradle Versions Plugin | Checks for version updates, not vulnerabilities -- different purpose |
 
 ---
 
 ## Version Compatibility Matrix
 
-| Library | Version | Compatible With | Notes |
-|---------|---------|-----------------|-------|
-| `io.mockk:mockk:1.14.7` | Kotlin 1.9.21 | HIGH confidence | 1.14.x series targets Kotlin 1.9+ |
-| `org.robolectric:robolectric:4.16` | compileSdk 35 | HIGH confidence | 4.16 supports SDK 35 and 36 |
-| `io.gitlab.arturbosch.detekt:1.23.8` | Kotlin 1.9.21 | HIGH confidence | 1.23.x series explicitly supports Kotlin 1.9.x; DO NOT upgrade to Detekt 2.x with Kotlin 1.9 |
-| `kotlinx-coroutines-test:1.7.3` | `kotlinx-coroutines-android:1.7.3` | HIGH confidence — version MUST match | Use the exact same version as `implementation` coroutines |
-| `fragment-testing:1.8.9` | `fragment-ktx:1.6.2` | MEDIUM confidence | fragment-testing 1.8.x is forward-compatible but test with the project's fragment-ktx version |
-| `espresso-core:3.7.0` | `androidx.test.ext:junit-ktx:1.3.0` | HIGH confidence | Both released together July 2025 as part of same test suite |
-| `leakcanary-android:2.14` | Kotlin 1.9, minSdk 24 | HIGH confidence | 2.14 stable, no 3.x stable exists as of March 2026 |
+| New Dependency | Kotlin 1.9.21 | Min SDK 24 | Java 17 | Protobuf Conflict? | ProGuard Rules? |
+|----------------|---------------|------------|---------|---------------------|-----------------|
+| tink-android 1.20.0 | Compatible (pure Java) | Fully supported (API 24+) | Compatible (requires Java 11+) | No -- shades protobuf-lite internally | None needed (official docs confirm) |
+| security-crypto 1.1.0 | Compatible (pure Java) | Requires API 23+ | Compatible | No -- uses Tink internally | None needed (consumer rules bundled in AAR) |
+| Timber 5.0.1 | Compatible (pure Java) | API 14+ | Compatible | No | None needed (consumer rules bundled in AAR) |
+| dependency-check-gradle 12.2.0 | N/A (Gradle plugin, not runtime code) | N/A | Requires Java 11+ (project uses 17) | No | N/A |
+
+**Key compatibility note:** All recommended additions are pure Java libraries. None introduce Kotlin version constraints, which is critical given the Kotlin 1.9.21 lock and the coroutines force-resolution strategy in `build.gradle.kts`.
 
 ---
 
-## JaCoCo Coverage Report Command
+## Integration Points with Existing Stack
 
-```bash
-# Generate unit test coverage report (no device needed)
-./gradlew createDebugUnitTestCoverageReport
+### Tink + Existing File Storage Pipeline
 
-# Output location:
-# app/build/reports/coverage/test/debug/index.html
+```
+CURRENT (unencrypted):
+  CameraX capture -> File(filesDir/scans/X.jpg) -> ImageProcessor -> File(filesDir/processed/X.jpg) -> PdfUtils -> File(filesDir/pdfs/X.pdf)
 
-# Coverage thresholds from PROJECT.md (enforce manually or in CI):
-# util/ package: 70% line coverage
-# viewmodel/ package: 50% line coverage
+ENCRYPTED:
+  CameraX capture -> Tink.encrypt(outputStream) -> filesDir/scans/X.jpg.enc -> Tink.decrypt(inputStream) -> ImageProcessor -> Tink.encrypt() -> filesDir/processed/X.jpg.enc -> Tink.decrypt() -> PdfUtils -> Tink.encrypt() -> filesDir/pdfs/X.pdf.enc
 ```
 
+- Tink's `StreamingAead` provides `newEncryptingStream(OutputStream)` and `newDecryptingStream(InputStream)` -- wraps existing Java I/O
+- Key stored in AndroidKeyStore (hardware-backed on devices with TEE/StrongBox)
+- Encrypted files are opaque blobs -- Coil cannot load them directly
+- **Coil integration:** Decrypt to a temporary ByteArray or temp file, load into Coil, wipe temp data. Alternatively, write a custom Coil `Fetcher` that decrypts on-the-fly.
+- **FileProvider sharing:** Decrypt to a temp file in `cacheDir`, share via FileProvider, delete temp file after share completes
+
+### EncryptedSharedPreferences + Existing SharedPreferences
+
+- `DocumentHistoryRepository` uses `SharedPreferences` for document history JSON
+- `AppPreferences` uses `SharedPreferences` for user settings
+- Swap `context.getSharedPreferences(name, mode)` with `EncryptedSharedPreferences.create(name, masterKeyAlias, context, ...)` -- same API
+- **Migration path:** On first launch after update, read any existing unencrypted SharedPreferences data, write to EncryptedSharedPreferences, delete the old unencrypted file
+- MasterKey generation: `MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()`
+
+### Timber + Existing 49 Log Calls
+
+- Global find-and-replace: `Log.d(TAG,` -> `Timber.d(` across 9 files
+- Remove `companion object { private const val TAG = "..." }` from each class
+- **Detekt enforcement:** Add `ForbiddenImport` rule for `android.util.Log` in `detekt.yml` to prevent regression
+- No behavioral change in debug builds (same logcat output via DebugTree)
+- Release builds: zero logcat output (no Tree planted)
+
+### FLAG_SECURE + Existing Single-Activity Architecture
+
+- One line in `MainActivity.onCreate()` before `super.onCreate()` / `setContentView()`
+- Covers all 8 fragments automatically
+- No impact on CameraX preview (FLAG_SECURE applies to the window compositor, not camera hardware access)
+- No impact on ML Kit document scanner (it launches its own Activity with separate window)
+
+### Network Security Config + Existing AndroidManifest
+
+- Create `res/xml/network_security_config.xml`
+- Add `android:networkSecurityConfig="@xml/network_security_config"` to `<application>` in AndroidManifest
+- No code changes -- purely declarative
+
+### OWASP dependency-check + Existing Gradle Build
+
+- Add plugin to root `build.gradle.kts`
+- New Gradle task: `./gradlew dependencyCheckAnalyze`
+- HTML report at `build/reports/dependency-check-report.html`
+- Does NOT affect `./gradlew assembleRelease` or any existing tasks
+- First run: 5-20 minutes (NVD download). Subsequent: 1-3 minutes.
+
 ---
 
-## Testing Strategy by Code Layer
+## Complete Dependency Configuration
 
-Maps the stack to the actual project files.
+### app/build.gradle.kts -- Dependencies to ADD
 
-| Layer | Key Files | Test Type | Tools |
-|-------|-----------|-----------|-------|
-| ViewModel | `ScannerViewModel.kt` | Unit (JVM) | JUnit 4 + MockK + coroutines-test + InstantTaskExecutorRule |
-| Utilities | `ImageProcessor.kt`, `PdfUtils.kt`, `PdfPageExtractor.kt` | Unit (JVM + Robolectric) | JUnit 4 + Robolectric + Truth |
-| Repository | `DocumentHistoryRepository.kt` | Unit (Robolectric) | JUnit 4 + Robolectric (SharedPreferences/filesDir) |
-| Preferences | `AppPreferences.kt` | Unit (Robolectric) | JUnit 4 + Robolectric |
-| JSON round-trip | `DocumentEntry.kt` | Unit (JVM) | JUnit 4 + Truth |
-| Fragments (UI) | All 8 fragments | Instrumented | Espresso + fragment-testing + MockK Android |
-| Navigation | Fragment transitions | Instrumented | Espresso + Navigation Testing |
-| Memory leaks | All Activities/Fragments | Debug runtime | LeakCanary (automatic) |
-| Code quality | All .kt files | Static analysis | Detekt + Android Lint |
-| Coverage | `util/`, `viewmodel/` | Reporting | JaCoCo (AGP built-in) |
+```kotlin
+dependencies {
+    // ===== SECURITY HARDENING (v1.2) =====
+
+    // File encryption -- AES-256-GCM streaming via Tink
+    // API 24+ fully supported; shades protobuf-lite internally; no ProGuard rules needed
+    implementation("com.google.crypto.tink:tink-android:1.20.0")
+
+    // Key-value encryption -- drop-in replacement for SharedPreferences
+    // Deprecated but stable (1.1.0 released July 2025); wraps Tink internally
+    implementation("androidx.security:security-crypto:1.1.0")
+
+    // Secure logging -- replaces 49 android.util.Log calls
+    // Debug: DebugTree logs to logcat; Release: no Tree = zero output
+    implementation("com.jakewharton.timber:timber:5.0.1")
+}
+```
+
+### root build.gradle.kts -- Plugin to ADD
+
+```kotlin
+plugins {
+    id("com.android.application") version "8.13.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.21" apply false
+    id("androidx.navigation.safeargs.kotlin") version "2.7.6" apply false
+    id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false
+    id("org.owasp.dependencycheck") version "12.2.0" apply false  // ADD
+}
+```
+
+### app/build.gradle.kts -- Plugin to ADD
+
+```kotlin
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("androidx.navigation.safeargs.kotlin")
+    id("io.gitlab.arturbosch.detekt")
+    id("org.owasp.dependencycheck")  // ADD
+}
+```
+
+### OWASP dependency-check configuration (in app/build.gradle.kts)
+
+```kotlin
+dependencyCheck {
+    failBuildOnCVSS = 7.0f  // Fail on HIGH severity or above
+    formats = listOf("HTML", "JSON")
+    suppressionFile = "$rootDir/config/dependency-check-suppression.xml"
+    analyzers {
+        // Disable analyzers not relevant to Android/Gradle projects
+        nodeEnabled = false
+        assemblyEnabled = false
+    }
+}
+```
+
+### AndroidManifest.xml Changes
+
+```xml
+<application
+    android:name=".PdfScannerApp"
+    android:allowBackup="false"
+    android:networkSecurityConfig="@xml/network_security_config"
+    android:dataExtractionRules="@xml/data_extraction_rules"
+    android:fullBackupContent="@xml/backup_rules"
+    ... >
+```
+
+Changes from current:
+1. ADD `android:name=".PdfScannerApp"` (new Application subclass for Timber init + security checks)
+2. CHANGE `android:allowBackup` from `"true"` to `"false"`
+3. ADD `android:networkSecurityConfig="@xml/network_security_config"`
+
+### New Files to Create
+
+| File | Purpose |
+|------|---------|
+| `app/src/main/java/com/pdfscanner/app/PdfScannerApp.kt` | Application subclass: Timber init, debuggable check |
+| `app/src/main/res/xml/network_security_config.xml` | Block cleartext traffic |
+| `config/dependency-check-suppression.xml` | OWASP false positive suppressions |
+| Security utility classes (encryption helpers) | Tink key management, encrypt/decrypt wrappers |
+
+**No new repositories needed** -- all artifacts are on Maven Central or Google Maven (already configured in `settings.gradle.kts`).
+
+---
+
+## ProGuard/R8 Considerations
+
+| Library | Rules Needed? | Detail |
+|---------|---------------|--------|
+| tink-android 1.20.0 | No | "Tink Android requires no proguard configuration" per official setup docs. Shaded protobuf is pre-configured. |
+| security-crypto 1.1.0 | No | Consumer rules bundled in AAR. Auto-applied by R8. |
+| Timber 5.0.1 | No | Consumer rules bundled in AAR. Auto-applied by R8. |
+| OWASP dep-check | N/A | Build-time Gradle plugin -- not in APK. |
+
+**Existing `proguard-rules.pro` requires ZERO changes** for security hardening libraries.
+
+---
+
+## APK Size Impact Estimate
+
+| Library | Approximate Size (after R8) | Notes |
+|---------|-----------------------------|-------|
+| tink-android 1.20.0 | ~800 KB - 1.2 MB | Includes shaded protobuf-lite; R8 strips unused Tink primitives (e.g., JWT, hybrid encryption) |
+| security-crypto 1.1.0 | ~50 KB | Thin wrapper; most of the weight is Tink (already counted above) |
+| Timber 5.0.1 | ~20 KB | Very small library |
+| **Total new** | **~900 KB - 1.3 MB** | Acceptable for a security-critical app handling IDs, medical docs, contracts |
+
+---
+
+## OWASP MASVS Alignment
+
+The recommended stack maps to OWASP MASVS v2 categories:
+
+| MASVS Category | Coverage | Stack Component |
+|----------------|----------|-----------------|
+| MASVS-STORAGE | Encryption at rest, secure backup config | Tink, EncryptedSharedPreferences, allowBackup=false |
+| MASVS-CRYPTO | Proper key management, strong algorithms | Tink (AES-256-GCM), AndroidKeyStore |
+| MASVS-NETWORK | Cleartext traffic blocked | network_security_config.xml |
+| MASVS-PLATFORM | Tapjacking, clipboard, screenshot protection | filterTouchesWhenObscured, EXTRA_IS_SENSITIVE, FLAG_SECURE |
+| MASVS-CODE | Dependency scanning, secure logging, obfuscation | OWASP dependency-check, Timber, R8 (existing) |
+| MASVS-AUTH | N/A | App has no user accounts or authentication |
+| MASVS-RESILIENCE | Anti-debug check, R8 obfuscation | FLAG_DEBUGGABLE runtime check, R8 (existing) |
+| MASVS-PRIVACY | N/A for v1.2 | No analytics, no tracking, no PII collection beyond documents |
 
 ---
 
 ## Sources
 
-- [MockK releases — GitHub](https://github.com/mockk/mockk/releases) — version 1.14.7 confirmed latest stable (HIGH confidence)
-- [Robolectric releases — GitHub](https://github.com/robolectric/robolectric/releases) — 4.16 confirmed latest stable, SDK 36 support (HIGH confidence)
-- [AndroidX Test releases — developer.android.com](https://developer.android.com/jetpack/androidx/releases/test) — Espresso 3.7.0, junit-ktx 1.3.0 confirmed July 2025 stable (HIGH confidence)
-- [AndroidX Fragment releases](https://developer.android.com/jetpack/androidx/releases/fragment) — fragment-testing 1.8.9 confirmed February 2026 stable (HIGH confidence)
-- [LeakCanary changelog — square.github.io](https://square.github.io/leakcanary/changelog/) — 2.14 latest stable; 3.0 alpha only (HIGH confidence)
-- [Detekt releases — GitHub](https://github.com/detekt/detekt/releases) — 1.23.8 released February 2025, Kotlin 1.9 compatible, 2.0 still alpha (HIGH confidence)
-- [Detekt compatibility table — detekt.dev](https://detekt.dev/docs/introduction/compatibility/) — 1.23.x supports Kotlin 1.9 confirmed
-- [Gradle JaCoCo plugin docs — docs.gradle.org](https://docs.gradle.org/current/userguide/jacoco_plugin.html) — built into AGP 8.x via `enableUnitTestCoverage` (HIGH confidence)
-- [Maven Central io.mockk:mockk-android](https://central.sonatype.com/artifact/io.mockk/mockk-android/versions) — 1.14.7 confirmed on Maven Central (HIGH confidence)
-- Project `app/build.gradle.kts` analysis — existing plugin versions and existing test deps (HIGH confidence)
+### HIGH Confidence (Official Documentation, Verified March 2026)
+- [AndroidX Security Releases](https://developer.android.com/jetpack/androidx/releases/security) -- security-crypto 1.1.0 stable released July 30, 2025; all APIs deprecated
+- [Tink Java Setup Guide (Google Developers)](https://developers.google.com/tink/setup/java) -- tink-android 1.20.0, API 24+ fully supported, no ProGuard needed
+- [Tink Java GitHub Releases](https://github.com/tink-crypto/tink-java/releases) -- v1.20.0 released December 10, 2024; Protobuf 4.33.0
+- [Android FLAG_SECURE -- Secure Sensitive Activities](https://developer.android.com/security/fraud-prevention/activities) -- official screenshot/recording prevention
+- [Android Tapjacking Prevention](https://developer.android.com/privacy-and-security/risks/tapjacking) -- filterTouchesWhenObscured guidance
+- [Android Secure Clipboard Handling](https://developer.android.com/privacy-and-security/risks/secure-clipboard-handling) -- EXTRA_IS_SENSITIVE flag
+- [Android Network Security Configuration](https://developer.android.com/privacy-and-security/security-config) -- cleartext traffic and CA config
+- [Android Log Info Disclosure](https://developer.android.com/privacy-and-security/risks/log-info-disclosure) -- secure logging guidance
+
+### MEDIUM Confidence (Multiple Sources Agree)
+- [OWASP dependency-check-gradle Plugin Portal](https://plugins.gradle.org/plugin/org.owasp.dependencycheck) -- v12.2.0, published January 9, 2026
+- [Timber GitHub Repository](https://github.com/JakeWharton/timber) -- v5.0.1 stable, latest on Maven Central
+- [OWASP MASVS v2](https://mas.owasp.org/MASVS/) -- Mobile Application Security Verification Standard
+- [Goodbye EncryptedSharedPreferences: A 2026 Migration Guide (droidcon)](https://www.droidcon.com/2025/12/16/goodbye-encryptedsharedpreferences-a-2026-migration-guide/) -- confirms Tink as recommended replacement
+
+### LOW Confidence (Estimates, Needs Validation During Implementation)
+- APK size estimates are approximate; actual impact depends on R8 tree-shaking aggressiveness
+- Tink StreamingAead memory footprint during concurrent encrypt/decrypt of multiple pages needs profiling
+- EncryptedSharedPreferences first-open latency (MasterKey generation) needs measurement on low-end devices
 
 ---
 
-*Stack research for: Android testing infrastructure and release readiness tooling*
-*Researched: 2026-03-01*
+*Stack research for: Security hardening additions to Android document scanner*
+*Researched: 2026-03-03*

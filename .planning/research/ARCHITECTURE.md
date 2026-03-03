@@ -1,979 +1,760 @@
-# Architecture Research: Test Suite Structure for Android Document Scanner
+# Architecture Research: Security Hardening Integration
 
-**Domain:** Android app testing and release readiness — adding test coverage and release tooling to existing MVVM app
-**Researched:** 2026-03-01
-**Confidence:** HIGH (based on established Android testing patterns and actual codebase analysis)
+**Domain:** Android document scanner security hardening (Single Activity + MVVM)
+**Researched:** 2026-03-03
+**Confidence:** HIGH
 
-## Existing Architecture Summary
+## System Overview: Security Layer Integration
 
-The app follows Single Activity + Navigation Component + MVVM with these concrete components:
+The security hardening adds a new `security/` package that wraps around existing I/O operations
+without restructuring the MVVM architecture. The key principle is: **encryption sits between
+the repository/utility layer and the filesystem**, not inside fragments or ViewModel.
+
+```
++-----------------------------------------------------------------------+
+|                        UI Layer (Fragments)                           |
+|  +----------+ +--------+ +---------+ +------+ +------+ +----------+  |
+|  |   Home   | | Camera | | Preview | | Pages| |PdfEd | | Settings |  |
+|  +----+-----+ +---+----+ +----+----+ +--+---+ +--+---+ +----+-----+  |
+|       |           |           |          |        |          |        |
+|  FLAG_SECURE set/cleared per fragment via Activity callback           |
+|  BiometricPrompt launched from fragments, gates navigation            |
++-------------------------------+---------------------------------------+
+                                |
++-------------------------------v---------------------------------------+
+|                     ViewModel Layer                                    |
+|  +-------------------+  +-----------------------+                     |
+|  | ScannerViewModel  |  | PdfEditorViewModel    |                     |
+|  | (activityScope)   |  | (fragment scope)      |                     |
+|  +--------+----------+  +----------+------------+                     |
+|           |                        |                                  |
+|  No encryption awareness. URIs point to encrypted files.              |
+|  ViewModel passes URIs; decryption is transparent.                    |
++-----------+------------------------+----------------------------------+
+            |                        |
++-----------v------------------------v----------------------------------+
+|                Repository / Utility Layer                             |
+|  +------------------------------+  +-----------------------------+   |
+|  | DocumentHistoryRepository    |  | PdfUtils / ImageProcessor   |   |
+|  | (EncryptedSharedPreferences  |  | (read/write via             |   |
+|  |  or DataStore+Tink)          |  |  SecureFileManager)         |   |
+|  +------------------------------+  +-----------------------------+   |
+|                                                                       |
+|  +------------------------------+  +-----------------------------+   |
+|  | AppPreferences               |  | SecureFileManager (NEW)     |   |
+|  | (EncryptedSharedPreferences  |  | Wraps File I/O with Tink   |   |
+|  |  or DataStore+Tink)          |  | StreamingAead encryption    |   |
+|  +------------------------------+  +-----------------------------+   |
++-------------------------------+---------------------------------------+
+                                |
++-------------------------------v---------------------------------------+
+|                     Security Layer (NEW)                              |
+|  +-----------------------------+  +------------------------------+   |
+|  | SecurityManager (NEW)       |  | SecureFileManager (NEW)      |   |
+|  | - Tink keyset management    |  | - Encrypt/decrypt streams    |   |
+|  | - Android Keystore binding  |  | - Secure deletion            |   |
+|  | - Biometric key gating      |  | - Transparent file wrapper   |   |
+|  +-----------------------------+  +------------------------------+   |
+|                                                                       |
+|  +-----------------------------+  +------------------------------+   |
+|  | BiometricHelper (NEW)       |  | IntentValidator (NEW)        |   |
+|  | - BiometricPrompt wrapper   |  | - Validates incoming intents |   |
+|  | - CryptoObject integration  |  | - FileProvider URI checks    |   |
+|  +-----------------------------+  +------------------------------+   |
++-------------------------------+---------------------------------------+
+                                |
++-------------------------------v---------------------------------------+
+|                     Storage Layer                                     |
+|  +-------------+  +--------------+  +------------+  +-------------+  |
+|  | filesDir/   |  | filesDir/    |  | filesDir/  |  | cacheDir/   |  |
+|  | scans/      |  | processed/   |  | pdfs/      |  | (temp)      |  |
+|  | (encrypted) |  | (encrypted)  |  | (encrypted)|  | (plaintext) |  |
+|  +-------------+  +--------------+  +------------+  +-------------+  |
++-----------------------------------------------------------------------+
+```
+
+## Component Responsibilities
+
+| Component | Responsibility | Status |
+|-----------|---------------|--------|
+| `SecurityManager` | Tink keyset init, Android Keystore key management, master key lifecycle | NEW |
+| `SecureFileManager` | Encrypt/decrypt file streams, secure delete, transparent I/O wrapper | NEW |
+| `BiometricHelper` | BiometricPrompt setup, CryptoObject creation, auth state tracking | NEW |
+| `IntentValidator` | Validate incoming intents, sanitize extras, verify FileProvider URIs | NEW |
+| `SecurePreferences` | Migration wrapper: reads old SharedPreferences, writes to encrypted store | NEW |
+| `SecureDeletion` | Overwrite-then-delete for sensitive files | NEW |
+| `MainActivity` | FLAG_SECURE toggling per active fragment destination, app-lock gate | MODIFIED |
+| `DocumentHistoryRepository` | Migrate to encrypted backing store | MODIFIED |
+| `AppPreferences` | Migrate to encrypted backing store | MODIFIED |
+| `PdfUtils` | Use SecureFileManager for file I/O instead of raw File/FileOutputStream | MODIFIED |
+| `ImageProcessor` | Use SecureFileManager for file I/O | MODIFIED |
+| `CameraFragment` | Integrate with SecureFileManager for capture output | MODIFIED |
+| `PagesFragment` | Use SecureFileManager for PDF generation and sharing | MODIFIED |
+| `SettingsFragment` | Add security settings (app lock toggle, biometric toggle) | MODIFIED |
+
+## Recommended Project Structure
 
 ```
 app/src/main/java/com/pdfscanner/app/
-  MainActivity.kt                       # Single Activity host
-  viewmodel/ScannerViewModel.kt         # Shared ViewModel (activityViewModels)
-  editor/PdfEditorViewModel.kt          # Editor ViewModel (AndroidViewModel)
-  editor/PdfAnnotation.kt               # Data models for annotations
-  editor/AnnotationCanvasView.kt        # Custom View for drawing
-  editor/PdfEditorFragment.kt           # Editor UI
-  editor/SignaturePadView.kt            # Custom View for signatures
-  editor/NativePdfView.kt              # Custom View for PDF rendering
-  editor/SignatureDialogFragment.kt     # Dialog
-  editor/StampPickerDialogFragment.kt   # Dialog
-  editor/TextInputDialogFragment.kt     # Dialog
-  ui/HomeFragment.kt                    # Home screen
-  ui/CameraFragment.kt                  # CameraX capture
-  ui/PreviewFragment.kt                 # Image preview + filters
-  ui/PagesFragment.kt                   # Multi-page management
-  ui/PdfViewerFragment.kt              # PDF viewing
-  ui/HistoryFragment.kt                # Document history
-  ui/SettingsFragment.kt               # App settings
-  util/ImageProcessor.kt               # Bitmap filter logic (pure functions)
-  util/PdfUtils.kt                     # PDF merge/split/compress (suspend, needs Context)
-  util/DocumentScanner.kt              # ML Kit Document Scanner wrapper
-  util/SoundManager.kt                 # Sound effects
-  util/AnimationHelper.kt              # UI animations
-  util/AppPreferences.kt               # SharedPreferences wrapper
-  util/PdfPageExtractor.kt             # PDF page extraction
-  ocr/OcrProcessor.kt                  # ML Kit text recognition
-  data/DocumentHistory.kt              # DocumentEntry + DocumentHistoryRepository
-  adapter/PagesAdapter.kt              # RecyclerView adapter
-  adapter/HistoryAdapter.kt            # RecyclerView adapter
-  adapter/RecentDocumentsAdapter.kt    # RecyclerView adapter
++-- security/                    # NEW PACKAGE
+|   +-- SecurityManager.kt      # Tink keyset + Android Keystore management
+|   +-- SecureFileManager.kt    # Encrypted file I/O wrapper
+|   +-- BiometricHelper.kt      # BiometricPrompt integration
+|   +-- IntentValidator.kt      # Intent/URI validation
+|   +-- SecurePreferences.kt    # Encrypted key-value storage wrapper
+|   +-- SecureDeletion.kt       # Overwrite-then-delete utility
++-- data/
+|   +-- DocumentHistory.kt      # MODIFIED: use SecurePreferences
++-- util/
+|   +-- AppPreferences.kt       # MODIFIED: use SecurePreferences
+|   +-- PdfUtils.kt             # MODIFIED: use SecureFileManager
+|   +-- ImageProcessor.kt       # MODIFIED: use SecureFileManager
+|   +-- ImageUtils.kt           # MODIFIED: use SecureFileManager
++-- ui/
+|   +-- (all fragments)          # MODIFIED: FLAG_SECURE awareness
++-- viewmodel/
+|   +-- ScannerViewModel.kt     # UNCHANGED: URIs remain opaque
++-- MainActivity.kt             # MODIFIED: FLAG_SECURE + biometric gate
 ```
 
-### Component Responsibilities
+### Structure Rationale
 
-| Component | Responsibility | Typical Implementation |
-|-----------|----------------|------------------------|
-| ScannerViewModel | Shared state: scanned pages list, current capture URI, PDF URI, loading state, filter state | Plain ViewModel with MutableLiveData, SavedStateHandle for process-death safety |
-| PdfEditorViewModel | Editor state: annotations per page, saved signatures, drawing properties, tool selection | AndroidViewModel (needs Application for filesDir), JSON-based signature storage |
-| ImageProcessor | Bitmap filter application (Enhanced, B&W, Magic, Sharpen) | Pure object with static functions, takes Bitmap returns Bitmap |
-| PdfUtils | PDF merge, split, compress, extract pages | Object with suspend functions, needs Context for content resolver and filesDir |
-| DocumentHistoryRepository | CRUD for document history entries | SharedPreferences + JSON, singleton pattern |
-| OcrProcessor | Text recognition from images | ML Kit TextRecognizer wrapper, suspend functions |
-| DocumentScanner | ML Kit Document Scanner integration | Thin wrapper around GMS Document Scanner API |
-| Fragments (7 total) | UI layer: camera, preview, pages, home, history, settings, PDF viewer | View Binding, observe LiveData, delegate to ViewModels |
-| PdfEditorFragment | Complex UI: annotation canvas, tool switching, PDF rendering | Combines NativePdfView + AnnotationCanvasView |
-| Custom Views (3) | AnnotationCanvasView, SignaturePadView, NativePdfView | Canvas-based drawing, touch handling |
-| Adapters (3) | RecyclerView list rendering | ViewHolder pattern, click listeners |
+- **security/**: Isolated package makes security code auditable and testable in isolation. All security primitives are co-located, preventing encryption logic from scattering across UI/data layers.
+- **Existing packages stay intact**: Fragments, ViewModel, and adapters maintain their current structure. Security integrates via method-call boundaries, not inheritance or restructuring.
+- **SecureFileManager as facade**: Single entry point for all file I/O means encryption is enforced consistently. No fragment or utility bypasses encryption by accident.
 
-## Recommended Test Architecture
+## Architectural Patterns
 
-### Test Pyramid for This App
+### Pattern 1: Transparent Encryption via File I/O Wrapper
 
-```
-                    /\
-                   /  \
-                  / E2E \          ~5 tests
-                 / (Manual \       Smoke tests on real device
-                /  + limited  \    CameraX, ML Kit, full flows
-               /   automated)  \
-              /________________\
-             /                  \
-            /   Integration      \    ~15-20 tests
-           /  (androidTest)       \   Fragment + ViewModel, Navigation,
-          /   Robolectric where    \  File I/O with real filesystem
-         /    possible              \
-        /__________________________\
-       /                            \
-      /       Unit Tests             \   ~40-60 tests
-     /   (test - local JVM)           \  ViewModels, ImageProcessor,
-    /    Pure logic, data models,      \ PdfUtils logic, DocumentEntry,
-   /     PdfOperationResult, filters    \ DocumentHistoryRepository
-  /____________________________________\
-```
+**What:** SecureFileManager wraps all file read/write operations. Callers pass a target File and receive an InputStream/OutputStream. Internally, Tink StreamingAead encrypts on write and decrypts on read. Callers never see ciphertext.
 
-**Ratio target: ~60% unit, ~30% integration, ~10% manual/E2E**
+**When to use:** Every file operation on scans/, processed/, pdfs/ directories.
 
-This ratio is skewed toward unit tests because the app has significant testable logic in its utility classes and ViewModels that requires zero refactoring.
-
-### What Is Testable Without Restructuring
-
-| Component | Test Type | Testable As-Is | Notes |
-|-----------|-----------|----------------|-------|
-| ScannerViewModel | Unit (JVM) | YES | Pure ViewModel, only depends on Uri and LiveData |
-| PdfEditorViewModel | Unit (JVM) | PARTIAL | Extends AndroidViewModel, needs Application mock or Robolectric |
-| ImageProcessor | Unit (JVM) | YES | Pure functions on Bitmap. Bitmap needs Robolectric or Android test |
-| PdfUtils | Integration (device) | YES | Needs real ContentResolver and filesystem |
-| DocumentEntry | Unit (JVM) | YES | Data class with JSON serialization |
-| DocumentHistoryRepository | Integration | YES | Needs SharedPreferences (Robolectric or device) |
-| OcrProcessor | Integration (device) | PARTIAL | Needs ML Kit runtime, only testable on device with real model |
-| DocumentScanner | NOT TESTABLE | NO | Wraps GMS Intent-based API, test at E2E level only |
-| Fragments | Integration (device) | YES | FragmentScenario for isolated testing |
-| Navigation flows | Integration (device) | YES | TestNavHostController |
-| Custom Views | Integration (device) | PARTIAL | Needs real Canvas, test rendering on device |
-| Adapters | Unit/Integration | YES | Test data binding, click callbacks |
-
-### What Requires Mocking vs Real Dependencies
-
-**No mocking needed (test directly):**
-- ScannerViewModel -- all LiveData operations, page management, filter tracking
-- DocumentEntry -- JSON round-trip, exists() with temp files, formattedSize()
-- PdfOperationResult -- data class validation
-- ImageProcessor.FilterType enum usage
-
-**Needs Robolectric (JVM with Android stubs):**
-- ImageProcessor -- Bitmap, Canvas, ColorMatrix are Android classes
-- DocumentHistoryRepository -- SharedPreferences
-- PdfEditorViewModel -- AndroidViewModel requires Application
-
-**Needs real device/emulator (androidTest):**
-- PdfUtils -- PdfRenderer, PdfDocument, ContentResolver
-- OcrProcessor -- ML Kit model loading
-- CameraFragment -- CameraX requires camera hardware
-- Navigation flows -- Fragment lifecycle + NavController
-- Custom Views -- Canvas rendering, touch events
-
-## Recommended Test Directory Structure
-
-New directories to create (none exist today):
-
-```
-app/src/
-  test/                                          # JVM unit tests  [NEW]
-    java/com/pdfscanner/app/
-      viewmodel/
-        ScannerViewModelTest.kt                  # Page management, filter state, loading
-      editor/
-        PdfEditorViewModelTest.kt                # Tool selection, page nav, annotation state
-      data/
-        DocumentEntryTest.kt                     # JSON serialization, formattedSize
-        DocumentHistoryRepositoryTest.kt         # CRUD ops (Robolectric)
-      util/
-        ImageProcessorTest.kt                    # Filter application (Robolectric for Bitmap)
-        PdfUtilsFormatTest.kt                    # formatFileSize, pure utility methods
-
-  androidTest/                                   # Instrumented tests  [NEW]
-    java/com/pdfscanner/app/
-      util/
-        PdfUtilsInstrumentedTest.kt              # Merge, split, compress with real PDFs
-        PdfPageExtractorTest.kt                  # PDF page extraction
-      ocr/
-        OcrProcessorTest.kt                      # Text recognition with test images
-      ui/
-        HomeFragmentTest.kt                      # Navigation from home
-        CameraFragmentTest.kt                    # Camera permission, basic UI (no capture)
-        PreviewFragmentTest.kt                   # Filter application, add page flow
-        PagesFragmentTest.kt                     # Drag reorder, multi-select, PDF generation
-        HistoryFragmentTest.kt                   # List display, delete, open
-        PdfViewerFragmentTest.kt                 # PDF rendering, share
-      editor/
-        PdfEditorFragmentTest.kt                 # Tool switching, annotation, save
-      navigation/
-        NavigationFlowTest.kt                    # End-to-end navigation paths
-      data/
-        DocumentHistoryInstrumentedTest.kt       # Real SharedPreferences on device
-
-  androidTest/assets/                            # Test fixture PDFs  [NEW]
-    test_single_page.pdf                         # Used by PdfUtils merge/split tests
-    test_multi_page.pdf                          # 3+ page PDF for split/extract tests
-    test_ocr_image.jpg                           # Known-text image for OCR assertion
-```
-
-**New files at root level:**
-
-```
-app/
-  proguard-rules.pro          [MODIFY — add ML Kit + Safe Args + Navigation rules]
-  detekt.yml                  [NEW — Detekt rule configuration]
-  detekt-baseline.xml         [NEW — generated by detektBaseline task, suppresses existing violations]
-  lint.xml                    [NEW — Android Lint configuration, accessibility as errors]
-
-config/
-  (no separate config dir needed for single-module app)
-```
-
-## Architectural Patterns for Testing
-
-### Pattern 1: ViewModel Unit Testing with InstantTaskExecutorRule
-
-**What:** Test ScannerViewModel on JVM using AndroidX test utilities that make LiveData synchronous.
-**When to use:** All ViewModel tests. ScannerViewModel takes SavedStateHandle — pass `SavedStateHandle()` directly in tests (no mocking needed, it works on JVM).
-**Trade-offs:** Fast execution, no device needed. Cannot test coroutine-dependent operations without TestCoroutineDispatcher.
+**Trade-offs:**
+- PRO: Existing code changes are minimal (swap `FileOutputStream(file)` for `secureFileManager.openEncryptedOutput(file)`)
+- PRO: Encryption cannot be forgotten because the only File I/O path goes through the wrapper
+- CON: Slight performance overhead from Tink streaming (measured at ~5-10% for large files)
+- CON: Files are not readable outside the app (intended for security, but affects debugging)
 
 **Example:**
 ```kotlin
-@RunWith(JUnit4::class)
-class ScannerViewModelTest {
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
+// security/SecureFileManager.kt
+class SecureFileManager(private val securityManager: SecurityManager) {
 
-    private lateinit var viewModel: ScannerViewModel
-
-    @Before
-    fun setup() {
-        // SavedStateHandle() works on JVM without mocking
-        viewModel = ScannerViewModel(SavedStateHandle())
+    private val streamingAead: StreamingAead by lazy {
+        securityManager.getStreamingAead()
     }
 
-    @Test
-    fun addPage_addsToList() {
-        val uri = Uri.parse("file:///test/scan1.jpg")
-        viewModel.addPage(uri)
-        assertEquals(1, viewModel.getPageCount())
-        assertEquals(uri, viewModel.pages.value?.first())
+    /**
+     * Open an encrypted output stream. Data written to this stream
+     * is encrypted with AES256-GCM-HKDF before hitting disk.
+     *
+     * @param file Target file (will contain ciphertext)
+     * @param associatedData Context binding (e.g., "scan" or "pdf") -- authenticated but not encrypted
+     */
+    fun openEncryptedOutput(file: File, associatedData: ByteArray = ByteArray(0)): OutputStream {
+        val fileChannel = FileOutputStream(file).channel
+        return Channels.newOutputStream(
+            streamingAead.newEncryptingChannel(fileChannel, associatedData)
+        )
     }
 
-    @Test
-    fun movePage_swapsPositions() {
-        val uri1 = Uri.parse("file:///test/scan1.jpg")
-        val uri2 = Uri.parse("file:///test/scan2.jpg")
-        viewModel.addPage(uri1)
-        viewModel.addPage(uri2)
-        viewModel.movePage(0, 1)
-        assertEquals(uri2, viewModel.pages.value?.get(0))
-        assertEquals(uri1, viewModel.pages.value?.get(1))
-    }
-
-    @Test
-    fun getPdfFileName_usesBaseName_whenSet() {
-        viewModel.setPdfBaseName("Meeting Notes")
-        val result = viewModel.getPdfFileName("20260301_120000")
-        assertEquals("Meeting Notes_20260301_120000.pdf", result)
-    }
-
-    @Test
-    fun clearAllPages_resetsEverything() {
-        viewModel.addPage(Uri.parse("file:///test.jpg"))
-        viewModel.setPdfBaseName("test")
-        viewModel.clearAllPages()
-        assertEquals(0, viewModel.getPageCount())
-        assertNull(viewModel.pdfBaseName.value)
+    /**
+     * Open a decrypted input stream. Reads ciphertext from disk
+     * and returns plaintext to the caller.
+     */
+    fun openDecryptedInput(file: File, associatedData: ByteArray = ByteArray(0)): InputStream {
+        val fileChannel = FileInputStream(file).channel
+        return Channels.newInputStream(
+            streamingAead.newDecryptingChannel(fileChannel, associatedData)
+        )
     }
 }
 ```
 
-### Pattern 2: Robolectric for Android-Dependent Unit Tests
+**Integration with existing PdfUtils:**
+```kotlin
+// BEFORE (PdfUtils.kt line ~144)
+FileOutputStream(outputFile).use { fos ->
+    pdfDocument.writeTo(fos)
+}
 
-**What:** Run tests that need Android framework classes (Bitmap, SharedPreferences, Application) on JVM using Robolectric shadows.
-**When to use:** ImageProcessor tests, DocumentHistoryRepository tests, PdfEditorViewModel tests.
-**Trade-offs:** Slower than pure JVM tests (~3-5s startup) but much faster than device tests. Not 100% faithful to real Android behavior for Canvas operations. Robolectric does NOT adequately shadow PdfRenderer — do not use Robolectric for PdfUtils tests.
+// AFTER
+secureFileManager.openEncryptedOutput(outputFile, "pdf".toByteArray()).use { os ->
+    pdfDocument.writeTo(os)
+}
+```
+
+### Pattern 2: Activity-Level FLAG_SECURE with Fragment Destination Awareness
+
+**What:** FLAG_SECURE is a Window flag -- it can only be set on the Activity's window, not per-fragment. In a single-activity architecture, the Activity listens to NavController destination changes and toggles FLAG_SECURE based on which fragment is displayed.
+
+**When to use:** Fragments displaying sensitive document content (Preview, Camera preview, Pages, PdfViewer, PdfEditor). HomeFragment and SettingsFragment may NOT need it.
+
+**Trade-offs:**
+- PRO: Centralized logic in one place (MainActivity)
+- PRO: Works with Navigation Component's OnDestinationChangedListener
+- CON: FLAG_SECURE is all-or-nothing per window -- cannot protect one fragment while leaving another visible
+- CON: Affects the entire screen including system UI, which may feel heavy-handed
 
 **Example:**
 ```kotlin
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
-class ImageProcessorTest {
-    @Test
-    fun applyFilter_original_returnsSameBitmap() {
-        val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-        val result = ImageProcessor.applyFilter(bitmap, ImageProcessor.FilterType.ORIGINAL)
-        assertSame(bitmap, result)
-    }
+// MainActivity.kt -- in onCreate(), after NavController setup
+val navController = navHostFragment.navController
 
-    @Test
-    fun applyFilter_enhanced_returnsDifferentBitmap() {
-        val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-        val result = ImageProcessor.applyFilter(bitmap, ImageProcessor.FilterType.ENHANCED)
-        assertNotSame(bitmap, result)
-        assertEquals(bitmap.width, result.width)
-    }
+// Fragments that display sensitive document content
+val secureDestinations = setOf(
+    R.id.cameraFragment,
+    R.id.previewFragment,
+    R.id.pagesFragment,
+    R.id.pdfViewerFragment,
+    R.id.pdfEditorFragment
+)
 
-    @Test
-    fun applyFilter_magic_capsToMaxDimension() {
-        // 4000x4000 should be scaled down to ~3368
-        val bitmap = Bitmap.createBitmap(4000, 4000, Bitmap.Config.ARGB_8888)
-        val result = ImageProcessor.applyFilter(bitmap, ImageProcessor.FilterType.MAGIC)
-        assertTrue(result.width <= 3368 && result.height <= 3368)
+navController.addOnDestinationChangedListener { _, destination, _ ->
+    if (destination.id in secureDestinations) {
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
+    } else {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
     }
 }
 ```
 
-### Pattern 3: Fragment Testing with FragmentScenario
+**Dialog caveat:** MaterialAlertDialogBuilder dialogs inherit the Activity window's FLAG_SECURE. This is correct behavior for this app -- dialogs over secure fragments should also be protected. No additional work needed for dialogs.
 
-**What:** Launch fragments in isolation with mock or real NavController to test UI behavior.
-**When to use:** All Fragment integration tests. Use `launchFragmentInContainer` for UI tests, `launchFragment` (no container) for logic-only tests.
-**Trade-offs:** Requires device/emulator, slower. Provides real lifecycle and view rendering.
+### Pattern 3: Biometric Gating via Navigation Interceptor
+
+**What:** BiometricPrompt authenticates in a Fragment, then conditionally allows navigation. The biometric check gates app entry (on cold start or return from background), not individual fragment transitions.
+
+**When to use:** App launch and return-from-background (configurable in Settings).
+
+**Trade-offs:**
+- PRO: BiometricPrompt is lifecycle-aware when hosted in Fragment/FragmentActivity
+- PRO: Navigation Component's NavController.navigate() can be called in the success callback
+- CON: BiometricPrompt cannot be shown before a Fragment's view is created, so there is a brief flash
+- CON: Process death + biometric creates UX complexity (user returns to mid-scan state but must auth first)
 
 **Example:**
 ```kotlin
-@RunWith(AndroidJUnit4::class)
-class HomeFragmentTest {
-    @Test
-    fun clickScanButton_navigatesToCamera() {
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+// BiometricHelper.kt
+class BiometricHelper(private val fragment: Fragment) {
 
-        launchFragmentInContainer<HomeFragment>(themeResId = R.style.Theme_PdfScanner).onFragment { fragment ->
-            navController.setGraph(R.navigation.nav_graph)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
+    fun authenticate(
+        title: String,
+        subtitle: String,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(title)
+            .setSubtitle(subtitle)
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
+            .build()
 
-        onView(withId(R.id.btnScan)).perform(click())
-        assertEquals(R.id.cameraFragment, navController.currentDestination?.id)
+        val biometricPrompt = BiometricPrompt(
+            fragment,
+            ContextCompat.getMainExecutor(fragment.requireContext()),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
+                    onSuccess()
+                }
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    if (errorCode != BiometricPrompt.ERROR_USER_CANCELED &&
+                        errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                        onFailure()
+                    }
+                }
+            }
+        )
+        biometricPrompt.authenticate(promptInfo)
     }
 }
 ```
 
-### Pattern 4: File I/O Testing with Temporary Directories
+**Navigation Integration:** The HomeFragment's `onViewCreated()` checks biometric state. If the user has not authenticated this session, show BiometricPrompt before revealing content. The ViewModel tracks `isAuthenticated` as transient state (not persisted -- fresh auth on each cold start).
 
-**What:** Test PdfUtils and file-based operations using InstrumentationRegistry's targetContext for real filesystem access.
-**When to use:** PdfUtils merge/split/compress tests, signature save/load tests.
-**Trade-offs:** Needs device, creates real files. Must clean up in @After.
+### Pattern 4: SharedPreferences Migration Without Data Loss
+
+**What:** Migrate `AppPreferences` (pdf_scanner_prefs) and `DocumentHistoryRepository` (document_history) from plaintext SharedPreferences to encrypted storage. Use a two-phase migration: read old -> write encrypted -> delete old.
+
+**When to use:** First app launch after the security update.
+
+**Critical decision: EncryptedSharedPreferences vs DataStore+Tink**
+
+The `security-crypto` library (which includes EncryptedSharedPreferences) was deprecated in v1.1.0 (July 2025). The official recommendation is DataStore + Tink. However, for THIS project:
+
+**Use EncryptedSharedPreferences (security-crypto 1.1.0 stable) because:**
+1. The app uses synchronous SharedPreferences access patterns throughout (prefs.getInt(), prefs.edit().putInt().apply())
+2. DataStore is async-only (Flow/suspend) and would require rewriting every preference read site
+3. The stored data is small (a few ints + one JSON string) -- the keyset corruption issues that plagued ESP primarily affected high-frequency writes
+4. The community fork `io.github.nickebbitt:security-crypto` provides ongoing maintenance if the stable release becomes unmaintained
+5. Migration from SharedPreferences to EncryptedSharedPreferences is trivial because ESP implements the SharedPreferences interface
+
+**Alternative if ESP proves unstable:** Wrap Tink AEAD (not streaming) directly around SharedPreferences values. Encrypt each value before putString(), decrypt after getString(). This avoids the DataStore migration entirely while using Tink directly.
+
+**Migration pattern:**
+```kotlin
+// SecurePreferences.kt
+class SecurePreferences(context: Context) {
+
+    private val encryptedPrefs: SharedPreferences by lazy {
+        EncryptedSharedPreferences.create(
+            "pdf_scanner_prefs_encrypted",
+            MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build(),
+            context,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
+    /**
+     * One-time migration: reads all values from old plaintext prefs,
+     * writes them to encrypted prefs, then deletes old file.
+     */
+    fun migrateIfNeeded(context: Context) {
+        val migrationKey = "migration_complete_v1"
+        if (encryptedPrefs.getBoolean(migrationKey, false)) return
+
+        // Migrate AppPreferences
+        val oldAppPrefs = context.getSharedPreferences(
+            "pdf_scanner_prefs", Context.MODE_PRIVATE
+        )
+        if (oldAppPrefs.all.isNotEmpty()) {
+            val editor = encryptedPrefs.edit()
+            oldAppPrefs.all.forEach { (key, value) ->
+                when (value) {
+                    is Int -> editor.putInt(key, value)
+                    is String -> editor.putString(key, value)
+                    is Boolean -> editor.putBoolean(key, value)
+                    is Long -> editor.putLong(key, value)
+                    is Float -> editor.putFloat(key, value)
+                }
+            }
+            editor.putBoolean(migrationKey, true)
+            editor.apply()
+
+            // Delete old plaintext file
+            context.deleteSharedPreferences("pdf_scanner_prefs")
+        }
+
+        // Migrate DocumentHistory
+        val oldHistoryPrefs = context.getSharedPreferences(
+            "document_history", Context.MODE_PRIVATE
+        )
+        if (oldHistoryPrefs.all.isNotEmpty()) {
+            val historyEditor = encryptedPrefs.edit()
+            oldHistoryPrefs.all.forEach { (key, value) ->
+                if (value is String) historyEditor.putString("history_$key", value)
+            }
+            historyEditor.apply()
+            context.deleteSharedPreferences("document_history")
+        }
+    }
+}
+```
+
+### Pattern 5: Secure Deletion with Overwrite
+
+**What:** When deleting sensitive files (scans, processed images, PDFs), overwrite file contents with random bytes before calling File.delete(). This prevents recovery from flash storage wear-leveling remnants.
+
+**When to use:** All file deletions in scans/, processed/, pdfs/ directories. Also applies to temp file cleanup in MainActivity.
+
+**Trade-offs:**
+- PRO: Significantly harder to recover deleted files
+- CON: Flash storage wear-leveling means overwrite is not guaranteed to hit same physical blocks
+- CON: Slower than plain delete (must write file-length of random data)
+- MITIGATION: Combined with at-rest encryption, secure deletion provides defense-in-depth
 
 **Example:**
 ```kotlin
-@RunWith(AndroidJUnit4::class)
-class PdfUtilsInstrumentedTest {
-    private lateinit var context: Context
-    private lateinit var testDir: File
+// security/SecureDeletion.kt
+object SecureDeletion {
 
-    @Before
-    fun setup() {
-        context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDir = File(context.cacheDir, "test_pdfs").apply { mkdirs() }
-    }
-
-    @After
-    fun cleanup() {
-        testDir.deleteRecursively()
-    }
-
-    @Test
-    fun mergePdfs_withEmptyList_returnsFailure() = runBlocking {
-        val result = PdfUtils.mergePdfs(context, emptyList())
-        assertFalse(result.success)
-    }
-
-    @Test
-    fun formatFileSize_formatsCorrectly() {
-        assertEquals("500 B", PdfUtils.formatFileSize(500))
-        assertEquals("1 KB", PdfUtils.formatFileSize(1024))
-        assertEquals("1.5 MB", PdfUtils.formatFileSize(1572864))
-    }
-}
-```
-
-## Build Configuration: New Files and Modifications
-
-### JaCoCo Integration in build.gradle.kts
-
-**What changes:** Two modifications to `app/build.gradle.kts`:
-1. Enable unit test coverage in the debug build type.
-2. Register a custom `jacocoTestReport` task.
-
-**Why a custom task is needed:** The Android Gradle Plugin's built-in JaCoCo integration produces `.exec` files but does not generate the HTML/XML report automatically. A custom task assembles the report from execution data and source directories.
-
-**Modified section of `app/build.gradle.kts`:**
-```kotlin
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("androidx.navigation.safeargs.kotlin")
-    id("jacoco")  // Add JaCoCo plugin
-}
-
-android {
-    // ... existing config unchanged ...
-
-    buildTypes {
-        debug {
-            isDebuggable = true
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-            enableUnitTestCoverage = true        // New: replaces deprecated isTestCoverageEnabled
-            enableAndroidTestCoverage = true     // New: for instrumented test coverage
-        }
-        release {
-            // ... unchanged ...
+    /**
+     * Overwrite file contents with random bytes, then delete.
+     * Best-effort on flash storage -- combined with encryption for defense-in-depth.
+     */
+    fun secureDelete(file: File): Boolean {
+        if (!file.exists()) return true
+        return try {
+            val length = file.length()
+            if (length > 0) {
+                RandomAccessFile(file, "rw").use { raf ->
+                    val random = SecureRandom()
+                    val buffer = ByteArray(8192)
+                    var remaining = length
+                    while (remaining > 0) {
+                        random.nextBytes(buffer)
+                        val toWrite = minOf(remaining, buffer.size.toLong()).toInt()
+                        raf.write(buffer, 0, toWrite)
+                        remaining -= toWrite
+                    }
+                    raf.fd.sync()
+                }
+            }
+            file.delete()
+        } catch (e: Exception) {
+            // Fall back to regular delete
+            file.delete()
         }
     }
 }
+```
 
-// JaCoCo report task registered AFTER the android {} block
-// so Android Gradle Plugin task outputs are available
-tasks.register("jacocoTestReport", JacocoReport::class) {
-    dependsOn("testDebugUnitTest")
+### Pattern 6: Intent Validation at Activity Entry Point
 
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/html"))
+**What:** Validate all incoming intents in MainActivity before they reach any fragment. Since this app has a single exported Activity (launcher), the attack surface is limited. The FileProvider is already non-exported. Validation focuses on: (a) sanitizing any extras on the launch intent, (b) validating FileProvider URIs before sharing.
+
+**When to use:** MainActivity.onCreate() for incoming intents; HomeFragment for intent results from document/PDF pickers.
+
+**Trade-offs:**
+- PRO: Centralized validation point (single Activity)
+- PRO: Existing app only has launcher intent filter -- minimal attack surface
+- CON: Over-validation can break legitimate deep links if added later
+
+**Example:**
+```kotlin
+// security/IntentValidator.kt
+object IntentValidator {
+
+    /**
+     * Validate that a URI from an intent result is safe to process.
+     * Rejects file:// URIs from external sources (must be content://).
+     */
+    fun isValidContentUri(uri: Uri?): Boolean {
+        if (uri == null) return false
+        return uri.scheme == "content"
     }
 
-    // Exclusions: generated code that should not count toward coverage targets
-    val excludes = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*_Impl*",               // Room DAO implementations (none currently, future-proof)
-        "**/databinding/**",
-        "**/*Args*",                // Navigation Safe Args generated classes
-        "**/*Directions*",          // Navigation Safe Args generated classes
-    )
-
-    val javaClasses = fileTree(layout.buildDirectory.dir("intermediates/javac/debug")) {
-        exclude(excludes)
+    /**
+     * Validate a file path argument from SafeArgs navigation.
+     * Ensures path is within app-private storage.
+     */
+    fun isValidInternalPath(context: Context, path: String?): Boolean {
+        if (path.isNullOrBlank()) return false
+        val resolved = File(path).canonicalPath
+        val filesDir = context.filesDir.canonicalPath
+        val cacheDir = context.cacheDir.canonicalPath
+        return resolved.startsWith(filesDir) || resolved.startsWith(cacheDir)
     }
-    val kotlinClasses = fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
-        exclude(excludes)
-    }
+}
+```
 
-    classDirectories.setFrom(files(javaClasses, kotlinClasses))
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    executionData.setFrom(
-        fileTree(layout.buildDirectory) {
-            include("jacoco/testDebugUnitTest.exec")
+## Data Flow
+
+### Scan-to-PDF Flow (with encryption)
+
+```
+[Camera Capture]
+    |
+    v
+CameraFragment.takePhoto()
+    |
+    v
+imageCapture.takePicture(outputFile) -- writes plaintext to temp File
+    |
+    v
+SecureFileManager.encryptInPlace(outputFile) -- re-encrypts the file
+    |                                           (read plaintext, write ciphertext,
+    |                                            delete plaintext)
+    v
+viewModel.addPage(encryptedFileUri) -- URI stored in SavedStateHandle
+    |
+    v
+[User edits: crop/filter in PreviewFragment]
+    |
+    v
+ImageProcessor reads via SecureFileManager.openDecryptedInput()
+    |        writes via SecureFileManager.openEncryptedOutput()
+    v
+[User taps "Create PDF" in PagesFragment]
+    |
+    v
+PagesFragment reads pages via SecureFileManager.openDecryptedInput()
+    |        Decodes bitmaps, renders to PdfDocument
+    |        Writes PDF via SecureFileManager.openEncryptedOutput()
+    v
+[Share via FileProvider]
+    |
+    v
+Temp decrypted copy to cacheDir -> FileProvider URI -> Intent.ACTION_SEND
+    |
+    v
+Temp file cleaned up after share completes (or on next startup)
+```
+
+### Biometric App Lock Flow
+
+```
+[App Launch / Return from Background]
+    |
+    v
+HomeFragment.onViewCreated() checks SecurityManager.isAuthRequired()
+    |
+    +-- YES --> BiometricHelper.authenticate()
+    |               |
+    |               +-- onSuccess() --> show fragment content,
+    |               |                   set isAuthenticated = true
+    |               |
+    |               +-- onError() --> finish() activity (lock user out)
+    |
+    +-- NO --> show fragment content directly
+```
+
+### SharedPreferences Migration Flow
+
+```
+[First launch after update]
+    |
+    v
+Application.onCreate() or MainActivity.onCreate()
+    |
+    v
+SecurePreferences.migrateIfNeeded(context)
+    |
+    +-- Check "migration_complete_v1" flag in encrypted prefs
+    |
+    +-- NOT migrated:
+    |       Read old "pdf_scanner_prefs" (plaintext)
+    |       Write all entries to encrypted prefs
+    |       Read old "document_history" (plaintext)
+    |       Write all entries to encrypted prefs
+    |         (namespaced with "history_" prefix)
+    |       Set migration flag
+    |       Delete old SharedPreferences files
+    |
+    +-- Already migrated: skip
+```
+
+## Integration Points with Existing Components
+
+### Component-by-Component Impact
+
+| Existing Component | Security Integration | Change Size | Risk |
+|---|---|---|---|
+| **MainActivity** | Add FLAG_SECURE OnDestinationChangedListener; call SecurePreferences.migrateIfNeeded(); update cleanupStaleTempFiles() to use SecureDeletion | Small | LOW -- additive changes |
+| **ScannerViewModel** | NONE -- URIs remain opaque. No encryption awareness needed. | Zero | NONE |
+| **CameraFragment** | After capture, encrypt file via SecureFileManager.encryptInPlace() | Small | LOW -- one call added after save |
+| **PreviewFragment** | Load images via SecureFileManager (decrypt on read) instead of raw URI | Medium | MEDIUM -- bitmap loading path changes |
+| **PagesFragment** | PDF generation reads via SecureFileManager; share creates temp decrypted copy; delete uses SecureDeletion | Medium | MEDIUM -- multiple I/O paths |
+| **PdfViewerFragment** | Open PDF via decrypted temp copy (PdfRenderer needs seekable FileDescriptor) | Medium | MEDIUM -- PdfRenderer requires raw FD |
+| **PdfEditorFragment** | Same as PdfViewer -- decrypted temp copy for editing | Medium | MEDIUM |
+| **HomeFragment** | Biometric gate on entry; intent result validation | Small | LOW |
+| **SettingsFragment** | New security section (app lock toggle, biometric toggle); uses SecurePreferences | Small | LOW |
+| **DocumentHistoryRepository** | Constructor takes SecurePreferences instead of raw SharedPreferences | Small | LOW -- same API (SharedPreferences interface) |
+| **AppPreferences** | Constructor takes SecurePreferences instead of raw SharedPreferences | Small | LOW -- same API |
+| **PdfUtils** | All FileOutputStream replaced with SecureFileManager.openEncryptedOutput() | Medium | MEDIUM -- 6+ I/O sites |
+| **ImageProcessor** | File reads/writes through SecureFileManager | Small | LOW -- utility methods |
+| **ImageUtils** | EXIF correction output via SecureFileManager | Small | LOW |
+| **PdfPageExtractor** | Read imported PDFs (external, not encrypted); write extracted pages via SecureFileManager | Small | LOW |
+| **FileProvider (file_paths.xml)** | No change. FileProvider serves content:// URIs from filesDir paths. Encrypted files are at same paths. | Zero | NONE |
+| **nav_graph.xml** | No structural changes. Biometric gating is in fragment code, not navigation. | Zero | NONE |
+
+### PdfRenderer Compatibility Issue
+
+**Problem:** PdfRenderer requires a seekable ParcelFileDescriptor. Tink StreamingAead provides a streaming decryption channel, not a seekable one. You cannot pass an encrypted file directly to PdfRenderer.
+
+**Solution:** For PDF viewing/editing, decrypt to a temp file in cacheDir, open PdfRenderer on the temp file, then securely delete the temp file when done. This is the same pattern already used by PdfViewerFragment (which creates temp copies in cacheDir). The only change is adding encryption/decryption around the copy step.
+
+```kotlin
+// In PdfViewerFragment / PdfEditorFragment:
+val tempFile = File(
+    requireContext().cacheDir,
+    "pdf_view_temp_${System.currentTimeMillis()}.pdf"
+)
+secureFileManager.decryptToFile(encryptedPdfFile, tempFile)
+// Use tempFile with PdfRenderer as before
+// On fragment destroy: SecureDeletion.secureDelete(tempFile)
+```
+
+### Coil Image Loading Compatibility
+
+**Problem:** Coil loads images from URIs. Encrypted files cannot be loaded directly by Coil because the bytes are ciphertext.
+
+**Solution:** Register a custom Coil `Fetcher` that detects encrypted file URIs and decrypts them to a Bitmap before passing to Coil's pipeline. Alternatively, decrypt to a temp file and load that. The custom Fetcher approach is cleaner:
+
+```kotlin
+// Custom Coil fetcher for encrypted files
+class EncryptedFileFetcher(
+    private val secureFileManager: SecureFileManager,
+    private val file: File
+) : Fetcher {
+    override suspend fun fetch(): FetchResult {
+        val inputStream = secureFileManager.openDecryptedInput(file)
+        return SourceResult(
+            source = inputStream.source().buffer(),
+            mimeType = "image/jpeg",
+            dataSource = DataSource.DISK
+        )
+    }
+}
+```
+
+### CameraX Capture Integration
+
+**Problem:** CameraX ImageCapture writes directly to a File via OutputFileOptions. There is no way to inject an encrypted OutputStream into the CameraX capture pipeline.
+
+**Solution:** Let CameraX write plaintext to the file as normal, then immediately encrypt-in-place in the onImageSaved callback:
+
+```kotlin
+// In CameraFragment.takePhoto() onImageSaved callback:
+override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+    // CameraX wrote plaintext JPEG to photoFile
+    // Encrypt it in place before the URI propagates to ViewModel
+    lifecycleScope.launch(Dispatchers.IO) {
+        secureFileManager.encryptInPlace(photoFile)
+        withContext(Dispatchers.Main) {
+            val savedUri = photoFile.toUri()
+            viewModel.setCurrentCapture(savedUri)
+            // ... navigation as before
         }
-    )
-}
-```
-
-**Coverage targets from requirements:**
-- `util/` package: 70% line coverage (ImageProcessor, PdfUtils format methods, AppPreferences)
-- `viewmodel/` package: 50% line coverage (ScannerViewModel)
-
-**How to run:**
-```bash
-./gradlew testDebugUnitTest jacocoTestReport
-# Report: app/build/reports/jacoco/html/index.html
-```
-
-### Detekt Integration
-
-**What:** Two new files + one modification to root `build.gradle.kts`.
-
-**New file: `app/detekt.yml`** — Detekt rule configuration for this project.
-
-The key principle: rules ship enabled by default in Detekt. The config file selectively disables rules that conflict with the codebase's established patterns.
-
-```yaml
-# app/detekt.yml
-# Rules not listed here use Detekt defaults (active: true where applicable)
-
-style:
-  MagicNumber:
-    active: true
-    ignoreNumbers: ['-1', '0', '1', '2', '100', '255', '1024']  # Common in image math
-    ignoreConstantDeclaration: true
-    ignoreEnums: true
-  MaxLineLength:
-    active: true
-    maxLineLength: 120         # Matches Android Studio default
-  WildcardImport:
-    active: true
-    excludeImports: []
-
-complexity:
-  LongMethod:
-    active: true
-    threshold: 60              # Some filter functions are inherently long
-  CyclomaticComplexMethod:
-    active: true
-    threshold: 15
-
-naming:
-  FunctionNaming:
-    active: true
-    functionPattern: '[a-z][a-zA-Z0-9]*'   # Allows existing camelCase names
-
-formatting:
-  # detekt-formatting delegates to ktlint internally
-  # Enable the rules you care about:
-  Indentation:
-    active: true
-    indentSize: 4
-  NoWildcardImports:
-    active: true
-  MaximumLineLength:
-    active: true
-    maxLineLength: 120
-```
-
-**Baseline approach: generate first, enforce new violations only.**
-
-The baseline mechanism works as follows:
-1. Run `./gradlew detektBaseline` — Detekt analyzes all existing code and writes every current violation into `app/detekt-baseline.xml`.
-2. On every subsequent `./gradlew detekt` run, violations present in the baseline are silently ignored. Only violations NOT in the baseline (i.e., new code violations) cause build failure.
-3. The baseline file must be committed to version control. It is the "debt snapshot" of existing code.
-4. When a baseline violation is fixed, re-running `./gradlew detektBaseline` regenerates the file without that entry.
-
-**Modified `build.gradle.kts` (root level):**
-```kotlin
-plugins {
-    id("com.android.application") version "8.13.2" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.21" apply false
-    id("androidx.navigation.safeargs.kotlin") version "2.7.6" apply false
-    id("io.gitlab.arturbosch.detekt") version "1.23.7" apply false  // Add Detekt
-}
-```
-
-**Modified `app/build.gradle.kts` (add plugin and configure):**
-```kotlin
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("androidx.navigation.safeargs.kotlin")
-    id("jacoco")
-    id("io.gitlab.arturbosch.detekt")          // Add Detekt
-}
-
-// After the android {} block:
-detekt {
-    config.setFrom("$projectDir/detekt.yml")
-    baseline = file("$projectDir/detekt-baseline.xml")
-    buildUponDefaultConfig = true              // Layer on top of Detekt defaults
-
-    // Include detekt-formatting (ktlint rules)
-    dependencies {
-        detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
     }
 }
 ```
 
-**Workflow for Phase 5 (RELEASE-01):**
-```bash
-# Step 1: Generate baseline for all existing code violations
-./gradlew detektBaseline
-# -> creates app/detekt-baseline.xml, commit this file
+### CanHub Image Cropper Integration
 
-# Step 2: From now on, detekt enforces zero NEW violations
-./gradlew detekt
-# -> passes (existing violations suppressed by baseline)
-# -> fails if new code introduces violations not in baseline
+**Problem:** The CanHub Image Cropper library (CropImageActivity) expects to read and write files directly. It cannot work with encrypted files.
+
+**Solution:** Decrypt to a temp file before launching the cropper, let the cropper write its output to a temp file, then encrypt the result and clean up the temp files. This follows the same temp-decrypt pattern used for PdfRenderer.
+
+## Anti-Patterns
+
+### Anti-Pattern 1: Encrypting in the ViewModel
+
+**What people do:** Add encryption/decryption calls inside ScannerViewModel methods.
+**Why it's wrong:** ViewModel should be UI-state management only. Mixing I/O concerns makes it untestable with pure JVM tests (existing 22 ViewModel tests would break). Also creates tight coupling between state management and cryptography.
+**Do this instead:** Encryption lives in SecureFileManager. ViewModel passes URIs. Fragments call SecureFileManager when doing I/O.
+
+### Anti-Pattern 2: Per-Fragment FLAG_SECURE Calls
+
+**What people do:** Each fragment calls `requireActivity().window.setFlags(FLAG_SECURE, ...)` in its own `onResume()`.
+**Why it's wrong:** 8 fragments means 8 places to remember. Fragment transitions can race (new fragment's onResume before old fragment's onPause). Clearing FLAG_SECURE in one fragment while another secure fragment is still visible causes a security gap.
+**Do this instead:** Single OnDestinationChangedListener in MainActivity. One source of truth for which destinations are secure.
+
+### Anti-Pattern 3: Encrypting SharedPreferences Values Individually
+
+**What people do:** Manually encrypt each value before `putString()` and decrypt after `getString()`.
+**Why it's wrong:** Key names are still plaintext (leaks what settings exist). Error-prone (forget to encrypt one value). Duplicates effort that EncryptedSharedPreferences already handles.
+**Do this instead:** Use EncryptedSharedPreferences which encrypts both keys AND values. Or use the Tink AEAD wrapper only as a fallback if ESP is unstable.
+
+### Anti-Pattern 4: Blocking Main Thread for Biometric
+
+**What people do:** Show BiometricPrompt in `onCreate()` before `setContentView()`, hoping to prevent any UI from appearing.
+**Why it's wrong:** BiometricPrompt requires a Fragment or FragmentActivity with an active lifecycle. Calling it before the view is ready crashes. Also, there will always be at least one frame rendered before the prompt appears.
+**Do this instead:** Show a blank/splash overlay in the layout, show BiometricPrompt in `onViewCreated()`, and remove the overlay on authentication success. Accept the brief visual transition as unavoidable.
+
+### Anti-Pattern 5: Storing Encryption Keys in SharedPreferences
+
+**What people do:** Generate an AES key and store it in SharedPreferences (even encrypted ones).
+**Why it's wrong:** Keys should never leave the Android Keystore hardware-backed store. If a key is extractable, a rooted device can read it.
+**Do this instead:** Store Tink keysets encrypted with an Android Keystore master key. The Tink keyset contains the actual AES key material, but it is wrapped (encrypted) by the Keystore master key. The AES key never appears in plaintext outside the Keystore.
+
+## Scaling Considerations (Security Context)
+
+| Concern | Current (v1.2) | Future (v2+) |
+|---------|----------------|--------------|
+| File count | Encrypt all files in scans/processed/pdfs/ | Same -- no change needed |
+| Performance | Tink StreamingAead adds ~5-10% overhead | Consider chunk size tuning if >100 page docs |
+| Key rotation | Single master keyset, no rotation | Add keyset rotation on major version upgrade |
+| Biometric | Simple app-lock gate | Per-document biometric (CryptoObject per PDF) |
+| Multi-user | N/A (single user app) | Consider separate keysets per user profile |
+| Cloud sync | N/A (out of scope) | End-to-end encryption with user-held key |
+
+## Build Order (Dependency-Aware)
+
+Security features have strict dependencies. Building in the wrong order creates rework.
+
+```
+Phase 1: Foundation (must be first -- everything else depends on this)
+  1. SecurityManager (Tink init, Keystore master key)
+  2. SecureFileManager (encrypt/decrypt streams, using SecurityManager)
+  3. SecureDeletion (standalone, no dependencies)
+
+Phase 2: Data Migration (depends on Phase 1)
+  4. SecurePreferences (migration wrapper)
+  5. AppPreferences migration (swap backing store)
+  6. DocumentHistoryRepository migration (swap backing store)
+
+Phase 3: File Encryption Integration (depends on Phase 1)
+  7. CameraFragment capture encryption
+  8. ImageProcessor/ImageUtils encrypted I/O
+  9. PdfUtils encrypted I/O
+  10. Coil encrypted file fetcher
+  11. PdfViewer/PdfEditor temp-decrypt pattern
+  12. CanHub Cropper temp-decrypt pattern
+
+Phase 4: UI Security (independent of Phases 2-3, depends on Phase 1)
+  13. FLAG_SECURE in MainActivity
+  14. IntentValidator
+  15. BiometricHelper
+  16. SettingsFragment security section
+  17. App-lock biometric gate in HomeFragment
+
+Phase 5: Hardening (depends on all above)
+  18. Secure deletion integration in all delete paths
+  19. Existing temp cleanup migration to SecureDeletion
+  20. ProGuard/R8 keep rules for Tink classes
+  21. Security audit pass (verify no plaintext leaks)
 ```
 
-**Important:** Do NOT run `detektBaseline` on a CI system that blocks merges. Run it once locally, commit the result, and thereafter only run `detekt`.
+**Rationale:** SecurityManager/SecureFileManager are the foundation that all other features depend on. SharedPreferences migration and file encryption are independent of each other but both need the foundation. UI security (FLAG_SECURE, biometric) is independent of encryption but should come after the foundation is proven stable. Hardening is last because it cross-cuts everything.
 
-### ProGuard / R8 Rules
+## Key Technology Decisions
 
-**What changes:** `app/proguard-rules.pro` is modified (it currently has minimal rules for CameraX and CanHub).
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| File encryption library | **Tink Android 1.20.0** | Official Google crypto library. StreamingAead handles large files. Fully supported on minSdk 24. NOT deprecated (unlike security-crypto). |
+| File encryption scheme | **AES128_GCM_HKDF_4KB** | 4KB segment size keeps memory usage low (important for 10+ page doc processing). GCM provides authenticated encryption. |
+| Key storage | **Android Keystore** via Tink AndroidKeysetManager | Hardware-backed key storage. Tink wraps keyset with Keystore master key automatically. |
+| SharedPreferences encryption | **EncryptedSharedPreferences** (security-crypto 1.1.0 stable) | Same SharedPreferences interface means minimal code changes. Deprecated but stable release (1.1.0 July 2025). Small data volume avoids known keyset corruption issues. |
+| Biometric library | **androidx.biometric:biometric:1.1.0** | Stable release. Fragment-aware. CryptoObject support. minSdk 23 (project minSdk is 24). |
+| Biometric authentication mode | **BIOMETRIC_STRONG or DEVICE_CREDENTIAL** | Allows fingerprint/face AND PIN/pattern fallback. Broadest device compatibility. |
+| Screenshot prevention | **FLAG_SECURE** via OnDestinationChangedListener | Only reliable mechanism on Android. Activity-level but fragment-aware via nav listener. |
 
-**Existing file (for reference):**
-```
--keep class androidx.camera.** { *; }
--keep class com.canhub.cropper.** { *; }
-```
-
-**Complete updated `app/proguard-rules.pro`:**
-
-```proguard
-# =============================================================
-# EXISTING RULES (kept)
-# =============================================================
-
-# Keep CameraX classes
--keep class androidx.camera.** { *; }
-
-# Keep CanHub Image Cropper
--keep class com.canhub.cropper.** { *; }
-
-# =============================================================
-# ML KIT TEXT RECOGNITION (com.google.mlkit:text-recognition)
-# =============================================================
-# ML Kit text recognition bundles its model in the APK.
-# R8 must not strip ML Kit runtime classes.
--keep class com.google.mlkit.** { *; }
--dontwarn com.google.mlkit.**
-
-# =============================================================
-# ML KIT DOCUMENT SCANNER (play-services-mlkit-document-scanner)
-# =============================================================
-# GMS-based scanner — the AAR includes consumer ProGuard rules,
-# but explicit keep prevents issues with dynamic feature loading.
--keep class com.google.android.gms.** { *; }
--dontwarn com.google.android.gms.**
-
-# =============================================================
-# NAVIGATION COMPONENT + SAFE ARGS
-# =============================================================
-# Safe Args generates *Directions and *Args classes at build time.
-# R8 must not rename these because they are referenced by the
-# navigation graph XML at runtime via reflection.
-#
-# The generated classes follow the pattern:
-#   com.pdfscanner.app.ui.*Directions
-#   com.pdfscanner.app.ui.*FragmentArgs
-#   com.pdfscanner.app.editor.*Directions
-#
-# Keep all generated Args and Directions classes by name.
--keepnames class com.pdfscanner.app.** implements androidx.navigation.NavArgs
--keep class com.pdfscanner.app.**Args { *; }
--keep class com.pdfscanner.app.**Directions { *; }
--keep class com.pdfscanner.app.**Directions$* { *; }
-
-# Navigation Component core — safe to keep entire package
--keep class androidx.navigation.** { *; }
--dontwarn androidx.navigation.**
-
-# =============================================================
-# KOTLIN / COROUTINES
-# =============================================================
--keepclassmembernames class kotlinx.** {
-    volatile <fields>;
-}
--dontwarn kotlinx.coroutines.**
-
-# =============================================================
-# SERIALIZATION / REFLECTION USED BY DocumentEntry
-# =============================================================
-# DocumentEntry uses org.json.JSONObject for serialization.
-# org.json is part of Android SDK — no keep rules needed.
-# If Gson or kotlinx.serialization is added later, add rules here.
-
-# =============================================================
-# DEBUG TOOLING -- STRIP FROM RELEASE
-# =============================================================
-# LeakCanary is debugImplementation only; no rules needed.
-# The following removes any accidental Timber/Log.d calls.
--assumenosideeffects class android.util.Log {
-    public static *** d(...);
-    public static *** v(...);
-}
-
-# =============================================================
-# USEFUL DIAGNOSTICS (uncomment when diagnosing R8 issues)
-# =============================================================
-# -printconfiguration build/outputs/logs/r8-configuration.txt
-# -printseeds build/outputs/logs/r8-seeds.txt
-# -printusage build/outputs/logs/r8-usage.txt
-```
-
-**Why Safe Args needs explicit rules:** The Navigation Safe Args plugin generates classes at compile time that are referenced by the navigation graph XML at runtime. R8 does not see these XML-to-class references during analysis and will strip or rename the classes unless explicitly kept. The `NavArgs` interface keep covers future Safe Args classes if new destinations are added.
-
-**Why ML Kit GMS scanner needs explicit rules:** The `play-services-mlkit-document-scanner` library downloads its scanning model at runtime via Play Services. The AAR's consumer rules are bundled, but the `-keep class com.google.android.gms.**` guard prevents edge cases where GMS service class names are obfuscated, which breaks the dynamic feature download.
-
-### Android Lint Configuration
-
-**New file: `app/lint.xml`**
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<lint>
-    <!-- Treat accessibility issues as errors (blocks release build) -->
-    <issue id="ContentDescription" severity="error" />
-    <issue id="LabelFor" severity="error" />
-    <issue id="TouchTargetSizeCheck" severity="error" />
-
-    <!-- Treat hardcoded text as errors (all text must be in strings.xml) -->
-    <issue id="HardcodedText" severity="error" />
-
-    <!-- Network security config warnings are errors -->
-    <issue id="NetworkSecurityConfig" severity="error" />
-
-    <!-- Baseline lint for known existing issues -->
-    <!-- Run: ./gradlew lint and check lint-baseline.xml -->
-
-    <!-- Suppress false positives in generated binding classes -->
-    <issue id="UnusedResources">
-        <ignore path="**/databinding/**" />
-        <ignore path="**/R.java" />
-    </issue>
-</lint>
-```
-
-**Lint baseline** (separate from Detekt baseline): Run `./gradlew lintDebug` with `android.lintOptions { baseline = file("lint-baseline.xml") }` to generate a suppression file for existing lint warnings before enforcing new ones.
-
-**Modified `app/build.gradle.kts` — android block addition:**
-```kotlin
-android {
-    // ... existing config ...
-
-    lint {
-        lintConfig = file("lint.xml")
-        abortOnError = true          // Build fails on lint errors
-        checkReleaseBuilds = true    // Run lint on release variant
-        baseline = file("lint-baseline.xml")  // Suppress pre-existing issues
-    }
-}
-```
-
-### LeakCanary Integration
-
-**What:** One line addition to `app/build.gradle.kts` dependencies. No code changes needed — LeakCanary auto-installs via ContentProvider.
+## New Dependencies
 
 ```kotlin
-dependencies {
-    // ... existing dependencies ...
+// build.gradle.kts additions:
 
-    // LeakCanary -- debug builds only, no code changes needed
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-}
+// Tink -- file encryption (StreamingAead)
+implementation("com.google.crypto.tink:tink-android:1.20.0")
+
+// Security Crypto -- EncryptedSharedPreferences (deprecated but stable 1.1.0)
+implementation("androidx.security:security-crypto:1.1.0")
+
+// Biometric -- BiometricPrompt for app lock
+implementation("androidx.biometric:biometric:1.1.0")
 ```
 
-**Verification approach:** After adding, run debug build on device, exercise all 8 fragment flows, then navigate away from app and return. LeakCanary will show a notification if retained leaks are detected. Zero leaks required before RELEASE-08 is marked complete.
-
-## Data Flow: How Tests Map to App Flows
-
-### Scan Flow (highest priority for testing)
-
-```
-[Camera Capture]     [ML Kit Document Scanner]     [Gallery Import]
-       |                      |                          |
-       v                      v                          v
-  CameraFragment -----> ScannerViewModel.setCurrentCapture(uri)
-                              |
-                              v
-                    PreviewFragment (filter selection)
-                              |
-                    ScannerViewModel.addPage(uri)
-                    ScannerViewModel.setPageFilter(idx, type)
-                              |
-                              v
-                    PagesFragment (reorder, multi-select)
-                              |
-                    ScannerViewModel.movePage(from, to)
-                    ScannerViewModel.removePage(idx)
-                              |
-                              v
-                    PDF Generation (in PagesFragment)
-                              |
-                    ScannerViewModel.setPdfUri(uri)
-                              |
-                              v
-                    DocumentHistoryRepository.addDocument()
-```
-
-**Test coverage strategy for this flow:**
-- Unit: ScannerViewModel page operations (add, remove, move, filter, clear)
-- Unit: ScannerViewModel PDF naming (getPdfFileName)
-- Integration: PreviewFragment filter UI selection triggers ViewModel state change
-- Integration: PagesFragment RecyclerView displays correct page count
-- Integration: DocumentHistoryRepository persists and retrieves entries
-- E2E (manual): Full camera -> preview -> pages -> PDF -> history
-
-### PDF Tools Flow
-
-```
-[Select PDF from History]
-         |
-         v
-   PdfViewerFragment
-         |
-    [User selects tool]
-         |
-    +----+----+----+
-    |    |    |    |
-    v    v    v    v
-  Merge Split Compress Edit
-    |    |    |    |
-    v    v    v    v
-  PdfUtils.*()     PdfEditorFragment
-    |                    |
-    v                    v
-  PdfOperationResult   PdfAnnotationRenderer.render()
-    |                    |
-    v                    v
-  DocumentHistoryRepository.addDocument()
-```
-
-**Test coverage strategy for this flow:**
-- Unit: PdfOperationResult construction and field access
-- Unit: PdfUtils.formatFileSize
-- Integration: PdfUtils.mergePdfs, splitPdf, compressPdf with real test PDF files
-- Integration: PdfEditorViewModel annotation state management
-- E2E (manual): Open PDF -> Edit -> Save -> Verify annotations rendered
-
-## Build Order: What to Test First
-
-Priority is based on: (1) risk of bugs, (2) ease of testing, (3) user-facing impact.
-
-### Phase 1: Foundation -- Pure Unit Tests (no device needed)
-
-1. **ScannerViewModel** -- highest value, easiest to test, core of the app. Uses `SavedStateHandle()` directly (no mocking).
-2. **DocumentEntry** -- JSON round-trip, data integrity
-3. **PdfUtils.formatFileSize** -- pure utility
-4. **ScannerViewModel.getPdfFileName** -- naming logic
-
-**Why first:** Zero infrastructure needed beyond JUnit + `androidx.arch.core:core-testing`. Establishes test patterns and CI baseline immediately.
-
-### Phase 2: Robolectric Tests (JVM, Android stubs)
-
-5. **ImageProcessor** -- filter functions with Bitmap operations
-6. **DocumentHistoryRepository** -- SharedPreferences CRUD (use fresh context + clear prefs in @Before)
-7. **PdfEditorViewModel** -- tool/page state management (Robolectric needed for AndroidViewModel)
-
-**Why second:** Needs Robolectric dependency added but still runs on JVM. Covers the data/utility layer.
-
-### Phase 3: Instrumented Integration Tests (device/emulator)
-
-8. **PdfUtils** -- merge, split, compress with actual PDF files. Use test assets in `androidTest/assets/`.
-9. **OcrProcessor** -- text recognition with test images (expect partial match on recognized text)
-10. **Navigation flows** -- TestNavHostController for critical paths (Camera -> Preview -> Pages -> PDF)
-11. **Fragment smoke tests** -- HomeFragment renders, buttons are clickable
-
-**Why third:** Requires device/emulator, slower feedback loop. But covers the critical file I/O paths that are most likely to have bugs.
-
-### Phase 4: Release Tooling (after all tests pass)
-
-12. **Detekt baseline**: Run `./gradlew detektBaseline`, commit `detekt-baseline.xml`
-13. **Detekt enforcement**: Run `./gradlew detekt` — zero new violations
-14. **Lint baseline**: Run `./gradlew lintDebug` with baseline configured
-15. **ProGuard**: Build release APK, smoke test all 8 flows on real device
-16. **LeakCanary**: Exercise all flows in debug build, verify zero retained leaks
-
-**Why last:** Release tooling depends on test suite being stable. ProGuard rules should only be validated against a working, well-tested app.
-
-## Integration Points: New vs Modified Files
-
-### New Files
-
-| File | Purpose | Created By |
-|------|---------|------------|
-| `app/src/test/java/com/pdfscanner/app/viewmodel/ScannerViewModelTest.kt` | ViewModel unit tests | Phase 4 |
-| `app/src/test/java/com/pdfscanner/app/data/DocumentEntryTest.kt` | JSON round-trip tests | Phase 4 |
-| `app/src/test/java/com/pdfscanner/app/util/ImageProcessorTest.kt` | Filter tests (Robolectric) | Phase 4 |
-| `app/src/test/java/com/pdfscanner/app/data/DocumentHistoryRepositoryTest.kt` | Repository CRUD (Robolectric) | Phase 4 |
-| `app/src/androidTest/java/com/pdfscanner/app/util/PdfUtilsInstrumentedTest.kt` | PDF ops on device | Phase 4 |
-| `app/src/androidTest/java/com/pdfscanner/app/navigation/NavigationFlowTest.kt` | Navigation flow tests | Phase 4 |
-| `app/src/androidTest/java/com/pdfscanner/app/ui/HomeFragmentTest.kt` + 4 more | Fragment smoke tests | Phase 4 |
-| `app/src/androidTest/assets/test_single_page.pdf` | Test fixture | Phase 4 |
-| `app/src/androidTest/assets/test_multi_page.pdf` | Test fixture | Phase 4 |
-| `app/detekt.yml` | Detekt rule config | Phase 5 |
-| `app/detekt-baseline.xml` | Generated by detektBaseline task | Phase 5 |
-| `app/lint.xml` | Lint rule config | Phase 5 |
-| `app/lint-baseline.xml` | Generated by lintDebug task | Phase 5 |
-
-### Modified Files
-
-| File | What Changes | Phase |
-|------|-------------|-------|
-| `app/build.gradle.kts` | Add: JaCoCo plugin + enableUnitTestCoverage, Detekt plugin + config, LeakCanary debugImplementation, lint config, MockK + Robolectric + fragment-testing + navigation-testing dependencies | Phase 4-5 |
-| `build.gradle.kts` (root) | Add: Detekt plugin declaration | Phase 5 |
-| `app/proguard-rules.pro` | Add: ML Kit rules, Safe Args rules, Navigation rules, Log stripping | Phase 5 |
-
-## Anti-Patterns to Avoid
-
-### Anti-Pattern 1: Testing CameraX Capture in Automated Tests
-
-**What people do:** Try to automate camera capture with Espresso/UI Automator.
-**Why it's wrong:** CameraX requires real camera hardware, emulator cameras are unreliable, tests become flaky. ML Kit Document Scanner launches its own Activity which cannot be controlled by Espresso.
-**Do this instead:** Test CameraFragment UI state (permission handling, button visibility) but NOT actual capture. Use test fixture images for everything downstream of capture.
-
-### Anti-Pattern 2: Testing LiveData Without InstantTaskExecutorRule
-
-**What people do:** Observe LiveData in tests without making the executor synchronous.
-**Why it's wrong:** LiveData posts to main thread; without the rule, assertions run before values are set.
-**Do this instead:** Always add `@get:Rule val instantExecutorRule = InstantTaskExecutorRule()` in ViewModel tests. This is satisfied by `androidx.arch.core:core-testing`.
-
-### Anti-Pattern 3: Heavyweight Integration Tests for Pure Logic
-
-**What people do:** Run ImageProcessor filter tests as androidTest on device because Bitmap is an Android class.
-**Why it's wrong:** Device tests are 10-50x slower than JVM tests. Robolectric shadows Bitmap adequately for these tests.
-**Do this instead:** Use Robolectric for Bitmap/Canvas operations. Only use device tests for PdfRenderer/PdfDocument which Robolectric does NOT shadow well.
-
-### Anti-Pattern 4: Trying to Unit Test Singleton Objects Directly
-
-**What people do:** Test OcrProcessor or DocumentScanner objects that hold static state.
-**Why it's wrong:** Singletons leak state between tests. The lazy `recognizer` in OcrProcessor persists across test methods.
-**Do this instead:** For OcrProcessor, test on device where ML Kit runtime is available. For DocumentHistoryRepository, use `getInstance()` with fresh context per test and clear SharedPreferences in @Before.
-
-### Anti-Pattern 5: Testing Navigation by Checking Fragment Transactions
-
-**What people do:** Assert that FragmentManager contains specific fragments after navigation.
-**Why it's wrong:** Navigation Component manages the back stack internally. Checking fragment transactions is brittle.
-**Do this instead:** Use `TestNavHostController` and assert `navController.currentDestination?.id` equals expected destination ID.
-
-### Anti-Pattern 6: Running detektBaseline in CI
-
-**What people do:** Add `detektBaseline` to the CI pipeline.
-**Why it's wrong:** CI regenerating the baseline would silently suppress new violations that were introduced in the branch.
-**Do this instead:** Run `detektBaseline` once locally (Phase 5 setup), commit `detekt-baseline.xml`, and run only `detekt` in CI. The baseline file is immutable until a developer intentionally regenerates it.
-
-### Anti-Pattern 7: Applying JaCoCo to Release Builds
-
-**What people do:** Enable `enableUnitTestCoverage = true` in the release build type.
-**Why it's wrong:** Coverage instrumentation adds overhead to the build and can interfere with R8 optimization.
-**Do this instead:** Only enable coverage on the debug build type as shown above.
-
-### Anti-Pattern 8: Keeping ALL Safe Args Classes With Wildcard
-
-**What people do:** `-keep class com.pdfscanner.app.** { *; }` to avoid thinking about Safe Args.
-**Why it's wrong:** This defeats R8's dead code elimination entirely for your own package, bloating the APK and negating obfuscation.
-**Do this instead:** Keep only the Safe Args interfaces and generated class name patterns (as shown in the proguard-rules.pro above). Let R8 optimize all other classes.
-
-## Required Dependencies for Testing
-
-Add to `app/build.gradle.kts` dependencies block:
-
-```kotlin
-dependencies {
-    // === EXISTING (already present) ===
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
-    // === NEW: Unit test dependencies ===
-    testImplementation("androidx.arch.core:core-testing:2.2.0")             // InstantTaskExecutorRule
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3") // TestCoroutineDispatcher
-    testImplementation("org.robolectric:robolectric:4.11.1")               // Android stubs on JVM
-    testImplementation("androidx.test:core:1.5.0")                         // ApplicationProvider for Robolectric
-    testImplementation("io.mockk:mockk:1.13.10")                           // Mocking for Kotlin (prefer MockK over Mockito in Kotlin codebases)
-
-    // === NEW: Instrumented test dependencies ===
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")  // RecyclerView actions
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")  // Intent verification
-    androidTestImplementation("androidx.fragment:fragment-testing:1.6.2")        // FragmentScenario
-    androidTestImplementation("androidx.navigation:navigation-testing:2.7.6")    // TestNavHostController
-    androidTestImplementation("androidx.test:runner:1.5.2")
-    androidTestImplementation("androidx.test:rules:1.5.0")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    androidTestImplementation("io.mockk:mockk-android:1.13.10")
-
-    // === NEW: Release quality tooling ===
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-
-    // Detekt formatting plugin is configured via detekt { } block, not dependencies { }
-}
-```
-
-**Dependency version notes:**
-- Robolectric 4.11.1: Compatible with SDK 34 and Kotlin 1.9. Does NOT shadow PdfRenderer — use androidTest for PdfUtils tests.
-- MockK 1.13.10: Kotlin-native mock library. Preferred over Mockito-Kotlin in pure Kotlin codebases.
-- fragment-testing 1.6.2: Must match the `androidx.fragment:fragment-ktx:1.6.2` version already in the project.
-- navigation-testing 2.7.6: Must match `navigation-fragment-ktx:2.7.6` already in the project.
-- LeakCanary 2.14: Current stable as of early 2026. Requires no code changes — auto-installs via ContentProvider.
-
-## Scalability Considerations
-
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| Current (0 tests) | Add test infrastructure, write foundational tests for ViewModels and utilities |
-| 30-50 tests | Run unit tests in CI on every commit. Run instrumented tests nightly or on PR. |
-| 50-100 tests | Consider Gradle test sharding for instrumented tests. Add screenshot testing for UI regression. |
-
-### Scaling Priorities
-
-1. **First bottleneck:** Instrumented test execution time. PdfUtils tests create real files and are slow. Mitigation: Use `@SmallTest`/`@MediumTest`/`@LargeTest` annotations to run subsets.
-2. **Second bottleneck:** Flaky emulator tests. CameraX and ML Kit tests may fail intermittently on CI emulators. Mitigation: Tag these as `@FlakyTest` and run separately with retry logic.
-
-## External Services Integration
-
-| Service | Integration Pattern | Test Strategy |
-|---------|---------------------|---------------|
-| CameraX | Camera lifecycle bound to Fragment | Do NOT automate capture. Test Fragment UI state only. Use fixture images. |
-| ML Kit Text Recognition | Singleton TextRecognizer, suspend + await | Integration test on device with known test image containing text. Assert recognized text contains expected substrings. |
-| ML Kit Document Scanner | GMS Intent-based API | NOT automatically testable. Launches separate Activity. Manual testing only. |
-| CanHub Image Cropper | Activity result contract | NOT automatically testable in isolation. Test that crop result URIs are correctly handled in PreviewFragment. |
-| Android PdfRenderer | ParcelFileDescriptor from ContentResolver | Integration test with test PDF in androidTest assets. Verify page count, rendered bitmap dimensions. |
-| SharedPreferences | Context.getSharedPreferences | Robolectric for unit tests, real device for integration. Clear in @Before. |
-| FileProvider | Manifest-configured, shares files via content:// URI | Integration test: verify share Intent contains correct URI and MIME type. |
-
-## Internal Boundaries
-
-| Boundary | Communication | Test Implications |
-|----------|---------------|-------------------|
-| Fragment <-> ScannerViewModel | LiveData observation, method calls | Test ViewModel in isolation (unit). Test Fragment observes correctly (integration). |
-| Fragment <-> PdfEditorViewModel | LiveData observation, method calls | Same as above. PdfEditorViewModel needs Application context — use Robolectric or androidTest. |
-| Fragment <-> Navigation | NavController.navigate() with Safe Args | Test with TestNavHostController, assert destination IDs. |
-| PagesFragment <-> PdfUtils | Direct suspend call from Fragment coroutine scope | Test PdfUtils in isolation (integration). Fragment tests can mock ViewModel state. |
-| HistoryFragment <-> DocumentHistoryRepository | Direct instantiation via getInstance() | Test Repository in isolation. Fragment tests verify list rendering. |
-| PdfEditorFragment <-> AnnotationCanvasView | Direct view reference, method calls | Tightly coupled. Test as unit at Fragment level. |
+**Note on dependency conflicts:** Tink 1.20.0 uses Protocol Buffers internally. Check for conflicts with ML Kit's protobuf dependency. If conflicts arise, use `force()` in resolutionStrategy as already done for coroutines/stdlib.
 
 ## Sources
 
-- Android developer documentation on testing (developer.android.com/training/testing) -- HIGH confidence
-- [Detekt baseline documentation](https://detekt.dev/docs/introduction/baseline/) -- HIGH confidence (established API, stable across 1.x)
-- [Detekt Gradle plugin docs](https://detekt.dev/docs/gettingstarted/gradle/) -- HIGH confidence
-- [JaCoCo Gradle plugin documentation](https://docs.gradle.org/current/userguide/jacoco_plugin.html) -- HIGH confidence
-- [JaCoCo with Kotlin DSL (Medium)](https://medium.com/@ranjeetsinha/jacoco-with-kotlin-dsl-f1f067e42cd0) -- MEDIUM confidence (community article, verified against AGP docs)
-- [enableUnitTestCoverage AGP API reference](https://developer.android.com/reference/tools/gradle-api/8.1/com/android/build/api/dsl/BuildType) -- HIGH confidence (official)
-- [LeakCanary Getting Started](https://square.github.io/leakcanary/getting_started/) -- HIGH confidence (official Square docs)
-- [Navigation Safe Args ProGuard (Droid on Roids)](https://www.thedroidsonroids.com/blog/how-to-generate-proguard-r8-rules-for-navigation-component-arguments) -- MEDIUM confidence (established pattern, widely referenced)
-- [ProGuard/R8 Rules 2025 (Android Developers Blog)](https://android-developers.googleblog.com/2025/11/configure-and-troubleshoot-r8-keep-rules.html) -- HIGH confidence (official Google blog)
-- Codebase analysis of all 31 Kotlin source files in this project -- HIGH confidence
+- [Android Keystore system](https://developer.android.com/privacy-and-security/keystore) -- Official Keystore documentation (HIGH confidence)
+- [Tink Streaming AEAD](https://developers.google.com/tink/streaming-aead) -- Official Tink docs for file encryption (HIGH confidence)
+- [Tink setup for Java/Android](https://developers.google.com/tink/setup/java) -- Version 1.20.0, minSdk 24 confirmed (HIGH confidence)
+- [Security-crypto releases](https://developer.android.com/jetpack/androidx/releases/security) -- Deprecation status, 1.1.0 stable (HIGH confidence)
+- [Biometric library releases](https://developer.android.com/jetpack/androidx/releases/biometric) -- v1.1.0 stable, minSdk 23 (HIGH confidence)
+- [BiometricPrompt with CryptoObject](https://medium.com/androiddevelopers/using-biometricprompt-with-cryptoobject-how-and-why-aace500ccdb7) -- Official Android Developers blog (MEDIUM confidence)
+- [FLAG_SECURE and window flags](https://issuetracker.google.com/issues/143778149) -- Fragment/Dialog FLAG_SECURE propagation (MEDIUM confidence)
+- [Goodbye EncryptedSharedPreferences migration guide](https://www.droidcon.com/2025/12/16/goodbye-encryptedsharedpreferences-a-2026-migration-guide/) -- Community migration patterns (MEDIUM confidence)
+- [EncryptedSharedPreferences to Tink and DataStore](https://blog.kinto-technologies.com/posts/2025-06-16-encrypted-shared-preferences-migration/) -- Tink vs Keystore performance comparison (MEDIUM confidence)
+- [Intent security best practices](https://securecodingpractices.com/android-intent-security-best-practices-filters-permissions-validation/) -- Intent validation patterns (MEDIUM confidence)
+- [Preventing screenshots on Android](https://tomasrepcik.dev/blog/2023/2023-12-09-android-securing-screen/) -- FLAG_SECURE in single-activity apps (MEDIUM confidence)
+- [Community fork: encrypted-shared-preferences](https://github.com/ed-george/encrypted-shared-preferences) -- Maintained ESP fork post-deprecation (LOW confidence -- community maintained)
 
 ---
-*Architecture research for: Android Document Scanner Test Suite + Release Tooling*
-*Researched: 2026-03-01*
+*Architecture research for: Security Hardening of Android Document Scanner (v1.2)*
+*Researched: 2026-03-03*

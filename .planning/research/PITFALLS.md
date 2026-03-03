@@ -1,491 +1,600 @@
-# Pitfalls Research
+# Domain Pitfalls
 
-**Domain:** Android Document Scanner App -- Testing & Release Readiness (v1.1)
-**Researched:** 2026-03-01
-**Confidence:** HIGH for Kotlin/JaCoCo/MockK/ProGuard pitfalls (well-documented, multi-source verified); MEDIUM for CameraX/ML Kit test environment behavior (fewer authoritative sources, some training data)
+**Domain:** Android Document Scanner App -- Security Hardening (v1.2)
+**Researched:** 2026-03-03
+**Confidence:** HIGH for EncryptedSharedPreferences/KeyStore/R8 pitfalls (multi-source verified, official bug trackers); MEDIUM for flash storage deletion and Tink streaming performance (limited Android-specific benchmarks); LOW for CI biometric emulation (rapidly evolving tooling)
 
-> **Scope note:** This file supersedes the v1.0 PITFALLS.md for the v1.1 milestone. v1.0 pitfalls (OOM, resource leaks, requireContext crashes) are already fixed or tracked. This file focuses exclusively on the new risks introduced by adding tests and release tooling to an existing codebase.
+> **Scope note:** This file covers pitfalls specific to adding security hardening to an existing Android app. The v1.1 PITFALLS.md (testing/release) remains valid for its scope. This file focuses exclusively on risks introduced by the v1.2 Security Hardening milestone: encrypted storage migration, biometric auth, file encryption, FLAG_SECURE, and R8 interactions with security libraries.
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: JaCoCo Does Not Measure What You Think "70% Coverage" Means
+Mistakes that cause data loss, crashes on production devices, or security regressions that defeat the purpose of hardening.
+
+### Pitfall 1: EncryptedSharedPreferences Migration Silently Loses Existing Document History
 
 **What goes wrong:**
-The project goal is "70% line coverage for `util/`, 50% for `viewmodel/`." JaCoCo tracks six different counters: instructions (bytecode), branches (if/switch decision points), cyclomatic complexity, lines (source lines), methods, and classes. These produce very different percentages from the same test suite. A report can show 72% LINE coverage and simultaneously 41% BRANCH coverage. The project requirement does not specify which counter to enforce, so the threshold can be trivially gamed or accidentally missed depending on which report column you read.
+The app stores document history as a JSON array in `SharedPreferences` (file: `document_history`, key: `documents`) and user settings in a second file (`pdf_scanner_prefs`). Migrating to `EncryptedSharedPreferences` requires creating a NEW encrypted prefs file -- it cannot encrypt an existing XML file in-place. If the migration code reads from the old file, writes to the new encrypted file, and then the app crashes or is killed mid-migration, the user loses their document history permanently. The old file may have been partially read, the new file may be incomplete, and there is no transactional guarantee.
 
-Additionally, Kotlin coroutines introduce phantom branches in JaCoCo reports. Every `launch {}`, `flow {}`, and `flatMapLatest {}` call generates synthetic bytecode branches (suspend state machine transitions) that JaCoCo counts as uncovered branches. A ViewModel with 80% logical coverage can report as low as 55% branch coverage due purely to coroutine machinery, with zero defective code.
+Worse: `EncryptedSharedPreferences.create()` itself can crash on certain devices (see Pitfall 2), meaning the migration code never completes, but if you already deleted the old file, the data is gone.
+
+The existing `DocumentHistoryRepository` stores `filePath` (absolute paths to PDFs in `filesDir`). These paths remain valid after migration -- only the metadata index is at risk. But losing the index means the user cannot find their documents through the app UI, even though the files still exist on disk.
 
 **Why it happens:**
-The Android Gradle Plugin exposes coverage as a percentage in HTML/XML reports without labeling which counter type is being shown by default. Teams read the headline number without checking counter type. The Kotlin compiler generates internal branching in all coroutine-using code that does not correspond to any user-written conditional.
+SharedPreferences does not support atomic migration between files. The Android framework provides no built-in migration utility for SharedPreferences-to-EncryptedSharedPreferences. Most online tutorials show a naive "read old, write new, delete old" pattern without crash safety.
 
-**How to avoid:**
-1. Explicitly declare which counter the 70%/50% thresholds refer to in the JaCoCo task configuration:
+**Consequences:**
+- Users who upgrade from v1.1 to v1.2 lose their document history (up to 50 entries).
+- User settings (theme, default filter) revert to defaults.
+- PDFs still exist on disk but are invisible to the app.
+
+**Prevention:**
+1. **Never delete the old prefs file until encrypted write is confirmed.** Use a sentinel key in the encrypted file (e.g., `"migration_complete" = true`) to verify migration succeeded.
+2. **Implement idempotent migration:** Check if migration already completed before attempting. If the sentinel key exists in encrypted prefs, skip migration.
+3. **Keep the old file as backup** for at least one app version cycle (v1.2 migrates, v1.3 deletes old file).
+4. **Migration code pattern:**
    ```kotlin
-   // In build.gradle.kts
-   jacocoTestReport {
-     reports { html.required = true; xml.required = true }
+   fun migrateIfNeeded(context: Context) {
+       val encrypted = getEncryptedPrefs(context) // may throw -- handle below
+       if (encrypted.getBoolean("migration_complete", false)) return
+
+       val old = context.getSharedPreferences("document_history", Context.MODE_PRIVATE)
+       val json = old.getString("documents", null) ?: return
+
+       encrypted.edit()
+           .putString("documents", json)
+           .putBoolean("migration_complete", true)
+           .commit() // commit(), NOT apply() -- must be synchronous
+       // DO NOT delete old file yet
    }
-   // Enforce on LINE counter, not BRANCH:
-   jacocoTestCoverageVerification {
-     violationRules {
-       rule {
-         element = "PACKAGE"
-         includes = listOf("com/example/scanner/util/*")
-         limit { counter = "LINE"; value = "COVEREDRATIO"; minimum = 0.70.toBigDecimal() }
+   ```
+5. **Handle EncryptedSharedPreferences creation failure** (see Pitfall 2) by falling back to unencrypted prefs with a logged warning, rather than crashing.
+
+**Detection:**
+- Document history is empty after app update.
+- `SharedPreferences` XML file exists but has no corresponding encrypted counterpart.
+- Crash reports showing `SecurityException` or `KeyStoreException` during first launch after update.
+
+**Phase to address:** First security phase -- encrypted storage migration must be the earliest task, with rollback safety.
+
+---
+
+### Pitfall 2: EncryptedSharedPreferences Crashes on API 24-27 Devices Due to KeyStore Instability
+
+**What goes wrong:**
+`EncryptedSharedPreferences.create()` depends on Android KeyStore to generate and store a master key (`_androidx_security_master_key_`). On API 24-27 devices (particularly Huawei, Honor, OPPO, and some Samsung models), the KeyStore implementation has known bugs where:
+- The master key exists but becomes "unusable" after device restart, lock screen change, or OEM firmware update.
+- `java.security.KeyStoreException: the master key android-keystore://_androidx_security_master_key_ exists but is unusable` crashes the app on startup.
+- `javax.crypto.AEADBadTagException` occurs when the keyset stored in the prefs file was encrypted with a key that the KeyStore can no longer reproduce.
+
+**This is documented in Tink issue #535** with 57% of crashes on Android 7 (API 24-25) and 26% on Android 6. Once triggered, the crash is persistent -- every subsequent app launch crashes at the same point.
+
+**Why it happens:**
+API 24-27 devices use software-backed or TEE-backed KeyStore implementations that vary wildly by OEM. There is no StrongBox (introduced in API 28). Some OEMs have buggy Keymaster HAL implementations that corrupt keys after device state changes. The `EncryptedSharedPreferences` library does not gracefully handle this -- catching the exception leaves the instance in an unusable `null` state.
+
+**Consequences:**
+- App becomes permanently unusable on affected devices (crash loop).
+- No recovery path without clearing app data (losing all documents).
+- The app's minSdk is 24, so these devices are in the support range.
+
+**Prevention:**
+1. **Wrap EncryptedSharedPreferences creation in try-catch with fallback:**
+   ```kotlin
+   fun getSecurePrefs(context: Context): SharedPreferences {
+       return try {
+           val masterKey = MasterKey.Builder(context)
+               .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+               .build()
+           EncryptedSharedPreferences.create(
+               context,
+               "secure_document_history",
+               masterKey,
+               EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+               EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+           )
+       } catch (e: Exception) {
+           // Log to analytics -- track how many devices hit this
+           Log.e("Security", "EncryptedSharedPreferences failed, falling back", e)
+           // Delete corrupted encrypted prefs and re-create
+           context.deleteSharedPreferences("secure_document_history")
+           try {
+               // Retry once after clearing corrupted state
+               val masterKey = MasterKey.Builder(context)
+                   .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                   .build()
+               EncryptedSharedPreferences.create(/* same params */)
+           } catch (e2: Exception) {
+               // Permanent fallback to unencrypted prefs
+               context.getSharedPreferences("document_history", Context.MODE_PRIVATE)
+           }
        }
-       rule {
-         element = "PACKAGE"
-         includes = listOf("com/example/scanner/viewmodel/*")
-         limit { counter = "LINE"; value = "COVEREDRATIO"; minimum = 0.50.toBigDecimal() }
+   }
+   ```
+2. **Consider Tink + DataStore instead of EncryptedSharedPreferences.** EncryptedSharedPreferences is deprecated since `security-crypto:1.1.0-alpha07` (April 2025). The modern path is DataStore + Tink's `StreamingAead`, which manages its own keys without depending on the fragile MasterKey/KeyStore interaction. However, DataStore requires coroutines integration, which adds complexity.
+3. **If using EncryptedSharedPreferences via the community fork** (`ed-george/encrypted-shared-preferences`), pin to a specific version and monitor the repo for KeyStore-related fixes.
+4. **Test on real API 24-26 devices** (not just emulator) -- emulators use a software KeyStore that rarely exhibits these bugs.
+
+**Detection:**
+- Crash reports with `KeyStoreException` or `AEADBadTagException` concentrated on API 24-27.
+- Crash occurs on app cold start, not during any specific user action.
+- Affected devices are disproportionately Huawei, Honor, OPPO.
+
+**Phase to address:** Encrypted storage phase -- must be addressed in architecture before writing migration code. The fallback strategy is a prerequisite.
+
+---
+
+### Pitfall 3: R8 Strips Tink/Security-Crypto Classes in Release Builds, Causing Crypto Crashes
+
+**What goes wrong:**
+The app already has R8 enabled (`isMinifyEnabled = true`) with keep rules for ML Kit, GMS, CameraX, and SafeArgs. Adding `security-crypto` or Tink introduces new classes that use reflection and protobuf internally. R8 strips:
+- Tink's protobuf-generated message classes (e.g., `AesGcmKeyFormat.version_` field removed -- Tink issue #361).
+- Error-prone annotations referenced by Tink (`com.google.errorprone.annotations.CanIgnoreReturnValue` -- tink-java issue #7).
+- Security-crypto's `MasterKey` internal factory classes accessed via reflection.
+
+The app works perfectly in debug (no R8), then crashes on the first encrypted operation in release.
+
+**Why it happens:**
+Tink 1.4.0+ and tink-java 1.9.0+ include bundled consumer ProGuard rules via `META-INF/proguard/`. However, older versions and some transitive dependency configurations do not propagate these rules correctly. The `security-crypto` library pulls a specific Tink version that may or may not include complete rules. Additionally, if the project uses `proguard-android-optimize.txt` (which this project does), aggressive optimization can override the consumer rules.
+
+**Consequences:**
+- `java.lang.NoSuchFieldError: No field version_ in AesGcmKeyFormat` at runtime in release builds.
+- `ClassNotFoundException` for error-prone annotations (non-fatal but triggers R8 warnings that may mask real issues).
+- Encrypted data written in debug cannot be read in release (different class structure after obfuscation).
+
+**Prevention:**
+1. **Add explicit keep rules for Tink and security-crypto:**
+   ```proguard
+   # Tink cryptographic library -- protobuf reflection
+   -keepclassmembers class * extends com.google.crypto.tink.shaded.protobuf.GeneratedMessageLite {
+     <fields>;
+   }
+   -keep class com.google.crypto.tink.** { *; }
+   -dontwarn com.google.errorprone.annotations.**
+
+   # AndroidX Security Crypto
+   -keep class androidx.security.crypto.** { *; }
+   ```
+2. **Verify by running `./gradlew assembleRelease` and testing every encrypted operation** on a physical device.
+3. **Use R8's `-printconfiguration` to dump merged rules** and verify Tink's consumer rules are included:
+   ```proguard
+   -printconfiguration /tmp/full-r8-config.txt
+   ```
+4. **Pin Tink version explicitly** in dependency resolution to avoid transitive version drift:
+   ```kotlin
+   configurations.all {
+       resolutionStrategy.force("com.google.crypto.tink:tink-android:1.12.0")
+   }
+   ```
+
+**Detection:**
+- Release APK crashes on first encrypted read/write operation.
+- `adb logcat | grep -E "(NoSuchField|ClassNotFound|tink|crypto)"` shows stripping errors.
+- Debug build works, release build does not (the classic R8 symptom).
+
+**Phase to address:** Encrypted storage phase AND release verification phase. Add keep rules when adding the dependency; verify in release build before moving on.
+
+---
+
+### Pitfall 4: Encryption Key Permanently Invalidated When User Changes Biometric or Lock Screen
+
+**What goes wrong:**
+If encryption keys are created with `setUserAuthenticationRequired(true)` and tied to biometric authentication, the Android KeyStore automatically and irreversibly invalidates the key when:
+- A new fingerprint is enrolled (any API level with biometrics).
+- All biometrics are removed (API 24+).
+- The secure lock screen is disabled or reset (API 24+).
+- A new face is enrolled (API 29+ with face unlock).
+
+This throws `KeyPermanentlyInvalidatedException` on the next crypto operation. If encrypted files or preferences were protected by this key, they become permanently unreadable. For a document scanner storing encrypted PDFs, this means **all scanned documents become inaccessible** when the user adds a new fingerprint.
+
+**Why it happens:**
+This is a deliberate Android security feature -- if biometrics change, old keys should not be trusted because a new (potentially unauthorized) biometric was added. The `setInvalidatedByBiometricEnrollment(true)` default ensures keys cannot survive biometric enrollment changes.
+
+**Consequences:**
+- User adds a new fingerprint and all encrypted documents become permanently inaccessible.
+- No recovery path -- the key is gone from the KeyStore.
+- User perceives the app as having "deleted their documents."
+
+**Prevention:**
+1. **Separate authentication keys from encryption keys.** Use biometric auth as a gate (UI-level lock) but encrypt files with a key that does NOT require user authentication:
+   ```kotlin
+   // Authentication key -- for BiometricPrompt gate
+   val authKeySpec = KeyGenParameterSpec.Builder("auth_key", PURPOSE_ENCRYPT or PURPOSE_DECRYPT)
+       .setUserAuthenticationRequired(true)
+       .setInvalidatedByBiometricEnrollment(true) // OK -- we re-create this key
+       .build()
+
+   // Encryption key -- for file/prefs encryption
+   val encKeySpec = KeyGenParameterSpec.Builder("enc_key", PURPOSE_ENCRYPT or PURPOSE_DECRYPT)
+       .setUserAuthenticationRequired(false) // NOT tied to biometrics
+       .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+       .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+       .build()
+   ```
+2. **Handle `KeyPermanentlyInvalidatedException` gracefully** -- if the auth key is invalidated, delete it, regenerate, and re-prompt for biometric enrollment. Never let this exception reach an unhandled state.
+3. **`setInvalidatedByBiometricEnrollment(false)`** is available on API 24+, but reduces security. Use it only if the key is NOT protecting sensitive data directly (e.g., a session token, not the document encryption key).
+4. **Test this scenario explicitly:** Enroll a new fingerprint while the app has encrypted data, then reopen the app. This must be part of manual QA.
+
+**Detection:**
+- `KeyPermanentlyInvalidatedException` in crash logs after user changes biometric settings.
+- Users report "all my documents are gone" after adding a new fingerprint.
+- QA never tests the "add fingerprint mid-usage" scenario.
+
+**Phase to address:** Biometric authentication phase AND file encryption phase -- architecture decision must be made before implementing either feature.
+
+---
+
+### Pitfall 5: SharedPreferences Backed Up to Google Cloud Despite Backup Exclusion Rules
+
+**What goes wrong:**
+The app's `data_extraction_rules.xml` and `backup_rules.xml` exclude `scans/`, `processed/`, and `pdfs/` from backup (domain: `file`). But SharedPreferences files (`document_history.xml`, `pdf_scanner_prefs.xml`) are in the `sharedpref` domain, which is NOT excluded. This means:
+- Document history (names, file paths, timestamps) is backed up to Google Drive.
+- User preferences are backed up.
+- If the user switches devices, backed-up SharedPreferences contain absolute file paths that point to non-existent files on the new device.
+
+For a high-sensitivity app handling IDs and medical documents, **document metadata leaking to cloud backup is a security issue** even if the documents themselves are excluded.
+
+After encrypting SharedPreferences, backing up the encrypted file to Google Drive creates a new problem: the encryption key is device-specific (in the Android KeyStore), so the backed-up encrypted file is unreadable on any other device. On restore, the app tries to decrypt with a non-existent key and crashes.
+
+**Why it happens:**
+The v1.1 backup exclusion rules were designed to prevent document files from being backed up, but nobody considered that the SharedPreferences metadata index also contains sensitive information. The `sharedpref` domain requires its own explicit exclusion rules.
+
+**Consequences:**
+- Document metadata (names like "Medical_Report_2026.pdf", "Passport_Scan.pdf") backed up to Google cloud in plaintext.
+- After encrypting prefs: restore from backup causes crash (encrypted file, no key).
+- Device transfer includes stale metadata pointing to non-existent files.
+
+**Prevention:**
+1. **Add SharedPreferences to backup exclusions:**
+   ```xml
+   <!-- data_extraction_rules.xml (API 31+) -->
+   <data-extraction-rules>
+       <cloud-backup>
+           <exclude domain="file" path="scans/" />
+           <exclude domain="file" path="processed/" />
+           <exclude domain="file" path="pdfs/" />
+           <exclude domain="sharedpref" path="document_history.xml" />
+           <exclude domain="sharedpref" path="pdf_scanner_prefs.xml" />
+           <exclude domain="sharedpref" path="secure_document_history.xml" />
+       </cloud-backup>
+       <device-transfer>
+           <!-- same exclusions -->
+       </device-transfer>
+   </data-extraction-rules>
+   ```
+   And the same pattern for `backup_rules.xml` (pre-API 31).
+2. **Consider `android:allowBackup="false"`** for a high-sensitivity app. This is the nuclear option but eliminates the entire class of backup-related data leakage.
+3. **Test backup behavior** with `adb shell bmgr backupnow <package>` and `adb shell bmgr restore <package>` to verify exclusions work.
+
+**Detection:**
+- `adb shell bmgr list transports` and manual backup/restore shows SharedPreferences files in the backup set.
+- After factory reset + restore, app crashes trying to decrypt restored encrypted prefs.
+- Document names visible in Google Drive backup data.
+
+**Phase to address:** Encrypted storage phase -- update backup rules in the same commit that introduces encrypted SharedPreferences.
+
+---
+
+## Moderate Pitfalls
+
+### Pitfall 6: FLAG_SECURE Breaks Screenshot Tests and Accessibility Services
+
+**What goes wrong:**
+Adding `window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)` to prevent screenshots of sensitive documents also:
+- Blocks Espresso screenshot capture on test failure (all screenshots are black).
+- Breaks Roborazzi/Paparazzi screenshot regression tests (if added in v2+).
+- Disables screen recording for bug reports.
+- Blocks accessibility services that rely on screen content reading (some screen readers).
+- Prevents the app from appearing in the recent apps thumbnail (shows blank).
+
+**Why it happens:**
+FLAG_SECURE is a blunt instrument -- it tells the window compositor to never include this window in screen captures, period. There is no "except for testing" or "except for accessibility" override at the OS level.
+
+**Prevention:**
+1. **Apply FLAG_SECURE conditionally using a build-type flag:**
+   ```kotlin
+   // In Activity or Fragment
+   if (!BuildConfig.DEBUG) {
+       window.setFlags(FLAG_SECURE, FLAG_SECURE)
+   }
+   ```
+   This allows screenshots in debug builds (for testing) while blocking them in release.
+2. **Apply FLAG_SECURE only to sensitive screens**, not globally. The document viewer and camera preview need it; the settings screen and home screen do not.
+3. **Clear FLAG_SECURE when navigating away from sensitive screens:**
+   ```kotlin
+   override fun onResume() {
+       super.onResume()
+       if (isShowingSensitiveContent) {
+           requireActivity().window.addFlags(FLAG_SECURE)
        }
-     }
+   }
+   override fun onPause() {
+       super.onPause()
+       requireActivity().window.clearFlags(FLAG_SECURE)
    }
    ```
-2. Exclude coroutine-generated classes from branch coverage reports by adding JaCoCo exclusions for Kotlin coroutine internals in the execution data filter.
-3. Use LINE coverage as the primary metric for this project (it matches developer mental model and is not distorted by coroutine state machines).
+4. **Document the impact on accessibility** in release notes. Some assistive technologies may not work on secured screens.
 
-**Warning signs:**
-- The HTML report shows wildly different percentages for "Lines" vs "Branches" columns.
-- BRANCH coverage is lower than LINE coverage by more than 15 percentage points (coroutine inflation).
-- `CoroutineScope.launch` is shown as "partially covered" even when the test triggers the coroutine.
+**Detection:**
+- Espresso test screenshots are entirely black.
+- Recent apps shows a blank/white thumbnail for the app.
+- QA cannot record screen for bug reports in release builds.
 
-**Phase to address:**
-Phase 4 (Test Coverage) -- define counter type before writing a single test. Retrofitting this decision after writing 30+ tests is painful.
+**Phase to address:** UI security phase. Must be coordinated with test infrastructure.
 
 ---
 
-### Pitfall 2: JaCoCo Reports Inflate or Deflate Coverage Due to Missing Exclusions
+### Pitfall 7: File Encryption Performance Degrades Noticeably on Large Multi-Page PDFs
 
 **What goes wrong:**
-Without exclusion filters, JaCoCo includes Android-generated classes (`R`, `R$*`, `BuildConfig`, `Manifest`, `*$ViewBinding`, Safe Args `*Args`, `*Directions`) in coverage calculations. Because these generated classes are never covered by unit tests (they contain no testable logic), they drag total coverage down -- sometimes by 10-20 percentage points. The project may hit 70% line coverage in actual logic but fail the threshold at 58% because `R.class` has thousands of uncovered lines.
+Encrypting files with `EncryptedFile` (Tink `StreamingAead` with `AES256_GCM_HKDF_4KB`) processes data in 4KB chunks. For a 50-page scanned PDF at 200 DPI, file sizes can reach 20-50 MB. On API 24-27 devices without hardware AES acceleration (older ARMv7 devices still in the minSdk 24 range), encryption adds measurable latency:
+- TEE-backed KeyStore: ~7ms per MB (manageable).
+- Software-only fallback: ~2-5ms per MB (acceptable).
+- StrongBox (API 28+): ~209ms per 4MB chunk (unacceptable for large files -- would take 2.5+ seconds for a 50MB PDF).
 
-The inverse also occurs: if generated classes happen to be exercised indirectly, they inflate coverage, making real logic look more covered than it is.
-
-**Why it happens:**
-The JaCoCo plugin for Android does not automatically exclude generated classes. The `classDirectories` source set must be manually configured with exclusion glob patterns in the `jacocoTestReport` task. This is not shown in basic documentation and requires deliberate configuration.
-
-**How to avoid:**
-Add exclusion patterns to the JaCoCo report task in `build.gradle.kts`:
-```kotlin
-classDirectories.setFrom(
-  fileTree(layout.buildDirectory.dir("intermediates/javac/debug")) {
-    exclude(
-      "**/R.class",
-      "**/R\$*.class",
-      "**/BuildConfig.*",
-      "**/Manifest*.*",
-      "**/*Args.*",         // Safe Args generated
-      "**/*Directions.*",   // Safe Args generated
-      "**/*Binding.*",      // ViewBinding generated
-      "**/*\$\$serializer*",// Kotlin serialization generated
-    )
-  }
-)
-```
-Run the report once without exclusions to establish a baseline, then apply exclusions to see real coverage.
-
-**Warning signs:**
-- Total project coverage is suspiciously lower than what manual review of test files suggests.
-- HTML report shows `R`, `BuildConfig`, or `*Directions` classes in the coverage tree.
-- Adding a trivial test causes coverage to jump by more than expected.
-
-**Phase to address:**
-Phase 4 (Test Coverage) -- configure exclusions before running coverage for the first time.
-
----
-
-### Pitfall 3: CameraX Cannot Be Instantiated in Robolectric -- Tests Crash or Silently No-Op
-
-**What goes wrong:**
-Any test that instantiates or imports `ProcessCameraProvider`, `CameraSelector`, `Preview`, or `ImageCapture` in a Robolectric context will either crash with `UnsatisfiedLinkError` (CameraX uses native camera2 bindings that Robolectric cannot load), or the provider will return `null` / throw `IllegalStateException` because no camera implementation is available on the JVM.
-
-This affects `CameraFragment` directly: any attempt to test camera initialization, use case binding, or capture with Robolectric will fail. The same applies to `ImageAnalysis` use cases used for any ML Kit live preview integration.
+The real-world problem is not encryption speed but the interaction with the existing code flow: `PdfUtils` generates PDFs synchronously, and if encryption is added to the save path, the UI freezes during PDF generation + encryption.
 
 **Why it happens:**
-CameraX's `ProcessCameraProvider` requires a real camera2 backend. Robolectric's shadow implementations do not include camera2 or CameraX shims. The native `.so` libraries required by CameraX cannot be loaded in the JVM environment.
+The existing PDF generation in `PdfUtils.kt` already runs on a coroutine (`Dispatchers.IO`), but if encryption is added as a blocking operation within the same coroutine, the progress indicator (which shows "Page X of Y") cannot update during the encryption phase. Users see the progress complete, then the UI hangs for an additional 1-3 seconds while encryption finishes.
 
-**How to avoid:**
-1. Do NOT attempt to unit test CameraX use case binding logic with Robolectric. CameraX testing belongs in instrumented tests on a real device or emulator with camera support.
-2. Extract all non-camera logic from `CameraFragment` into the ViewModel (`ScannerViewModel`) or utility classes that can be tested independently.
-3. For smoke tests of `CameraFragment` via `FragmentScenario`, use Espresso instrumented tests and either:
-   - Use the emulator with "Virtual Scene" camera (API 26+), or
-   - Mock `ProcessCameraProvider` at the interface level using `ProcessCameraProvider.configureInstance()` (available since CameraX 1.1.0) to inject a fake `CameraProvider`.
-4. The `ProcessCameraProvider.shutdownAsync()` method is a public testing API -- use it in `@After` methods of any instrumented test to allow re-initialization between tests.
+**Consequences:**
+- Users perceive the app as frozen after PDF generation "completes."
+- On low-end API 24 devices, large document encryption can trigger ANR if run on the main thread.
+- StrongBox encryption (API 28+) is too slow for files; must use software or TEE keys.
 
-**Warning signs:**
-- Robolectric test fails with `UnsatisfiedLinkError: dlopen failed: library "libcamera2ndk.so" not found`.
-- Test passes but LogCat shows `CameraX is not initialized` or camera preview is never bound.
-- `ProcessCameraProvider.getInstance(context).get()` hangs indefinitely in Robolectric environment.
-
-**Phase to address:**
-Phase 4 (Test Coverage) -- TEST-07 (fragment smoke tests) must be configured as instrumented tests, not Robolectric unit tests, for any fragment that touches CameraX.
-
----
-
-### Pitfall 4: ML Kit Cannot Be Tested with Robolectric -- Models Require GMS or Bundled Native Code
-
-**What goes wrong:**
-ML Kit uses either the bundled model path (`com.google.mlkit:text-recognition`) or the GMS dynamic module path (`com.google.android.gms.tasks`). Neither works in Robolectric because:
-- The bundled model (.tflite) requires TensorFlow Lite native libraries that Robolectric cannot load.
-- The GMS path requires Google Play Services which is not present on the JVM.
-- `Tasks.await()` and `Task<T>` callbacks never complete or throw `RuntimeException: Cannot block main thread`.
-
-Tests that call `ImageProcessor.applyOcr()` or any ML Kit scanner logic will hang indefinitely or crash with task timeout exceptions.
-
-**Why it happens:**
-ML Kit's Java API is a thin wrapper over native TFLite inference. The native binary is loaded at runtime by the model runtime, which Robolectric does not emulate.
-
-**How to avoid:**
-1. Define an interface wrapper around ML Kit operations:
+**Prevention:**
+1. **Never use StrongBox-backed keys for file encryption.** StrongBox is for small operations (key wrapping, authentication tokens). File encryption should use software-backed or TEE-backed keys:
    ```kotlin
-   interface OcrProcessor { suspend fun recognize(bitmap: Bitmap): String }
-   class MlKitOcrProcessor : OcrProcessor { /* real ML Kit impl */ }
-   class FakeOcrProcessor : OcrProcessor { override suspend fun recognize(b: Bitmap) = "FAKE_TEXT" }
+   val keySpec = KeyGenParameterSpec.Builder("file_enc_key", ...)
+       .setIsStrongBoxBacked(false) // Explicitly opt out of StrongBox
+       .build()
    ```
-2. Inject `OcrProcessor` into `ScannerViewModel` (or wherever OCR is called). Unit tests inject `FakeOcrProcessor`. Production code uses `MlKitOcrProcessor`.
-3. ML Kit integration should be tested only in instrumented tests (TEST-06, PdfUtils instrumented tests) on real device or emulator.
-4. `ImageProcessor` filter tests (TEST-04) must exclude any method that calls ML Kit directly -- test only the bitmap manipulation logic.
-
-**Warning signs:**
-- Test hangs at `Tasks.await()` without completing.
-- `java.lang.RuntimeException: Cannot block the main thread` during Robolectric test run.
-- `UnsatisfiedLinkError` mentioning `libtensorflowlite_jni.so` or `libmlkit*.so`.
-
-**Phase to address:**
-Phase 4 (Test Coverage) -- establish the interface boundary for ML Kit before writing TEST-04. This is a prerequisite for testable `ImageProcessor` logic.
-
----
-
-### Pitfall 5: Missing ProGuard Rules for ML Kit Cause Silent Release Build Crashes
-
-**What goes wrong:**
-The release build uses R8 with `isMinifyEnabled = true`. R8 aggressively removes and obfuscates classes unless keep rules are present. ML Kit ships with consumer ProGuard rules for some modules, but the rules are incomplete or missing for:
-- `com.google.mlkit.vision.text` -- text recognition classes stripped if not accessed via reflection
-- `com.google.mlkit.vision.documentscanner` -- GMS Document Scanner classes obfuscated
-- Native methods in ML Kit JNI bridge (`java.lang.UnsatisfiedLinkError` in release builds)
-- Language ID module (known issue with AGP 7.0+: native methods obfuscated by custom rules in versions ≤ 16.1.1)
-
-The crash does not appear in debug builds because debug builds do not run R8/ProGuard.
-
-**Why it happens:**
-ML Kit's AAR files include consumer ProGuard rules, but they are incomplete and have known gaps. Navigation Safe Args generates `*Args` and `*Directions` classes at build time, but does NOT auto-generate ProGuard rules for them. Any non-primitive argument type passed through Safe Args must have explicit keep rules or it will be obfuscated and crash at navigation time.
-
-**How to avoid:**
-Add the following to `proguard-rules.pro`:
-```proguard
-# ML Kit -- text recognition, document scanner, common
--keep class com.google.mlkit.** { *; }
--dontwarn com.google.mlkit.**
--keep class com.google.android.gms.internal.mlkit_vision_common.** { *; }
--dontwarn com.google.android.gms.**
-
-# ML Kit native JNI bridge (prevents UnsatisfiedLinkError in release)
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-
-# Navigation Safe Args -- all generated Args and Directions classes
--keep class **.ui.**.*Args { *; }
--keep class **.ui.**.*Directions { *; }
--keep class **.ui.**.*Directions$* { *; }
-
-# Any data class used as a Safe Args argument (add specific ones as needed)
-# -keep class com.example.scanner.model.DocumentEntry { *; }
-```
-Then run `./gradlew assembleRelease` and install the release APK on a physical device to test every screen. Use `adb logcat | grep -E "(ClassNotFound|NoSuchMethod|UnsatisfiedLink)"` to catch R8 regressions quickly.
-
-To generate the complete merged rule set for debugging: add `-printconfiguration full-r8-config.txt` to `proguard-rules.pro` temporarily.
-
-**Warning signs:**
-- App works in debug, crashes in release on specific screens (navigation, OCR, document scanning).
-- `ClassNotFoundException: com.google.mlkit.vision.text.TextRecognizer` in release logcat.
-- `NoSuchMethodError` when navigating between fragments in release build.
-- ML Kit Document Scanner opens then immediately closes with no error message.
-
-**Phase to address:**
-Phase 5 (Release Readiness) -- RELEASE-03. MUST test release APK on physical device, not emulator. This pitfall cannot be caught by unit tests alone.
-
----
-
-### Pitfall 6: LeakCanary Reports Navigation Component Leak That Is a Known Library Bug
-
-**What goes wrong:**
-LeakCanary 2.x reports a memory leak traced to `AbstractAppBarOnDestinationChangedListener` holding a strong reference to `Context` when using `NavigationUI.setupWithNavController(toolbar, navController)`. This is a real leak in Navigation Component 2.7.x -- the `ToolbarOnDestinationChangedListener` uses a `WeakReference` for the Toolbar but the parent class holds a strong `Context` reference that outlives fragment lifecycle.
-
-The leak appears in logcat as:
-```
-┬───
-│ GC Root: Thread
-...
-├─ AbstractAppBarOnDestinationChangedListener instance
-│    Leaking: YES (ObjectWatcher was watching this)
-│    key = ...
-│    retainedHeapSize = ...
-╰→ Context instance
-```
-
-This can be mistaken for a leak in your own code, leading to wasted investigation time.
-
-**Why it happens:**
-Navigation Component 2.7.x has a known bug where `OnDestinationChangedListener` is not always properly removed when the associated Fragment is destroyed. This is a library-side issue, not an app-side issue. LeakCanary correctly identifies it as a "Library Leak" -- meaning the leak originates in a dependency, not in your code.
-
-**How to avoid:**
-1. Check LeakCanary's leak trace for the full retained path before investigating. If it terminates in `AbstractAppBarOnDestinationChangedListener`, it is the known Navigation bug, not your code.
-2. The fix is to explicitly remove the listener in `onDestroyView()`:
+2. **Use Tink's `StreamingAead` directly** (not via `EncryptedFile`) for better control over chunk processing and progress reporting.
+3. **Update the progress indicator** to include an "Encrypting..." phase after PDF generation:
    ```kotlin
-   private var destinationListener: NavController.OnDestinationChangedListener? = null
+   // In ViewModel
+   _progress.postValue("Generating PDF...")
+   val pdfFile = PdfUtils.generatePdf(pages)
+   _progress.postValue("Securing document...")
+   encryptFile(pdfFile)
+   _progress.postValue("Complete")
+   ```
+4. **Benchmark on target devices** before committing to a chunk size. The 4KB default is fine for most cases but can be tuned.
 
-   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-     destinationListener = NavController.OnDestinationChangedListener { _, _, _ -> /* ... */ }
-     navController.addOnDestinationChangedListener(destinationListener!!)
-   }
+**Detection:**
+- UI hangs for 1-3 seconds after progress bar reaches 100%.
+- ANR reports on low-end devices during PDF save.
+- Users on API 28+ devices with StrongBox report extremely slow saves (StrongBox accidentally used).
 
-   override fun onDestroyView() {
-     super.onDestroyView()
-     destinationListener?.let { navController.removeOnDestinationChangedListener(it) }
-     destinationListener = null
+**Phase to address:** File encryption phase. Benchmark must happen before committing to an encryption approach.
+
+---
+
+### Pitfall 8: Biometric API Differences Across API 24-34 Cause Silent Failures or Crashes
+
+**What goes wrong:**
+The `androidx.biometric` library abstracts differences across API levels, but significant behavioral gaps remain:
+- **API 24-27:** No `BiometricPrompt` at all. The library falls back to `FingerprintManager` (API 23+), but only fingerprint is supported -- no face or iris. `DEVICE_CREDENTIAL` fallback (PIN/pattern) is NOT available.
+- **API 28:** `BiometricPrompt` introduced, but only supports `BIOMETRIC_STRONG`. `DEVICE_CREDENTIAL` alone is NOT supported.
+- **API 29:** `BiometricManager` introduced for checking enrollment. `BIOMETRIC_STRONG | DEVICE_CREDENTIAL` combination is NOT supported (throws `IllegalArgumentException`). Some emulators show cancellation errors when falling back to PIN.
+- **API 30+:** All authenticator combinations work. `DEVICE_CREDENTIAL` alone is supported. This is the "golden path."
+
+If the app uses `setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)` as a one-size-fits-all configuration, it crashes on API 28-29 and silently fails on API 24-27.
+
+**Why it happens:**
+The `androidx.biometric` library handles the dispatch to underlying APIs, but the API surface itself differs. The library throws `IllegalArgumentException` for unsupported combinations rather than silently degrading.
+
+**Consequences:**
+- Crash on API 28-29 devices when using certain authenticator combinations.
+- Users on API 24-27 with no fingerprint sensor have no way to authenticate (no device credential fallback).
+- Testing only on API 30+ emulator misses all these edge cases.
+
+**Prevention:**
+1. **Check API level and adjust authenticator type:**
+   ```kotlin
+   val authenticators = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+       BiometricManager.Authenticators.BIOMETRIC_STRONG or
+           BiometricManager.Authenticators.DEVICE_CREDENTIAL
+   } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+       BiometricManager.Authenticators.BIOMETRIC_STRONG
+       // On API 28-29, offer separate "Use PIN" button that launches KeyguardManager
+   } else {
+       BiometricManager.Authenticators.BIOMETRIC_WEAK
+       // API 24-27: fingerprint only, with separate PIN fallback
    }
    ```
-3. Alternatively, upgrade to Navigation Component 2.8+ which includes the fix.
-4. Configure LeakCanary to ignore this specific leak path if it becomes noisy:
+2. **Use `BiometricManager.canAuthenticate(authenticators)`** to check availability before showing the prompt. Handle `BIOMETRIC_ERROR_NO_HARDWARE`, `BIOMETRIC_ERROR_NONE_ENROLLED`, and `BIOMETRIC_ERROR_HW_UNAVAILABLE` distinctly.
+3. **For API 24-27 PIN fallback**, use `KeyguardManager.createConfirmDeviceCredentialIntent()` (deprecated in API 29 but functional on 24-28):
    ```kotlin
-   AppWatcher.config = AppWatcher.config.copy(enabled = true)
-   LeakCanary.config = LeakCanary.config.copy(
-     referenceMatchers = AndroidReferenceMatchers.appDefaults +
-       AndroidReferenceMatchers.instanceFieldLeak(
-         "androidx.navigation.ui.AbstractAppBarOnDestinationChangedListener",
-         "context",
-         description = "Known Navigation 2.7.x library leak"
-       )
-   )
+   if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+       val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+       val intent = km.createConfirmDeviceCredentialIntent("Verify identity", "")
+       if (intent != null) startActivityForResult(intent, REQUEST_CODE_KEYGUARD)
+   }
    ```
+4. **Test on at least three API levels:** API 26 (pre-BiometricPrompt), API 29 (partial support), and API 33+ (full support).
 
-**Warning signs:**
-- LeakCanary fires immediately after navigating between fragments with a toolbar.
-- All leak traces point to `AbstractAppBarOnDestinationChangedListener`, never to your Fragment or ViewModel classes.
-- Leak disappears when toolbar/NavigationUI integration is temporarily removed.
+**Detection:**
+- `IllegalArgumentException` crash on API 28-29 with `BIOMETRIC_STRONG | DEVICE_CREDENTIAL`.
+- Users on API 24-27 report they cannot unlock the app (no fingerprint, no PIN fallback).
+- BiometricPrompt callback receives `ERROR_CANCELED` on API 29 emulators.
 
-**Phase to address:**
-Phase 5 (Release Readiness) -- RELEASE-08. Identify this as a library leak during LeakCanary integration to avoid misdiagnosing as an app code bug.
+**Phase to address:** Biometric authentication phase. API-level branching must be designed before implementation.
 
 ---
 
-### Pitfall 7: ViewBinding Reference Not Nulled in onDestroyView() -- Real Leaks in Fragments
+### Pitfall 9: "Secure Deletion" of Temp Files Does Not Work on Flash Storage
 
 **What goes wrong:**
-When `_binding` is kept as a non-null property after `onDestroyView()`, the Fragment instance (which outlives its View when on the back stack) holds a strong reference to the entire View hierarchy via the binding object. LeakCanary will report this as a leak, and it is a genuine leak -- not a false positive.
-
-This is distinct from the Navigation library leak above. If any of the 8 fragments in this app hold binding references past `onDestroyView()`, LeakCanary will correctly flag them.
-
-**Why it happens:**
-Fragment View lifecycle ends at `onDestroyView()`, but Fragment lifecycle ends later at `onDestroy()`. Any view reference stored as a member variable bridges this gap and causes the binding (and its entire view tree) to be retained unnecessarily. This is the standard `Fragment + ViewBinding` leak pattern, well documented by Google since 2019.
-
-**How to avoid:**
-The standard pattern for every fragment:
+The app already cleans temp files on startup (1hr threshold, implemented in v1.0 BUG-03). A natural security hardening step is to add "secure deletion" by overwriting files with zeros before deleting:
 ```kotlin
-private var _binding: FragmentScannerBinding? = null
-private val binding get() = _binding!!
-
-override fun onCreateView(...): View {
-  _binding = FragmentScannerBinding.inflate(inflater, container, false)
-  return binding.root
-}
-
-override fun onDestroyView() {
-  super.onDestroyView()
-  _binding = null  // CRITICAL: must be here, NOT in onDestroy()
+// DOES NOT WORK on flash storage
+fun secureDelete(file: File) {
+    val length = file.length()
+    RandomAccessFile(file, "rw").use { raf ->
+        raf.seek(0)
+        raf.write(ByteArray(length.toInt())) // overwrite with zeros
+    }
+    file.delete()
 }
 ```
-Audit all 8 fragments to verify this pattern is in place before running LeakCanary.
-
-**Warning signs:**
-- LeakCanary reports a leak path going through `FragmentName -> *Binding -> View`.
-- Leak trace shows a Fragment instance as the GC root holding a binding reference.
-- Navigating forward and back 5+ times causes retained heap to grow linearly.
-
-**Phase to address:**
-Phase 4 (Test Coverage) -- audit binding nullification as part of TEST-07 fragment smoke tests. LeakCanary will catch any survivors in Phase 5 (RELEASE-08).
-
----
-
-### Pitfall 8: Coroutine Testing Uses Deprecated TestCoroutineDispatcher API
-
-**What goes wrong:**
-Online tutorials for Android coroutine testing (published 2020-2022) use `TestCoroutineDispatcher` and `runBlockingTest`, both deprecated as of `kotlinx-coroutines-test 1.6`. Tests written with the deprecated API may compile but produce incorrect behavior: `TestCoroutineDispatcher` pauses and resumes in ways that don't match how `StandardTestDispatcher` or `UnconfinedTestDispatcher` work. Subtle ordering bugs appear where tests pass locally but fail under CI due to dispatcher flush differences.
-
-The deprecated `MainCoroutineRule` pattern using `@get:Rule val coroutineRule = MainCoroutineRule()` with `TestCoroutineDispatcher` is still widely copied from old blog posts.
+On Android's flash storage (eMMC/UFS), the Flash Translation Layer (FTL) implements wear leveling, which redirects writes to new physical blocks. The overwrite writes zeros to a NEW physical location while the original data remains in the OLD location until garbage collection reclaims it. The "secure delete" provides zero additional security on flash storage.
 
 **Why it happens:**
-The coroutines test API changed significantly in 1.6. Most search results and StackOverflow answers predate this change. Developers copy the first working example they find without checking the API version.
+Flash storage fundamentally cannot support in-place overwrite. The FTL abstraction makes it look like a sequential-access device, but physically, the data is written elsewhere. This is true for all Android devices -- they all use flash storage (eMMC, UFS, or NVMe).
 
-**How to avoid:**
-Use the modern API only:
-```kotlin
-// build.gradle.kts
-testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+**Consequences:**
+- False sense of security -- developers believe temp files are securely erased.
+- Wasted CPU cycles and I/O bandwidth on useless overwrite operations.
+- Slower temp file cleanup (writing zeros to large scan images adds seconds).
+- Potential flash wear from unnecessary write cycles.
 
-// MainDispatcherRule.kt (not "MainCoroutineRule")
-class MainDispatcherRule(
-  private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
-) : TestWatcher() {
-  override fun starting(description: Description?) = Dispatchers.setMain(dispatcher)
-  override fun finished(description: Description?) = Dispatchers.resetMain()
-}
+**Prevention:**
+1. **Do not implement overwrite-based secure deletion.** It wastes resources and provides no security benefit on flash.
+2. **Instead, encrypt files at rest.** If temp files are encrypted, deletion removes the ability to read them because the key is in the KeyStore (not on flash). This is "cryptographic erasure" -- the data on flash is meaningless without the key.
+3. **If regulatory compliance requires "secure deletion," document** that Android's file-based encryption (FBE, enabled by default since API 29) encrypts all app data at the filesystem level, and deleting a file removes its FBE key association.
+4. **Continue the existing cleanup pattern** (delete on startup, 1hr threshold) but do not add overwrite logic.
 
-// In test class
-@get:Rule val mainDispatcherRule = MainDispatcherRule()
+**Detection:**
+- Code review shows `RandomAccessFile` overwrite patterns in security-related code.
+- Performance regression during temp file cleanup (I/O spike on startup).
+- Security audit falsely passes because "secure deletion is implemented."
 
-// In test body
-@Test fun `page CRUD works`() = runTest {
-  viewModel.addPage(uri)
-  assertEquals(1, viewModel.pages.value?.size)
-}
-```
-Use `UnconfinedTestDispatcher` for ViewModel tests (runs coroutines eagerly, matches expected synchronous behavior). Use `StandardTestDispatcher` only when you need to control time advancement with `advanceTimeBy()`.
-
-**Warning signs:**
-- Compiler warning: `'TestCoroutineDispatcher' is deprecated. Replaced with StandardTestDispatcher or UnconfinedTestDispatcher`.
-- Tests pass locally but behave differently on CI (ordering-dependent).
-- `viewModel.pages.value` is null immediately after calling `viewModel.addPage()` in a test.
-
-**Phase to address:**
-Phase 4 (Test Coverage) -- TEST-01 (dependency setup). Establish the correct dispatcher rule before writing any ViewModel tests.
+**Phase to address:** File encryption phase. Decide on "encrypt then delete" vs. "overwrite then delete" early -- the correct answer is always encrypt-then-delete on flash.
 
 ---
 
-### Pitfall 9: InstantTaskExecutorRule Missing Causes LiveData Tests to Never Emit
+### Pitfall 10: Over-Securing Causes UX Friction That Makes the App Unusable
 
 **What goes wrong:**
-`LiveData` uses `ArchTaskExecutor` internally to enforce main-thread observation. In unit tests (JVM, no Android Looper), `LiveData.setValue()` will fail silently or throw `java.lang.RuntimeException: Method getMainLooper not mocked` unless `InstantTaskExecutorRule` is active. The ViewModel posts values but the test's `assertEquals` on `liveData.value` reads `null` because the executor hasn't delivered the update.
+Adding every security feature simultaneously -- biometric prompt on every app open, FLAG_SECURE on all screens, re-authentication on every document view, encrypted file names that obscure document titles, mandatory timeout after 30 seconds -- turns a "delightful" scanner app into a miserable experience. Users who scan grocery receipts and school notes alongside occasional IDs do not want banking-app friction for every interaction.
 
-For `ScannerViewModel` tests (TEST-02), which rely on `LiveData<List<Page>>` and filter state LiveData, every assertion on `.value` will return `null` without this rule.
+The project description says "treat like banking app," but banking apps handle money -- documents have varying sensitivity levels. A one-size-fits-all approach drives users to uninstall.
 
 **Why it happens:**
-LiveData's main-thread enforcement is correct behavior in production, but test environments don't have a Looper. The `InstantTaskExecutorRule` swaps the background task executor for a synchronous one, making `postValue()` and `setValue()` behave identically in tests.
+Security engineers think in terms of threat models; users think in terms of "can I scan this document quickly." When security is added without considering the user journey, every security control becomes a speed bump. The cumulative effect of 5 small friction points (unlock, decrypt, view, re-authenticate, re-encrypt on close) is a workflow that takes 15 seconds instead of 2.
 
-**How to avoid:**
-Add to every test class that touches LiveData:
-```kotlin
-// build.gradle.kts
-testImplementation("androidx.arch.core:core-testing:2.2.0")
+**Consequences:**
+- Users uninstall the app because it is "too annoying."
+- Users disable biometric authentication entirely (reducing security below baseline).
+- Negative Play Store reviews about "too many prompts."
+- Development team spends time building features that actively harm adoption.
 
-// In test class
-@get:Rule val instantExecutorRule = InstantTaskExecutorRule()
-```
-Note: `InstantTaskExecutorRule` is a JUnit 4 `@Rule`. If the project upgrades to JUnit 5, use the `instant-task-executor-extension` library instead.
+**Prevention:**
+1. **Make authentication opt-in, not mandatory.** Add a "Require unlock to open app" toggle in Settings. Default to OFF. Users handling sensitive documents can enable it.
+2. **Use reasonable session timeouts.** After biometric unlock, keep the session valid for 5 minutes (not 30 seconds). Re-authenticate only after the app has been in background for the timeout period.
+3. **Apply FLAG_SECURE selectively** -- only on the document viewer and PDF preview, not on the home screen, settings, or camera preview.
+4. **Encrypt files by default** (transparent to user) but make biometric lock optional. Encryption protects against device theft without adding UX friction.
+5. **Test the full workflow** with a real user who is not a developer. Time the "scan a document and view it" flow with all security features enabled. If it takes more than 2x the unsecured flow, reduce friction.
 
-**Warning signs:**
-- `java.lang.RuntimeException: Method getMainLooper in android.os.Looper not mocked`.
-- `viewModel.pages.value` returns `null` even after calling methods that should update it.
-- LiveData `observeForever` callbacks never fire during test execution.
+**Detection:**
+- The "scan and view" workflow takes more than 2x longer with security enabled.
+- Users disable security features within the first week.
+- A/B testing shows decreased engagement after security update.
+- Play Store reviews mention "too many popups" or "too slow."
 
-**Phase to address:**
-Phase 4 (Test Coverage) -- TEST-02 (ScannerViewModel unit tests). Add this rule before writing the first ViewModel test.
+**Phase to address:** Biometric authentication phase AND integration/polish phase. Security features should be designed with opt-in UX from the start.
 
 ---
 
-### Pitfall 10: Detekt Baseline Must Be Generated from Clean State, Not Post-Fix State
+## Minor Pitfalls
+
+### Pitfall 11: EncryptedSharedPreferences Blocks the Main Thread
 
 **What goes wrong:**
-When running `./gradlew detektBaseline` on an existing codebase with pre-existing violations, the baseline records all current violations as "known." If the baseline is generated AFTER fixing some violations (but not all), it will fail to record the remaining unfixed violations, causing detekt to flag them as new errors immediately.
+`EncryptedSharedPreferences` performs encryption/decryption synchronously during `getString()`, `putString()`, etc. The existing `DocumentHistoryRepository.getAllDocuments()` is called from the main thread in some fragments (e.g., `HomeFragment` populating the recent documents list). After migration to encrypted prefs, this call adds 10-50ms of encryption overhead per read, potentially causing StrictMode violations and dropped frames on low-end devices.
 
-Conversely, if the baseline is generated before any cleanup and then violations are fixed, the baseline becomes stale and silently allows those patterns to re-appear without triggering failures.
+**Prevention:**
+Move all SharedPreferences reads to `Dispatchers.IO` via coroutines. The existing `DocumentHistoryRepository` already has a `getInstance(context)` pattern -- add `suspend` to read methods and call from `viewModelScope.launch(Dispatchers.IO)`. Alternatively, migrate to DataStore (which is async by design).
 
-The baseline file (`detekt-baseline.xml`) is a snapshot in time. It does not track "fixed" vs "unfixed" -- it simply ignores everything recorded at generation time.
-
-**Why it happens:**
-The baseline workflow is counterintuitive: you generate it on a "dirty" codebase to establish the starting point, then only NEW violations (not in the baseline) fail the build. Teams often generate the baseline after partial cleanup, or forget to commit the baseline and regenerate it on CI, losing the historical record.
-
-**How to avoid:**
-1. Generate baseline ONCE from the completely unmodified codebase (before any fixes): `./gradlew detektBaseline`.
-2. Commit `detekt-baseline.xml` immediately to version control.
-3. Set `detekt { baseline = file("detekt-baseline.xml") }` in `build.gradle.kts`.
-4. From this point forward, the build fails only on violations NOT in the baseline.
-5. Fix baseline violations iteratively by re-running `detektBaseline` after fixing a category.
-6. The RELEASE-01 goal of "zero blocking errors" means clearing the baseline entirely, not maintaining it.
-
-**Warning signs:**
-- `detektBaseline` task output says "0 findings" when you know the codebase has violations.
-- Detekt fails on CI but passes locally (baseline not committed or inconsistent).
-- The baseline XML contains thousands of entries (baseline was generated after CI already runs rules).
-
-**Phase to address:**
-Phase 5 (Release Readiness) -- RELEASE-01. Generate the baseline as the first action of this phase before any other detekt configuration.
+**Phase to address:** Encrypted storage phase.
 
 ---
 
-## Technical Debt Patterns
+### Pitfall 12: Security Library Version Conflicts with Kotlin 1.9.21
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Testing only the happy path in ViewModel tests | Fast to write 15 tests | Business logic bugs hide in error/empty branches | Never -- include error state and empty list tests from the start |
-| Using `relaxed = true` in MockK for all mocks | No "unnecessary stubbing" errors | Hides untested method calls, masks missing verifications | Only for constructor injection of large dependency trees; verify critical interactions explicitly |
-| Skipping release build testing until submission | Faster iteration | ProGuard/R8 bugs only surface in release builds, too late to fix before submission | Never -- test release APK for every phase |
-| Writing tests that test MockK, not the ViewModel | Passes 100% of the time, inflates coverage | Tests provide zero regression protection | Never |
-| Single JaCoCo report without enforced threshold | Easy to set up | Coverage number is decorative, not enforced; can drop unnoticed | Only during initial setup; enforce threshold before Phase 4 is "done" |
+**What goes wrong:**
+The project pins Kotlin to 1.9.21 with forced resolution. The `security-crypto` library (and its Tink dependency) may transitively pull in Kotlin 2.x stdlib or coroutines 1.8+ libraries. The existing `resolutionStrategy.force()` block handles coroutines and stdlib, but Tink may introduce new transitive dependencies (e.g., `protobuf-kotlin`, `tink-android`) that expect Kotlin 2.x binary compatibility.
 
----
+**Prevention:**
+1. After adding any security dependency, run `./gradlew dependencies --configuration releaseRuntimeClasspath | grep kotlin` and verify all Kotlin artifacts are 1.9.x.
+2. Add any new Kotlin-based transitive dependencies to the `force()` block.
+3. Prefer `security-crypto:1.0.0` (stable, Kotlin 1.x compatible) over `1.1.0-alpha07` if using EncryptedSharedPreferences.
 
-## Integration Gotchas
-
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| CameraX + Robolectric | Instantiating `ProcessCameraProvider` in unit tests | Use instrumented tests (Espresso) for any test touching CameraX; mock the interface in unit tests |
-| ML Kit + Robolectric | Calling ML Kit APIs directly in Robolectric tests | Wrap ML Kit behind an interface; use a `FakeOcrProcessor` in unit tests |
-| MockK + coroutines | Using `every {}` for suspend functions without `coEvery {}` | Use `coEvery { suspendFun() } returns result` and `coVerify { suspendFun() }` for suspend functions |
-| LiveData + unit tests | Forgetting `InstantTaskExecutorRule` | Add `@get:Rule val instantExecutorRule = InstantTaskExecutorRule()` to every ViewModel test class |
-| JaCoCo + Navigation Safe Args | Generated `*Args`/`*Directions` classes deflating coverage | Exclude `**/*Args.*` and `**/*Directions.*` patterns from JaCoCo `classDirectories` |
-| Detekt + View Binding | `UnusedPrivateMember` false positives for `_binding` pattern | Suppress via baseline or add `@Suppress("UnusedPrivateMember")` to the nullable backing property |
-| LeakCanary + Navigation | `AbstractAppBarOnDestinationChangedListener` leak | Treat as known library leak; upgrade Navigation to 2.8+ or add a custom `AndroidReferenceMatchers` exclusion |
-| FragmentScenario + themed app | Fragments rendered without correct theme, assertions fail | Always pass `R.style.Theme_YourApp` to `launchFragmentInContainer(themeResId = ...)` |
+**Phase to address:** Dependency setup phase -- first task.
 
 ---
 
-## Performance Traps
+### Pitfall 13: Biometric Prompt Appears Behind Dialog Fragments
 
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| Running all Espresso tests on every CI build | CI pipeline takes 20+ minutes | Separate unit tests (fast) from instrumented tests (slow); run instrumented only on PR merge | At 5+ Espresso test classes |
-| JaCoCo generating report on every build | Slow incremental builds | Only run `jacocoTestReport` as an explicit task, not as a dependency of `assemble` | Always -- keep coverage as on-demand task |
-| Robolectric downloading SDK JARs on first run | First CI run takes 5+ minutes, appears hung | Pre-seed Robolectric SDK cache in CI or use `@Config(sdk = [34])` to pin a single SDK (avoids downloading all SDKs) | First CI run without caching |
-| Detekt with type resolution on large codebases | Detekt takes 3+ minutes per run | Disable type resolution rules for incremental checks; enable only on full CI build | Codebases > 10K LOC |
+**What goes wrong:**
+If a `DialogFragment` is showing when `BiometricPrompt.authenticate()` is called, the biometric prompt may appear behind the dialog on some devices, making it untouchable. This is a known z-ordering issue on API 28-29 where BiometricPrompt uses a separate window.
 
----
+**Prevention:**
+Dismiss any visible `DialogFragment` before showing `BiometricPrompt`. Use `parentFragmentManager.fragments.filterIsInstance<DialogFragment>().forEach { it.dismiss() }` as a safety check.
 
-## Security Mistakes
-
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| Committing `google-services.json` or API keys in test fixtures | Key leakage in public repo | Use environment variables or Android `BuildConfig` fields from `local.properties`; never hardcode in test files |
-| LeakCanary left in release builds | Memory profiling data exposed, minor performance overhead | LeakCanary dependency must be `debugImplementation` only; verify `BuildConfig.DEBUG` check is not needed because debugImplementation handles it |
-| Release APK not tested before Play Store submission | ProGuard crashes discovered by users, not developers | Make `assembleRelease` + physical device test a mandatory gate before any submission |
+**Phase to address:** Biometric authentication phase.
 
 ---
 
-## UX Pitfalls
+### Pitfall 14: Testing Encrypted Storage in CI Without Device Access
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Coverage gate blocks shipping when coverage target is aspirational, not enforced | Team ignores coverage as a concept because it "always fails" | Set realistic initial thresholds (50% is good for retrofitted tests) and increase gradually |
-| Lint errors treated as warnings instead of errors | Accessibility issues (content descriptions, contrast) shipped to users | Set `abortOnError = true` and `checkReleaseBuilds = true` in `lint.xml` from the start |
-| "Zero Detekt errors" achieved by suppressing everything | Appears clean but policy is meaningless | Limit `@Suppress` annotations per class; prefer fixing over suppressing |
+**What goes wrong:**
+Unit tests with Robolectric cannot test `EncryptedSharedPreferences` or `MasterKey` because they depend on the Android KeyStore system service, which Robolectric does not emulate. Tests that call `EncryptedSharedPreferences.create()` in Robolectric will throw `ProviderException` or return unusable instances.
+
+Similarly, biometric authentication cannot be tested in standard CI emulators without manual fingerprint enrollment configuration.
+
+**Prevention:**
+1. **Abstract encrypted storage behind an interface:**
+   ```kotlin
+   interface SecureDocumentStore {
+       fun getAllDocuments(): List<DocumentEntry>
+       fun addDocument(entry: DocumentEntry)
+   }
+   class EncryptedDocumentStore(context: Context) : SecureDocumentStore { /* real impl */ }
+   class FakeDocumentStore : SecureDocumentStore { /* test impl using plain HashMap */ }
+   ```
+2. Unit tests inject `FakeDocumentStore`. Integration tests on real devices/emulators test `EncryptedDocumentStore`.
+3. For biometric testing in CI: use `adb -e emu finger touch 1` to simulate fingerprint on emulator, but note this only works with API 24+ emulators that have a fingerprint sensor configured.
+4. **Do not mock the KeyStore itself** -- the behavior is too complex and OEM-specific to mock correctly. Test the integration on real devices as part of release verification.
+
+**Phase to address:** Encrypted storage phase (interface design) and test phase (fake implementation).
+
+---
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Severity | Mitigation |
+|-------------|---------------|----------|------------|
+| Encrypted SharedPreferences migration | Data loss during migration (Pitfall 1) | CRITICAL | Idempotent migration with sentinel key; keep old file as backup |
+| Encrypted SharedPreferences on API 24-27 | KeyStore crash loop (Pitfall 2) | CRITICAL | Try-catch with fallback to unencrypted prefs; test on real devices |
+| Adding security-crypto/Tink dependency | R8 strips crypto classes (Pitfall 3) | CRITICAL | Add keep rules immediately when adding dependency; verify in release build |
+| Biometric-tied encryption keys | Key invalidated on fingerprint change (Pitfall 4) | CRITICAL | Separate auth keys from encryption keys; handle KeyPermanentlyInvalidatedException |
+| Backup rules for encrypted prefs | Metadata leaks to cloud backup (Pitfall 5) | CRITICAL | Add sharedpref domain exclusions to backup rules |
+| FLAG_SECURE implementation | Breaks screenshot tests (Pitfall 6) | MODERATE | Conditional on BuildConfig.DEBUG; apply per-screen, not globally |
+| File encryption for PDFs | Performance degradation on large files (Pitfall 7) | MODERATE | Avoid StrongBox for files; add "Encrypting..." progress phase |
+| Biometric prompt API branching | Crashes on API 28-29 (Pitfall 8) | MODERATE | API-level branching for authenticator types; test on 3+ API levels |
+| Temp file secure deletion | False security from overwrite (Pitfall 9) | MODERATE | Use encrypt-then-delete; do not implement overwrite patterns |
+| UX friction from security features | Users disable or uninstall (Pitfall 10) | MODERATE | Opt-in biometric lock; reasonable timeouts; selective FLAG_SECURE |
+| EncryptedSharedPreferences performance | Main thread blocking (Pitfall 11) | MINOR | Move reads to Dispatchers.IO; consider DataStore migration |
+| Kotlin 1.9.21 version conflicts | Build failure from transitive Kotlin 2.x | MINOR | Verify dependency tree after adding security libs; extend force() block |
+| BiometricPrompt z-ordering | Prompt hidden behind dialogs (Pitfall 13) | MINOR | Dismiss dialogs before showing biometric prompt |
+| CI testing without KeyStore | Cannot test encrypted code in Robolectric (Pitfall 14) | MINOR | Interface abstraction + fake implementation for unit tests |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **JaCoCo threshold:** Coverage report exists but threshold enforcement (`jacocoTestCoverageVerification` task) is not wired to CI -- coverage can drop without failing the build. Verify the verify task runs on CI.
-- [ ] **JaCoCo exclusions:** Generated classes (`R`, `BuildConfig`, Safe Args `*Directions`, `*Args`, View Bindings) are not excluded -- coverage numbers are wrong. Check the HTML report for generated class entries.
-- [ ] **Release APK tested:** Tests pass but only debug APK was installed on device -- ProGuard rules have not been validated. Run `./gradlew assembleRelease` and install the `.apk` manually.
-- [ ] **CameraFragment tests:** TEST-07 claims fragment smoke tests are written, but `CameraFragment` tests run as Robolectric -- they are silently no-ops. Verify tests are `androidTest` instrumented tests.
-- [ ] **ML Kit interface boundary:** TEST-04 ImageProcessor tests exist, but they call ML Kit directly and hang on CI (no device). Verify the ML Kit calls are mocked out in unit tests.
-- [ ] **LeakCanary false positive triaged:** RELEASE-08 shows "zero leaks" but the Navigation library leak was suppressed via baseline without investigation. Verify each suppressed leak path is genuinely a library issue.
-- [ ] **Detekt baseline committed:** `detekt-baseline.xml` exists in `/app` directory but is in `.gitignore` -- CI generates a fresh baseline on every run, defeating the purpose. Verify the file is tracked in git.
-- [ ] **Counter type documented:** JaCoCo report shows "72%" but whether that is lines, branches, or instructions is not specified in the acceptance criteria. Verify `jacocoTestCoverageVerification` uses `counter = "LINE"` explicitly.
-- [ ] **MockK clearance between tests:** `clearAllMocks()` or `unmockkAll()` is not called in `@After`, causing test ordering dependencies. Verify mocks are reset between tests.
-- [ ] **`_binding = null` in all fragments:** 8 fragments must null the binding in `onDestroyView()`. Verify all 8 before declaring RELEASE-08 complete.
+- [ ] **Migration safety:** Encrypted prefs migration has a sentinel key and does NOT delete the old prefs file in the same release. Verify by: checking for `"migration_complete"` key in code; confirming old file survives migration.
+- [ ] **KeyStore fallback:** `EncryptedSharedPreferences.create()` is wrapped in try-catch with fallback to unencrypted prefs. Verify by: searching for bare `EncryptedSharedPreferences.create()` calls without exception handling.
+- [ ] **R8 keep rules for Tink:** `proguard-rules.pro` contains keep rules for `com.google.crypto.tink.**` and Tink's shaded protobuf. Verify by: `grep "tink" app/proguard-rules.pro`.
+- [ ] **Backup exclusions updated:** `data_extraction_rules.xml` and `backup_rules.xml` exclude `sharedpref` domain for all prefs files. Verify by: reading both XML files for `domain="sharedpref"` entries.
+- [ ] **Auth key vs. encryption key separation:** Biometric-tied keys are NOT used for file/prefs encryption. Verify by: checking `KeyGenParameterSpec` for `setUserAuthenticationRequired(false)` on encryption keys.
+- [ ] **FLAG_SECURE conditional:** `FLAG_SECURE` is not applied in debug builds. Verify by: `grep FLAG_SECURE` shows `BuildConfig.DEBUG` check.
+- [ ] **No overwrite-based secure deletion:** No `RandomAccessFile` overwrite patterns in production code. Verify by: `grep RandomAccessFile` returns no security-related hits.
+- [ ] **Biometric API branching:** `setAllowedAuthenticators()` call is API-level-aware, not one-size-fits-all. Verify by: `Build.VERSION.SDK_INT` check before authenticator configuration.
+- [ ] **Kotlin version stability:** `./gradlew dependencies` shows no Kotlin 2.x artifacts in runtime classpath. Verify by: checking dependency tree after adding security libraries.
+- [ ] **Release APK tested with encryption:** All encrypted operations verified on physical device with release build (not just debug). Verify by: release testing checklist includes encrypted read/write/migration scenarios.
 
 ---
 
@@ -493,51 +602,36 @@ Phase 5 (Release Readiness) -- RELEASE-01. Generate the baseline as the first ac
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Wrong coverage counter type discovered after Phase 4 | MEDIUM | Reconfigure `jacocoTestCoverageVerification` counter; re-run tests to see true number; may need additional tests if LINE coverage is lower than reported BRANCH |
-| Missing JaCoCo exclusions discovered after setting threshold | LOW | Add exclusion patterns to `classDirectories`; re-run report; threshold target may need adjustment |
-| CameraX tests written as Robolectric (silent failures) | MEDIUM | Move tests to `androidTest` directory; set up instrumented test CI pipeline; may require emulator or physical device in CI |
-| Missing ProGuard rules discovered post-submission | HIGH | Emergency update required; users on release see crashes; must publish a patched release; test ALL features in release builds from day one |
-| Detekt baseline not committed; CI failing | LOW | Re-generate baseline from current state, commit, adjust violation count expectations |
-| Deprecated coroutine test API causes ordering flakiness | MEDIUM | Migrate test files from `TestCoroutineDispatcher`/`runBlockingTest` to `UnconfinedTestDispatcher`/`runTest`; verify all tests pass in isolation AND in suite |
-
----
-
-## Pitfall-to-Phase Mapping
-
-| Pitfall | Prevention Phase | Verification |
-|---------|------------------|--------------|
-| JaCoCo counter type ambiguity (LINE vs BRANCH vs INSTRUCTION) | Phase 4 -- before first test | `jacocoTestCoverageVerification` task has explicit `counter = "LINE"` in rules |
-| JaCoCo generated class inflation | Phase 4 -- JaCoCo configuration | HTML report tree contains no `R`, `BuildConfig`, `*Directions`, or `*Args` entries |
-| CameraX Robolectric incompatibility | Phase 4 -- TEST-07 fragment tests | CameraFragment tests are in `androidTest/` directory, not `test/` |
-| ML Kit Robolectric incompatibility | Phase 4 -- TEST-04 ImageProcessor | `ImageProcessor` unit tests use a fake/mock for ML Kit; no `Tasks.await()` in unit tests |
-| Missing ProGuard rules (ML Kit, Safe Args) | Phase 5 -- RELEASE-03 | Release APK installed on physical device; all features exercised without crashes |
-| Navigation library leak (LeakCanary) | Phase 5 -- RELEASE-08 | LeakCanary fire for this path is either fixed (Nav 2.8+) or added to exclusion list with documented rationale |
-| ViewBinding not nulled in onDestroyView | Phase 4 -- TEST-07 audit | All 8 fragment files have `_binding = null` in `onDestroyView()`; LeakCanary clean after back navigation |
-| Deprecated coroutine test API | Phase 4 -- TEST-01 dependency setup | No `TestCoroutineDispatcher` or `runBlockingTest` in any test file |
-| InstantTaskExecutorRule missing | Phase 4 -- TEST-02 ViewModel tests | Every ViewModel test class has `@get:Rule val instantExecutorRule = InstantTaskExecutorRule()` |
-| Detekt baseline not committed | Phase 5 -- RELEASE-01 | `git ls-files detekt-baseline.xml` returns the file path |
+| Data loss during migration (Pitfall 1) | HIGH | If old prefs file still exists: re-read and re-migrate. If deleted: scan filesDir for orphaned PDFs and rebuild index from file metadata. |
+| KeyStore crash loop (Pitfall 2) | HIGH | Push hotfix that wraps creation in try-catch with fallback. Users on crash loop must clear app data. |
+| R8 strips crypto classes (Pitfall 3) | MEDIUM | Add keep rules, rebuild release APK, push update. No data loss -- encrypted data is fine, just need the classes to read it. |
+| Key permanently invalidated (Pitfall 4) | CATASTROPHIC | If encryption key is gone, encrypted data is permanently lost. Only prevention works -- there is no recovery from `KeyPermanentlyInvalidatedException` for the data encrypted with that key. |
+| Backup leaks metadata (Pitfall 5) | LOW | Update backup rules, push update. Already-backed-up data cannot be recalled from Google Drive. |
+| Over-secured UX (Pitfall 10) | LOW | Add Settings toggle to disable biometric lock, reduce timeouts, push update. |
 
 ---
 
 ## Sources
 
-- [JaCoCo Coverage Counters -- official documentation](https://www.eclemma.org/jacoco/trunk/doc/counters.html) (HIGH confidence)
-- [JaCoCo cannot measure coverage inside coroutines blocks -- GitHub issue #1045](https://github.com/jacoco/jacoco/issues/1045) (HIGH confidence -- confirmed in JaCoCo tracker)
-- [CoroutineScope.launch reported as partially covered -- JaCoCo issue #1353](https://github.com/jacoco/jacoco/issues/1353) (HIGH confidence)
-- [Kotlin 2.x inline functions cause JaCoCo false coverage -- issue #1622](https://github.com/jacoco/jacoco/issues/1622) (HIGH confidence)
-- [Navigation Component 2.7.1 library leak -- LeakCanary issue #2566](https://github.com/square/leakcanary/issues/2566) (HIGH confidence)
-- [Fragment ViewBinding leak -- LeakCanary issue #2341](https://github.com/square/leakcanary/issues/2341) (HIGH confidence)
-- [How to generate ProGuard/R8 rules for Navigation Component arguments](https://koral.dev/blog/androidproguard/) (MEDIUM confidence -- community verified)
-- [ML Kit known issues -- ProGuard and AGP 7.0+](https://developers.google.com/ml-kit/known-issues) (HIGH confidence -- official Google docs)
-- [ML Kit ProGuard issue -- barcode scanning #213](https://github.com/googlesamples/mlkit/issues/213) (MEDIUM confidence)
-- [Robolectric native library UnsatisfiedLinkError -- issue #9099](https://github.com/robolectric/robolectric/issues/9099) (HIGH confidence)
-- [Unit testing LiveData -- Android Developers Medium](https://medium.com/androiddevelopers/unit-testing-livedata-and-other-common-observability-problems-bb477262eb04) (HIGH confidence -- official Android team)
-- [Testing Kotlin coroutines on Android -- official docs](https://developer.android.com/kotlin/coroutines/test) (HIGH confidence)
-- [TestCoroutineDispatcher deprecated migration guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-test/MIGRATION.md) (HIGH confidence)
-- [Detekt baseline documentation](https://detekt.dev/docs/introduction/baseline/) (HIGH confidence -- official detekt docs)
-- [Robolectric configuration -- official docs](https://robolectric.org/configuring/) (HIGH confidence)
-- [Troubleshooting ProGuard issues on Android -- Wojtek Kaliciński, Android Developers](https://medium.com/androiddevelopers/troubleshooting-proguard-issues-on-android-bce9de4f8a74) (HIGH confidence)
+- [Tink Issue #535: EncryptedSharedPreferences crashes on initialization](https://github.com/google/tink/issues/535) -- 57% on Android 7, 26% on Android 6 (HIGH confidence -- official bug tracker)
+- [Tink Issue #361: R8 strips protobuf fields from AesGcmKeyFormat](https://github.com/google/tink/issues/361) (HIGH confidence -- official bug tracker)
+- [tink-java Issue #7: Missing classes with R8 full mode](https://github.com/tink-crypto/tink-java/issues/7) (HIGH confidence -- official bug tracker)
+- [Google Issue Tracker #176215143: EncryptedSharedPreferences crash on KeyStore failure](https://issuetracker.google.com/issues/176215143) (HIGH confidence -- official tracker)
+- [Google Issue Tracker #370009394: Keystore crash while creating EncryptedSharedPreferences](https://issuetracker.google.com/issues/370009394) (HIGH confidence)
+- [Android Developers: KeyPermanentlyInvalidatedException](https://developer.android.com/reference/android/security/keystore/KeyPermanentlyInvalidatedException) (HIGH confidence)
+- [Android Developers: Biometric authentication dialog](https://developer.android.com/identity/sign-in/biometric-auth) (HIGH confidence)
+- [Android Developers: Back up user data with Auto Backup](https://developer.android.com/identity/data/autobackup) (HIGH confidence)
+- [Android Developers: Android Keystore system](https://developer.android.com/privacy-and-security/keystore) (HIGH confidence)
+- [Stytch Blog: Android Keystore pitfalls and best practices](https://stytch.com/blog/android-keystore-pitfalls-and-best-practices/) (MEDIUM confidence)
+- [ProAndroidDev: Goodbye EncryptedSharedPreferences -- 2026 Migration Guide](https://proandroiddev.com/goodbye-encryptedsharedpreferences-a-2026-migration-guide-4b819b4a537a) (MEDIUM confidence)
+- [KINTO Tech Blog: Migrate from EncryptedSharedPreferences to Tink and DataStore](https://blog.kinto-technologies.com/posts/2025-06-16-encrypted-shared-preferences-migration/) (MEDIUM confidence -- includes performance benchmarks)
+- [ProAndroidDev: Android KeyStore StrongBox vs hardware-backed keys](https://proandroiddev.com/android-keystore-what-is-the-difference-between-strongbox-and-hardware-backed-keys-4c276ea78fd0) (MEDIUM confidence)
+- [ed-george/encrypted-shared-preferences: Community fork post-deprecation](https://github.com/ed-george/encrypted-shared-preferences) (MEDIUM confidence)
+- [OWASP MASTG: Android KeyStore knowledge base](https://mas.owasp.org/MASTG/knowledge/android/MASVS-STORAGE/MASTG-KNOW-0043/) (HIGH confidence)
+- [Android Developers Blog: Configure and troubleshoot R8 Keep Rules (Nov 2025)](https://android-developers.googleblog.com/2025/11/configure-and-troubleshoot-r8-keep-rules.html) (HIGH confidence)
+- [Tink documentation: Encrypt large files or data streams](https://developers.google.com/tink/encrypt-large-files-or-data-streams) (HIGH confidence -- official Google docs)
+- [Google Play Console: FLAG_SECURE and REQUIRE_SECURE_ENV](https://support.google.com/googleplay/android-developer/answer/14638385) (HIGH confidence)
 
 ---
-*Pitfalls research for: Android Testing & Release Readiness -- retrofitting tests onto existing MVVM app (v1.1)*
-*Researched: 2026-03-01*
+*Pitfalls research for: Android Document Scanner -- Security Hardening (v1.2)*
+*Researched: 2026-03-03*
