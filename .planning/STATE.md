@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Quality Gates
-status: unknown
-last_updated: "2026-03-02T03:40:00Z"
+status: complete
+last_updated: "2026-03-02T04:00:00Z"
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01 after v1.1 milestone started)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** Phase 5 — Release Readiness
+**Current focus:** Phase 5 — Release Readiness (COMPLETE)
 
 ## Current Position
 
-Phase: 5 of 5 (Release Readiness)
-Plan: 2 of 3 complete in current phase (05-02 complete; 05-03 remaining)
-Status: 05-02 complete — Lint gate configured, AndroidManifest hardened, backup exclusion XMLs created
-Last activity: 2026-03-02 — 05-02: lint{} block + lint.xml (ContentDescription/TouchTargetSizeCheck as errors); 43 ContentDescription violations fixed; camera required=false; data_extraction_rules.xml + backup_rules.xml created; file_paths.xml cache-path tightened; ./gradlew lint BUILD SUCCESSFUL
+Phase: 5 of 5 (Release Readiness) — ALL PLANS COMPLETE
+Plan: 3 of 3 complete in current phase (05-03 complete)
+Status: ALL RELEASE READINESS REQUIREMENTS MET — project ready for Play Store submission
+Last activity: 2026-03-02 — 05-03: ML Kit, GMS, SafeArgs ProGuard keep rules added to proguard-rules.pro; RELEASE-04 E2E approved by user on physical device — all 8 feature paths confirmed crash-free
 
-Progress: [#########░] 90% (9/10 plans complete)
+Progress: [##########] 100% (10/10 plans complete)
 
 ## Accumulated Context
 
@@ -93,9 +93,15 @@ Decisions from 05-02 execution (2026-03-02):
 - cache/ omitted from data_extraction_rules.xml and backup_rules.xml — Android automatically excludes cacheDir per AOSP documentation; no explicit rule needed to satisfy RELEASE-06
 - FileProvider cache-path tightened to path="." — all cacheDir writes go to root; none pass through FileProvider.getUriForFile() (which uses files-path)
 
+Decisions from 05-03 execution (2026-03-02):
+- ML Kit and GMS use `-keep class ... { *; }` (full keep) not `-keepnames` — both use reflection to load internal class hierarchies; stripping members would cause runtime crashes
+- SafeArgs generated classes use `-keepnames` — only class names need to survive obfuscation for nav graph XML references; member minification is safe
+- Coil 2.7.0 and Kotlin Coroutines 1.7.3 explicitly documented as auto-bundled in their AARs — no manual keep rules needed
+- RELEASE-04 E2E environment-blocked in WSL2; user executed on host machine and approved — all 8 feature paths confirmed crash-free in release APK
+
 ### Blockers/Concerns
 
-- **Build environment (RELEASE-04)**: WSL2 lacks JDK — `./gradlew assembleRelease` blocked. Phase 5's terminal gate (real-device E2E) requires host machine with Android Studio. All unit tests and static analysis CAN run in WSL2 after JDK is available.
+None. All blockers resolved. RELEASE-04 WSL2 environment block resolved via user execution on host machine.
 
 ### Pending Todos
 
@@ -103,6 +109,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Completed 05-01 checkpoint resolution — RELEASE-08 user-approved; SUMMARY.md updated; next is 05-03 (ProGuard/R8 keep rules + release APK E2E)
+Last session: 2026-03-02
+Stopped at: Completed 05-03 — ProGuard/R8 keep rules + RELEASE-04 E2E user-approved; Phase 5 complete; all 10 plans complete; project ready for Play Store submission
 Resume file: None

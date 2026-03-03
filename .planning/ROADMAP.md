@@ -23,7 +23,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 **Milestone Goal:** A test foundation covering ViewModel logic, data persistence, JSON serialization, and image processing — plus a release-hardened APK that meets Play Store quality bar on manifest configuration, static analysis, ProGuard rules, and zero memory leaks.
 
 - [x] **Phase 4: Test Coverage** — Test dependency scaffold, ViewModel unit tests, JSON round-trip, Robolectric integration tests, JaCoCo coverage reporting, and stretch fragment/navigation tests (completed 2026-03-01)
-- [ ] **Phase 5: Release Readiness** — Detekt static analysis, Android Lint accessibility enforcement, ProGuard/R8 keep rules, manifest hardening, LeakCanary leak detection, and real-device E2E verification
+- [x] **Phase 5: Release Readiness** — Detekt static analysis, Android Lint accessibility enforcement, ProGuard/R8 keep rules, manifest hardening, LeakCanary leak detection, and real-device E2E verification (completed 2026-03-03)
 
 ## Phase Details
 
@@ -75,4 +75,4 @@ Plans:
 | 2. Design System | v1.0 | 8/8 | Complete | 2026-03-01 |
 | 3. Performance & Polish | v1.0 | 3/3 | Complete | 2026-03-01 |
 | 4. Test Coverage | v1.1 | 7/7 | Complete | 2026-03-02 |
-| 5. Release Readiness | 2/3 | In Progress|  | - |
+| 5. Release Readiness | 3/3 | Complete   | 2026-03-03 | - |
