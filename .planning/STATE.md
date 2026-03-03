@@ -1,32 +1,31 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Quality Gates
-status: unknown
-last_updated: "2026-03-03T03:06:27.150Z"
+milestone: v1.2
+milestone_name: Security Hardening
+status: defining_requirements
+last_updated: "2026-03-03"
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-03 after v1.1 milestone complete)
+See: .planning/PROJECT.md (updated 2026-03-03 after v1.2 milestone started)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** Planning next milestone — use `/gsd:new-milestone`
+**Current focus:** Defining requirements for v1.2 Security Hardening
 
 ## Current Position
 
-Milestone v1.1 Quality Gates — COMPLETE AND ARCHIVED
-Status: All 25 plans across 5 phases shipped. App is Play Store ready.
-Last activity: 2026-03-03 — v1.1 milestone archived; ROADMAP.md collapsed; PROJECT.md evolved; git tagged v1.1
-
-Progress: [##########] 100% (v1.1 milestone complete)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-03 — Milestone v1.2 started
 
 ## Accumulated Context
 

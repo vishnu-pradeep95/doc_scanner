@@ -53,9 +53,9 @@ Every feature that exists must work flawlessly, feel delightful, and be verified
 - ✓ LeakCanary 2.14 debugImplementation; zero app-code leaks; Navigation 2.7.x library leak documented in KNOWN_LEAKS.md — v1.1 (RELEASE-08)
 - ✓ JaCoCo: 70% LINE for util/ImageProcessor, 88.9% for viewmodel/, >=22% overall util/ — v1.1 (RELEASE-09)
 
-### Active (next milestone)
+### Active (v1.2)
 
-*(No active requirements — define with `/gsd:new-milestone`)*
+*(Requirements defined in REQUIREMENTS.md — Security Hardening milestone)*
 
 ### Out of Scope
 
@@ -80,6 +80,7 @@ Every feature that exists must work flawlessly, feel delightful, and be verified
 - **Architecture**: Single Activity + Navigation Component + MVVM (ScannerViewModel via `activityViewModels()`), LiveData, View Binding, Coroutines
 - **File storage**: App-private storage in `filesDir` (scans/, processed/, pdfs/) — no storage permissions
 - **Min SDK**: 24 (Android 7.0), Target SDK: 34, Compile SDK: 35
+- **Security stance**: High-sensitivity — documents may include IDs, medical records, contracts; treat like banking app
 - **Current state**: v1.1 shipped — 5 phases, 25 plans, ~13,500 Kotlin LOC + ~16,200 XML LOC
 - **App status**: Play Store quality bar met — ready for submission
 
@@ -110,5 +111,7 @@ Every feature that exists must work flawlessly, feel delightful, and be verified
 | cache/ omitted from backup exclusion XML | Android auto-excludes cacheDir per AOSP; no explicit rule needed | ✓ Good — simpler manifest, correct behavior |
 | ML Kit/GMS full keep rules (-keep not -keepnames) | Both use reflection to load internal class hierarchies | ✓ Good — release APK confirmed crash-free |
 
+| High-sensitivity threat model for v1.2 | Documents may include IDs, medical, contracts — banking-app security stance | — Pending |
+
 ---
-*Last updated: 2026-03-03 after v1.1 Quality Gates milestone*
+*Last updated: 2026-03-03 after v1.2 Security Hardening milestone started*
