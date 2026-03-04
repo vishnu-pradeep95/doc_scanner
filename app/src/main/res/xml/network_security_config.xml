@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SEC-04: Explicitly block all cleartext (HTTP) traffic -->
+<!-- Defense-in-depth for offline app — prevents any component from making unencrypted connections -->
+<!-- For API 28+ cleartext is blocked by default; this makes it explicit for API 24-27 (minSdk 24) -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
