@@ -66,11 +66,12 @@ Plans:
   3. Document history and app preferences are encrypted at rest using Tink AEAD with Android Keystore-backed keys
   4. Existing unencrypted SharedPreferences are migrated to encrypted storage without data loss (idempotent, crash-safe with sentinel key)
   5. App gracefully falls back to unencrypted prefs on devices with persistent KeyStore failures (API 24-27 edge cases)
-**Plans**: TBD
-**Research**: Needs phase research — migration safety, KeyStore fallback, auth/encryption key separation, R8 keep rules
+**Plans**: 2 plans
+**Research**: Complete — security-crypto:1.1.0, path canonicalization, MIME validation patterns
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md — InputValidator utility + fragment path validation + MIME validation at import (SEC-07)
+- [ ] 07-02-PLAN.md — EncryptedSharedPreferences with SecurePreferences singleton + migration + backup rules (SEC-08)
 
 ### Phase 8: File Encryption at Rest
 **Goal**: All document images and PDFs are encrypted at rest; existing unencrypted files are migrated transparently
@@ -129,7 +130,7 @@ Plans:
 | 4. Test Coverage | v1.1 | 7/7 | Complete | 2026-03-02 |
 | 5. Release Readiness | v1.1 | 3/3 | Complete | 2026-03-03 |
 | 6. Security Foundation & Quick Wins | v1.2 | 0/2 | Planned | - |
-| 7. Input Hardening & Encrypted Storage | v1.2 | 0/? | Not started | - |
+| 7. Input Hardening & Encrypted Storage | v1.2 | 0/2 | Planned | - |
 | 8. File Encryption at Rest | v1.2 | 0/? | Not started | - |
 | 9. Biometric App Lock | v1.2 | 0/? | Not started | - |
 | 10. Hardening Polish & Audit | v1.2 | 0/? | Not started | - |
