@@ -1,83 +1,85 @@
-# Requirements: PDF Scanner v1.1 — Quality Gates
+# Requirements: PDF Scanner — Security Hardening
 
-**Defined:** 2026-03-01
+**Defined:** 2026-03-03
 **Core Value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
 
-## v1.1 Requirements
+## v1.2 Requirements
 
-### Testing
+Requirements for security hardening milestone. Each maps to roadmap phases.
 
-- [x] **TEST-01**: User can run a basic test suite (test dependencies: MockK 1.14.7, Robolectric 4.16, Espresso 3.7.0, fragment-testing 1.8.9, kotlinx-coroutines-test 1.7.3, core-testing 2.2.0; JaCoCo configured with LINE counter and generated-class exclusions for R, BuildConfig, *Args, *Directions, *Binding)
-- [x] **TEST-02**: 15+ ScannerViewModel unit tests cover page CRUD, filter state, and PDF naming logic (using InstantTaskExecutorRule + UnconfinedTestDispatcher + runTest)
-- [x] **TEST-03**: DocumentEntry JSON serialization round-trips correctly with all fields preserved (pure JVM test, no Android dependencies)
-- [x] **TEST-04**: 8+ ImageProcessor filter tests run via Robolectric covering all FilterType enum values (Robolectric for Bitmap; ImageProcessor does not call OcrProcessor — no ML Kit boundary mock needed)
-- [x] **TEST-05**: 8+ DocumentHistoryRepository CRUD tests run via Robolectric covering create, read, update, delete, and filter operations
-- [x] **TEST-07**: 5+ fragment smoke tests verify layout inflation and View Binding initialization across non-camera fragments via FragmentScenario *(stretch goal)*
-- [x] **TEST-08**: Navigation flow test verifies Home → Camera nav action fires correctly using TestNavHostController (full camera hardware flow not testable without a device) *(stretch goal)*
+### Security Foundation
 
-### Release Readiness
+- [ ] **SEC-01**: App sets FLAG_SECURE on all screens to prevent screenshots and Recents thumbnails of sensitive documents
+- [ ] **SEC-03**: Production log calls (Log.v/d/i) stripped via ProGuard rule; Log.w/e retained for crash diagnostics
+- [ ] **SEC-04**: Network security config XML explicitly disables cleartext traffic (defense-in-depth for offline app)
+- [ ] **SEC-05**: Temp files in cacheDir cleaned immediately after use via finally blocks with randomized names
+- [ ] **SEC-06**: All non-launcher components explicitly marked `android:exported="false"` in manifest
 
-- [x] **RELEASE-01**: Detekt 1.23.8 + detekt-formatting configured with baseline file; `./gradlew detekt` passes with zero new blocking errors (existing violations captured in baseline, not fixed)
-- [x] **RELEASE-02**: Android Lint with `lint.xml` — accessibility errors (`ContentDescription`, `TouchTargetSizeCheck`, etc.) promoted to build errors; `./gradlew lint` passes
-- [x] **RELEASE-03**: ProGuard/R8 keep rules in `proguard-rules.pro` for ML Kit (`com.google.mlkit.**`, `com.google.android.gms.**`), Navigation SafeArgs (`**.*Args`, `**.*Directions`), Coil, and coroutines; verified via release APK inspection
-- [x] **RELEASE-04**: Release APK installed on physical Android device; every screen and feature path manually exercised (camera capture, gallery import, ML Kit OCR, PDF generation, share/export); requires host machine with Android Studio + JDK — environment-blocked in WSL2
-- [x] **RELEASE-05**: `<uses-feature android:name="android.hardware.camera" android:required="false" />` added to AndroidManifest.xml (enables install on tablets and Chromebooks)
-- [x] **RELEASE-06**: `dataExtractionRules` (API 31+) and `fullBackupContent` attributes added to AndroidManifest.xml excluding private `scans/`, `processed/`, and `pdfs/` directories from auto-backup. Note: `cache/` is intentionally omitted from the XML exclusion rules — Android automatically excludes `cacheDir` from both cloud backup and device transfer per AOSP documentation (https://developer.android.com/guide/topics/data/autobackup#IncludingFiles); no explicit rule is required or generated.
-- [x] **RELEASE-07**: FileProvider `file_paths.xml` paths scoped to only actually-used subdirectories (remove overly-broad `cache-path path="/"`)
-- [x] **RELEASE-08**: LeakCanary 2.14 added as `debugImplementation`; zero retained Activity/Fragment/ViewModel leaks after exercising all 8 fragment flows; Navigation 2.7.x `AbstractAppBarOnDestinationChangedListener` library leak documented as known and triaged (not an app bug)
-- [x] **RELEASE-09**: JaCoCo coverage report generated; LINE coverage meets 70% for `util/ImageProcessor` and 50% for `viewmodel/` package (BRANCH counter excluded due to coroutine synthetic branch inflation). Overall `util/` package LINE coverage is >=22% — `ImageUtils` (EXIF correction via ContentResolver URI I/O + real JPEG byte stream decoding) and the remainder of `util/` (PdfUtils, AnimationHelper, DocumentScanner, SoundManager, PdfPageExtractor) depend on ContentResolver, CameraX, ML Kit, and native PdfRenderer which require real file fixtures or a connected device and are outside JVM unit test scope for this milestone.
+### Input Hardening
 
-## v2 Requirements (Deferred)
+- [ ] **SEC-07**: Navigation args containing file paths validated against app-private storage boundaries; imported URIs validated for expected MIME types
+- [ ] **SEC-08**: Document history SharedPreferences encrypted at rest using Tink AEAD with Android Keystore-backed keys
 
-### Testing
+### App Lock
 
-- **TEST-06**: PdfUtils instrumented tests via AndroidJUnitRunner — 8+ tests covering PDF generation, page merge, and file output; deferred because PdfRenderer requires real device/emulator (Robolectric does not shadow PdfRenderer); HIGH complexity and environment uncertainty make this a scope risk for v1.1
+- [ ] **SEC-02**: User can enable biometric/PIN app lock via Settings; BiometricPrompt with DEVICE_CREDENTIAL fallback
+- [ ] **SEC-13**: App re-requires authentication after configurable timeout when backgrounded (immediate/30s/1min/5min)
 
-### Quality
+### Data Protection
 
-- **QUAL-01**: JaCoCo hard enforcement gate in CI (`jacocoTestCoverageVerification` with minimum thresholds) — add only after coverage is established and stable for several milestones
-- **QUAL-02**: CI/CD pipeline (GitHub Actions or similar) automating test, lint, and detekt on every PR
-- **QUAL-03**: Screenshot regression tests (Roborazzi/Paparazzi) — explicitly out of scope; tooling confidence LOW
+- [ ] **SEC-09**: All document images and PDFs encrypted at rest using Tink StreamingAead; existing files migrated on first launch
+- [ ] **SEC-10**: File deletion overwrites content with random bytes before removing filesystem reference
+- [ ] **SEC-11**: Clipboard content marked as sensitive via ClipDescription.EXTRA_IS_SENSITIVE flag
+- [ ] **SEC-12**: Sensitive views (document names, paths) protected from untrusted accessibility services via accessibilityDataSensitive attribute
+
+### Detection
+
+- [ ] **SEC-14**: App detects rooted/debuggable device and shows one-time warning dialog (not blocking)
+
+## Future Requirements
+
+### Extended Security
+
+- **QUAL-01**: JaCoCo hard enforcement gate in CI — add after coverage is stable across multiple milestones
+- **QUAL-02**: CI/CD pipeline (GitHub Actions) — v2+ milestone
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| New product features (cloud sync, searchable PDF, etc.) | This milestone is exclusively quality gates — no feature expansion |
-| Kotlin/Coroutines upgrade (1.9 → 2.x) | Would require Detekt 2.x upgrade and risk regressions across 31 source files |
-| Navigation Component upgrade (2.7.x → 2.8.x) | Can resolve LeakCanary false positive but adds upgrade risk; LeakCanary config exclusion is sufficient |
-| JUnit 5 | Instrumentation friction with no benefit for this test suite; JUnit 4 throughout |
-| Mockito | MockK has better Kotlin DSL for final classes and coroutines; Mockito requires extra workarounds |
-| Play Store submission | Out of scope for v1.1 — submission is a separate milestone action after RELEASE-04 confirms release quality |
-| Tablet-optimized layouts | v2+ |
-| Internationalization | v2+ |
+| Certificate pinning | App is offline-only; no backend to pin against |
+| Custom encryption implementation | Use Tink (Google-maintained) instead of rolling own crypto |
+| Blocking rooted devices | False positives from custom ROMs; warn-only approach (SEC-14) |
+| DRM-style content protection | Conflicts with core sharing/export functionality |
+| Per-document passwords | Requires iTextPDF/PDFBox (out of scope); app-level encryption covers this |
+| SQLCipher/Room encrypted database | App uses SharedPreferences, not SQLite; Tink encryption is sufficient |
+| Biometric-only auth (no PIN fallback) | Accessibility concern; BiometricPrompt with DEVICE_CREDENTIAL is correct |
+| Full binary obfuscation (DexGuard) | R8 provides adequate obfuscation; commercial tool adds cost/complexity |
 
 ## Traceability
 
-| Requirement | Phase | Plan | Status |
-|-------------|-------|------|--------|
-| TEST-01 | Phase 4 | 04-01 | Pending |
-| TEST-02 | Phase 4 | 04-02 | Pending |
-| TEST-03 | Phase 4 | 04-03 | Pending |
-| TEST-04 | Phase 4 | 04-03 | Pending |
-| TEST-05 | Phase 4 | 04-04 | Pending |
-| TEST-07 | Phase 4 | 04-05 | Pending |
-| TEST-08 | Phase 4 | 04-05 | Pending |
-| RELEASE-09 | Phase 4 | 04-04, 04-06 | Complete |
-| RELEASE-01 | Phase 5 | 05-01 | Pending |
-| RELEASE-02 | Phase 5 | 05-02 | Pending |
-| RELEASE-03 | Phase 5 | 05-03 | Pending |
-| RELEASE-04 | Phase 5 | 05-03 | Pending |
-| RELEASE-05 | Phase 5 | 05-02 | Pending |
-| RELEASE-06 | Phase 5 | 05-02 | Pending |
-| RELEASE-07 | Phase 5 | 05-02 | Pending |
-| RELEASE-08 | Phase 5 | 05-01 | Complete |
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SEC-01 | TBD | Pending |
+| SEC-02 | TBD | Pending |
+| SEC-03 | TBD | Pending |
+| SEC-04 | TBD | Pending |
+| SEC-05 | TBD | Pending |
+| SEC-06 | TBD | Pending |
+| SEC-07 | TBD | Pending |
+| SEC-08 | TBD | Pending |
+| SEC-09 | TBD | Pending |
+| SEC-10 | TBD | Pending |
+| SEC-11 | TBD | Pending |
+| SEC-12 | TBD | Pending |
+| SEC-13 | TBD | Pending |
+| SEC-14 | TBD | Pending |
 
 **Coverage:**
-- v1.1 requirements: 16 total
-- Mapped to phases: 16
-- Unmapped: 0 ✓
+- v1.2 requirements: 14 total
+- Mapped to phases: 0
+- Unmapped: 14 ⚠️
 
 ---
-*Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 — RELEASE-09 recalibrated to >=22% overall util/ threshold; ImageUtils added to JVM-exclusion list (ContentResolver/EXIF I/O requires real file fixtures); plan 04-07 gap closure. RELEASE-06 updated: cache/ removed from listed exclusion directories (Android auto-excludes cacheDir per AOSP — no explicit XML rule needed or generated).*
+*Requirements defined: 2026-03-03*
+*Last updated: 2026-03-03 after initial definition*
