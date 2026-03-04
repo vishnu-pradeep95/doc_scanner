@@ -75,18 +75,21 @@ Plans:
 
 ### Phase 8: File Encryption at Rest
 **Goal**: All document images and PDFs are encrypted at rest; existing unencrypted files are migrated transparently
-**Depends on**: Phase 7 (SecurityManager and SecureFileManager must exist)
+**Depends on**: Phase 7 (SecurePreferences must exist for migration sentinel storage)
 **Requirements**: SEC-09, SEC-10
 **Success Criteria** (what must be TRUE):
   1. All newly captured, processed, and generated files (scans/, processed/, pdfs/) are AES-256-GCM encrypted on disk
   2. Existing unencrypted document files are migrated to encrypted storage on first launch with progress UI
   3. All document viewing, sharing, and editing workflows function identically to pre-encryption behavior (encryption is transparent to the user)
   4. File deletion of encrypted documents is cryptographically secure (encrypted content with KeyStore-managed key is equivalent to secure erasure on flash storage)
-**Plans**: TBD
-**Research**: Needs phase research — CameraX encrypt-in-place, Coil Fetcher, PdfRenderer decrypt-to-temp, CanHub integration, benchmark data
+**Plans**: 4 plans
+**Research**: Complete — Tink StreamingAead, CameraX encrypt-in-place, Coil decrypt-to-bitmap, PdfRenderer decrypt-to-temp
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md — SecureFileManager singleton + tink-android dependency + ProGuard + backup rules (SEC-09, SEC-10)
+- [ ] 08-02-PLAN.md — Encrypt/decrypt in utility classes and editor components (SEC-09)
+- [ ] 08-03-PLAN.md — Encrypt/decrypt in UI fragments, adapters, and DocumentHistory secure delete (SEC-09, SEC-10)
+- [ ] 08-04-PLAN.md — Migration flow with progress UI in HomeFragment (SEC-09)
 
 ### Phase 9: Biometric App Lock
 **Goal**: Users can opt into biometric/PIN authentication with configurable auto-lock when the app is backgrounded
@@ -131,6 +134,6 @@ Plans:
 | 5. Release Readiness | v1.1 | 3/3 | Complete | 2026-03-03 |
 | 6. Security Foundation & Quick Wins | v1.2 | 0/2 | Planned | - |
 | 7. Input Hardening & Encrypted Storage | v1.2 | 0/2 | Planned | - |
-| 8. File Encryption at Rest | v1.2 | 0/? | Not started | - |
+| 8. File Encryption at Rest | v1.2 | 0/4 | Planned | - |
 | 9. Biometric App Lock | v1.2 | 0/? | Not started | - |
 | 10. Hardening Polish & Audit | v1.2 | 0/? | Not started | - |
