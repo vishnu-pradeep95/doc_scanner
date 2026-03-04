@@ -371,6 +371,14 @@ dependencies {
     implementation("androidx.exifinterface:exifinterface:1.3.7")
 
     // ===========================================
+    // SECURITY — Encrypted SharedPreferences (SEC-08)
+    // ===========================================
+
+    // EncryptedSharedPreferences + MasterKey (wraps Tink 1.7.0 internally)
+    // Deprecated but stable — provides SharedPreferences-compatible API
+    implementation("androidx.security:security-crypto:1.1.0")
+
+    // ===========================================
     // UI COMPONENTS
     // ===========================================
 

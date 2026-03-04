@@ -41,3 +41,8 @@
     public static int d(...);
     public static int i(...);
 }
+
+# ===== SEC-08: Tink (via security-crypto:1.1.0) R8 compatibility =====
+# Tink references error-prone annotations at compile time but they are not
+# runtime dependencies. R8 full mode (AGP 8.0+) flags these as missing.
+-dontwarn com.google.errorprone.annotations.**

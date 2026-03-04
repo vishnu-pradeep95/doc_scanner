@@ -99,7 +99,8 @@
         <activity
             android:name="com.canhub.cropper.CropImageActivity"
             android:exported="false"
-            android:theme="@style/Theme.PDFScanner.Crop" />
+            android:theme="@style/Theme.PDFScanner.Crop"
+            tools:replace="android:exported" />
 
         <!--
             FILEPROVIDER DECLARATION
