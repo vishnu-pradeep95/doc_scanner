@@ -31,3 +31,13 @@
 
 # Kotlin Coroutines 1.7.3 — consumer rules are AUTO-BUNDLED in kotlinx-coroutines-android.
 # No explicit rules needed.
+
+# ===== SEC-03: Strip verbose/debug/info log calls from release builds =====
+# R8 removes the method calls AND associated string concatenation (AGP 7.3+ / R8 3.3.70+).
+# Log.w and Log.e are intentionally retained for crash diagnostics.
+# Only effective when isMinifyEnabled = true (release builds).
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}
