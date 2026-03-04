@@ -30,6 +30,7 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 
 /**
  * Custom View that renders PDF pages using Android's native PdfRenderer
@@ -117,7 +118,7 @@ class NativePdfView @JvmOverloads constructor(
             Log.d(TAG, "Loading PDF from URI: $uri")
             
             // Copy to temp file for reliable access
-            val tempFile = File(context.cacheDir, "pdf_view_temp_${System.currentTimeMillis()}.pdf")
+            val tempFile = File(context.cacheDir, "pdf_view_${UUID.randomUUID()}.pdf")
             this.tempFile = tempFile  // Track for cleanup
 
             context.contentResolver.openInputStream(uri)?.use { input ->

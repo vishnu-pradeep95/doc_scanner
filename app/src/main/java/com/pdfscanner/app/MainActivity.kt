@@ -141,36 +141,30 @@ class MainActivity : AppCompatActivity() {
     
     /**
      * Clean up stale temp files created by PDF viewing and editing operations.
-     * Removes files older than 1 hour that match known temp file prefixes.
+     * SEC-05: Deletes ALL matching temp files on startup regardless of age,
+     * ensuring no stale temp files survive an app restart.
      * Runs on app startup as a best-effort cleanup (never crashes the app).
      */
     private fun cleanupStaleTempFiles() {
         try {
             val cacheDir = cacheDir
-            val oneHourAgo = System.currentTimeMillis() - (60 * 60 * 1000)
-
+            // SEC-05: Delete ALL matching temp files on startup (no age check)
+            // Ensures no stale temp files survive app restart
             cacheDir.listFiles()?.forEach { file ->
-                if (file.isFile && file.lastModified() < oneHourAgo) {
+                if (file.isFile) {
                     val name = file.name
-                    if (name.startsWith("pdf_view_temp_") ||
+                    if (name.startsWith("pdf_view_") ||
                         name.startsWith("temp_edit_") ||
                         name.startsWith("pdf_compress_temp")) {
                         file.delete()
                     }
                 }
             }
-
-            // Also clean pdf_compress_temp directory
+            // Also clean pdf_compress_temp directory completely
             val compressTemp = File(cacheDir, "pdf_compress_temp")
             if (compressTemp.exists() && compressTemp.isDirectory) {
-                compressTemp.listFiles()?.forEach { file ->
-                    if (file.lastModified() < oneHourAgo) {
-                        file.delete()
-                    }
-                }
-                if (compressTemp.listFiles()?.isEmpty() == true) {
-                    compressTemp.delete()
-                }
+                compressTemp.listFiles()?.forEach { it.delete() }
+                compressTemp.delete()
             }
         } catch (e: Exception) {
             // Cleanup is best-effort, don't crash the app

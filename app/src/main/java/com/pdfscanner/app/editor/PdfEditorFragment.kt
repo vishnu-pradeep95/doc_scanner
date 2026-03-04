@@ -41,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.UUID
 
 /**
  * Fragment for editing PDFs with annotations
@@ -242,7 +243,7 @@ class PdfEditorFragment : Fragment() {
             android.util.Log.d("PdfEditor", "Loading from content URI...")
             requireContext().contentResolver.openInputStream(pdfUri)?.use { inputStream ->
                 // Create temp file
-                val tempFile = File(requireContext().cacheDir, "temp_edit_${System.currentTimeMillis()}.pdf")
+                val tempFile = File(requireContext().cacheDir, "temp_edit_${UUID.randomUUID()}.pdf")
                 tempFile.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
                 }

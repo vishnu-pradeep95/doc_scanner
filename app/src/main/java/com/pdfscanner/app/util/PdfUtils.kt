@@ -35,6 +35,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 /**
  * Result from PDF operations
@@ -387,49 +388,52 @@ object PdfUtils {
             val tempDir = File(context.cacheDir, "pdf_compress_temp")
             if (!tempDir.exists()) tempDir.mkdirs()
 
-            pfd.use { fd ->
-                PdfRenderer(fd).use { renderer ->
-                    // Process each page: render -> compress as JPEG -> add to PDF
-                    for (i in 0 until renderer.pageCount) {
-                        renderer.openPage(i).use { page ->
-                            // Scale dimensions based on compression level
-                            val width = (page.width * scale).toInt().coerceAtLeast(100)
-                            val height = (page.height * scale).toInt().coerceAtLeast(100)
+            try {
+                pfd.use { fd ->
+                    PdfRenderer(fd).use { renderer ->
+                        // Process each page: render -> compress as JPEG -> add to PDF
+                        for (i in 0 until renderer.pageCount) {
+                            renderer.openPage(i).use { page ->
+                                // Scale dimensions based on compression level
+                                val width = (page.width * scale).toInt().coerceAtLeast(100)
+                                val height = (page.height * scale).toInt().coerceAtLeast(100)
 
-                            // Render page to bitmap
-                            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                            bitmap.eraseColor(Color.WHITE)
-                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                                // Render page to bitmap
+                                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                                bitmap.eraseColor(Color.WHITE)
+                                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-                            // Compress to JPEG and reload (this actually reduces quality/size)
-                            val tempJpeg = File(tempDir, "page_$i.jpg")
-                            FileOutputStream(tempJpeg).use { fos ->
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, fos)
+                                // SEC-05: Use UUID for temp file names (unpredictable)
+                                val tempJpeg = File(tempDir, "${UUID.randomUUID()}.jpg")
+                                FileOutputStream(tempJpeg).use { fos ->
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, fos)
+                                }
+                                bitmap.recycle()
+
+                                // Load the compressed JPEG back
+                                val compressedBitmap = android.graphics.BitmapFactory.decodeFile(tempJpeg.absolutePath)
+
+                                // Add compressed bitmap to PDF
+                                val pageInfo = PdfDocument.PageInfo.Builder(
+                                    compressedBitmap.width,
+                                    compressedBitmap.height,
+                                    i + 1
+                                ).create()
+                                val newPage = pdfDocument.startPage(pageInfo)
+                                newPage.canvas.drawBitmap(compressedBitmap, 0f, 0f, null)
+                                pdfDocument.finishPage(newPage)
+
+                                compressedBitmap.recycle()
+                                tempJpeg.delete()
                             }
-                            bitmap.recycle()
-
-                            // Load the compressed JPEG back
-                            val compressedBitmap = android.graphics.BitmapFactory.decodeFile(tempJpeg.absolutePath)
-
-                            // Add compressed bitmap to PDF
-                            val pageInfo = PdfDocument.PageInfo.Builder(
-                                compressedBitmap.width,
-                                compressedBitmap.height,
-                                i + 1
-                            ).create()
-                            val newPage = pdfDocument.startPage(pageInfo)
-                            newPage.canvas.drawBitmap(compressedBitmap, 0f, 0f, null)
-                            pdfDocument.finishPage(newPage)
-
-                            compressedBitmap.recycle()
-                            tempJpeg.delete()
                         }
                     }
                 }
+            } finally {
+                // SEC-05: Clean up temp directory and all contents even on exception
+                tempDir.listFiles()?.forEach { it.delete() }
+                tempDir.delete()
             }
-
-            // Cleanup temp directory
-            tempDir.delete()
 
             // Save compressed PDF
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
