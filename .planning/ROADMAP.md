@@ -49,11 +49,12 @@ Full details: `.planning/milestones/v1.1-ROADMAP.md`
   3. Cleartext HTTP traffic is explicitly blocked via network security config (verified via `adb shell dumpsys`)
   4. Temp files use randomized names and are cleaned up in finally blocks; no stale temp files survive app restart
   5. All non-launcher components in AndroidManifest are explicitly marked `android:exported="false"`
-**Plans**: TBD
-**Research**: Skip — standard Android API patterns
+**Plans**: 2 plans
+**Research**: Complete — standard Android API patterns
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md — FLAG_SECURE screenshot prevention + temp file security hardening (SEC-01, SEC-05)
+- [ ] 06-02-PLAN.md — ProGuard log stripping + network security config + exported component audit (SEC-03, SEC-04, SEC-06)
 
 ### Phase 7: Input Hardening & Encrypted Storage
 **Goal**: App validates all external input against path traversal and encrypts SharedPreferences at rest with crash-safe migration
@@ -127,7 +128,7 @@ Plans:
 | 3. Performance & Polish | v1.0 | 3/3 | Complete | 2026-03-01 |
 | 4. Test Coverage | v1.1 | 7/7 | Complete | 2026-03-02 |
 | 5. Release Readiness | v1.1 | 3/3 | Complete | 2026-03-03 |
-| 6. Security Foundation & Quick Wins | v1.2 | 0/? | Not started | - |
+| 6. Security Foundation & Quick Wins | v1.2 | 0/2 | Planned | - |
 | 7. Input Hardening & Encrypted Storage | v1.2 | 0/? | Not started | - |
 | 8. File Encryption at Rest | v1.2 | 0/? | Not started | - |
 | 9. Biometric App Lock | v1.2 | 0/? | Not started | - |
