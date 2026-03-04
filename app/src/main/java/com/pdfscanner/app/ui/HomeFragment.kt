@@ -43,6 +43,7 @@ import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.data.DocumentHistoryRepository
 import com.pdfscanner.app.databinding.FragmentHomeBinding
 import com.pdfscanner.app.util.DocumentScanner
+import com.pdfscanner.app.util.InputValidator
 import com.pdfscanner.app.util.PdfPageExtractor
 import com.pdfscanner.app.util.PdfUtils
 import com.pdfscanner.app.viewmodel.ScannerViewModel
@@ -373,16 +374,25 @@ class HomeFragment : Fragment() {
         if (uris.isEmpty()) return
         val ctx = context ?: return
 
+        // Validate MIME types (SEC-07)
+        val validUris = uris.filter { uri ->
+            InputValidator.isAllowedMimeType(ctx, uri)
+        }
+        if (validUris.isEmpty()) {
+            showSnackbar("Unsupported file type")
+            return
+        }
+
         // Add imported images to ViewModel with EXIF correction
-        uris.forEach { uri ->
+        validUris.forEach { uri ->
             val correctedUri = com.pdfscanner.app.util.ImageUtils.correctExifOrientation(ctx, uri)
             viewModel.addPage(correctedUri)
         }
 
         // Navigate to pages screen to crop/edit
-        if (uris.size == 1) {
+        if (validUris.size == 1) {
             // Single image - go to preview for cropping
-            val correctedFirst = viewModel.pages.value?.lastOrNull() ?: uris.first()
+            val correctedFirst = viewModel.pages.value?.lastOrNull() ?: validUris.first()
             viewModel.setCurrentCapture(correctedFirst)
             val action = HomeFragmentDirections.actionHomeToPreview(correctedFirst.toString())
             findNavController().navigate(action)
@@ -391,7 +401,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_home_to_pages)
         }
     }
-    
+
     /**
      * Handle results from import (images + PDFs)
      * Separates images and PDFs, extracts PDF pages as images
@@ -401,11 +411,20 @@ class HomeFragment : Fragment() {
 
         val ctx = context ?: return
 
+        // Validate MIME types -- reject unsupported files (SEC-07)
+        val validUris = uris.filter { uri ->
+            InputValidator.isAllowedMimeType(ctx, uri)
+        }
+        if (validUris.isEmpty()) {
+            showSnackbar("Unsupported file type")
+            return
+        }
+
         // Separate images and PDFs
         val imageUris = mutableListOf<Uri>()
         val pdfUris = mutableListOf<Uri>()
 
-        uris.forEach { uri ->
+        validUris.forEach { uri ->
             if (PdfPageExtractor.isPdfFile(ctx, uri)) {
                 pdfUris.add(uri)
             } else {

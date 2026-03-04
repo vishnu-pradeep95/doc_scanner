@@ -57,6 +57,7 @@ import com.canhub.cropper.CropImageOptions  // Crop configuration
 import com.pdfscanner.app.R
 import com.pdfscanner.app.databinding.FragmentPreviewBinding
 import com.pdfscanner.app.util.ImageProcessor
+import com.pdfscanner.app.util.InputValidator
 import com.pdfscanner.app.viewmodel.ScannerViewModel
 
 // Coroutines
@@ -218,9 +219,16 @@ class PreviewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Validate path BEFORE any processing (SEC-07)
+        if (!InputValidator.isUriPathWithinAppStorage(args.imageUri, requireContext())) {
+            showSnackbar("Document not available")
+            findNavController().navigateUp()
+            return
+        }
+
         /**
          * Get image URI from navigation arguments
-         * 
+         *
          * args.imageUri is a String (URIs are passed as strings in navigation)
          * Uri.parse() converts string back to Uri object
          */

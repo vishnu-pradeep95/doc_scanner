@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.pdfscanner.app.ui.showSnackbar
+import com.pdfscanner.app.util.InputValidator
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -72,7 +73,14 @@ class PdfViewerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
+        // Validate path BEFORE any processing (SEC-07)
+        if (!InputValidator.isPathWithinAppStorage(args.pdfPath, requireContext())) {
+            showSnackbar("Document not available")
+            findNavController().navigateUp()
+            return
+        }
+
         setupToolbar()
         setupNavigation()
         loadPdf()
