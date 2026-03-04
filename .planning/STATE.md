@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Security Hardening
-status: in-progress
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-03-04T20:15:08Z"
-last_activity: 2026-03-04 — Completed 07-02 (EncryptedSharedPreferences, SecurePreferences singleton, consumer wiring)
+status: completed
+stopped_at: Completed 07-01-PLAN.md - Phase 7 complete
+last_updated: "2026-03-04T20:19:41Z"
+last_activity: 2026-03-04 — Completed 07-01 (InputValidator, path traversal prevention, MIME validation)
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-03 after v1.2 milestone started)
 
 ## Current Position
 
-Phase: 7 of 10 (Input Hardening & Encrypted Storage)
-Plan: 1 of 2 (07-02 complete, 07-01 pending)
-Status: 07-02 complete, 07-01 pending
-Last activity: 2026-03-04 — Completed 07-02 (EncryptedSharedPreferences, SecurePreferences singleton, consumer wiring)
+Phase: 7 of 10 (Input Hardening & Encrypted Storage) -- COMPLETE
+Plan: 2 of 2 -- Phase 7 COMPLETE
+Status: Phase 7 complete, ready for Phase 8
+Last activity: 2026-03-04 — Completed 07-01 (InputValidator, path traversal prevention, MIME validation)
 
-Progress: [█████-----] 50% (1/2 plans in phase 7)
+Progress: [██████████] 100% (2/2 plans in phase 7)
 
 ## Performance Metrics
 
@@ -44,7 +44,7 @@ Progress: [█████-----] 50% (1/2 plans in phase 7)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 6. Security Foundation | 2 | 3min | 1.5min |
-| 7. Input & Encrypted Storage | 1/2 | 5min | 5min |
+| 7. Input & Encrypted Storage | 2/2 | 15min | 7.5min |
 | 8. File Encryption | - | - | - |
 | 9. Biometric App Lock | - | - | - |
 | 10. Hardening Polish | - | - | - |
@@ -52,6 +52,7 @@ Progress: [█████-----] 50% (1/2 plans in phase 7)
 *Updated after each plan completion*
 | Phase 06 P01 | 2min | 2 tasks | 5 files |
 | Phase 06 P02 | 1min | 2 tasks | 3 files |
+| Phase 07 P01 | 10min | 2 tasks | 6 files |
 | Phase 07 P02 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
@@ -68,6 +69,10 @@ Critical decisions carrying forward:
 - SecurePreferences merges both old prefs files into single encrypted file with prefix namespacing (history_, app_)
 - Sentinel key in same apply() transaction ensures crash-safe idempotent migration
 - Old unencrypted prefs files retained through v1.2 cycle (Phase 10 audit cleanup)
+- InputValidator uses canonical path resolution to prevent ../traversal attacks
+- content:// URIs bypass path validation (ContentResolver mediates access)
+- application/octet-stream explicitly rejected at import (banking-app security stance)
+- Security error messages are intentionally neutral ("Document not available") to prevent info leakage
 
 ### Blockers/Concerns
 
@@ -79,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T20:15:08Z
-Stopped at: Completed 07-02-PLAN.md
-Resume file: .planning/phases/07-input-hardening-encrypted-storage/07-02-SUMMARY.md
+Last session: 2026-03-04T20:19:41Z
+Stopped at: Completed 07-01-PLAN.md - Phase 7 fully complete
+Resume file: .planning/phases/07-input-hardening-encrypted-storage/07-01-SUMMARY.md
