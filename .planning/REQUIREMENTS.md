@@ -10,10 +10,10 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 ### Security Foundation
 
 - [ ] **SEC-01**: App sets FLAG_SECURE on all screens to prevent screenshots and Recents thumbnails of sensitive documents
-- [ ] **SEC-03**: Production log calls (Log.v/d/i) stripped via ProGuard rule; Log.w/e retained for crash diagnostics
-- [ ] **SEC-04**: Network security config XML explicitly disables cleartext traffic (defense-in-depth for offline app)
+- [x] **SEC-03**: Production log calls (Log.v/d/i) stripped via ProGuard rule; Log.w/e retained for crash diagnostics
+- [x] **SEC-04**: Network security config XML explicitly disables cleartext traffic (defense-in-depth for offline app)
 - [ ] **SEC-05**: Temp files in cacheDir cleaned immediately after use via finally blocks with randomized names
-- [ ] **SEC-06**: All non-launcher components explicitly marked `android:exported="false"` in manifest
+- [x] **SEC-06**: All non-launcher components explicitly marked `android:exported="false"` in manifest
 
 ### Input Hardening
 
@@ -62,10 +62,10 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 |-------------|-------|--------|
 | SEC-01 | Phase 6 | Pending |
 | SEC-02 | Phase 9 | Pending |
-| SEC-03 | Phase 6 | Pending |
-| SEC-04 | Phase 6 | Pending |
+| SEC-03 | Phase 6 | Complete |
+| SEC-04 | Phase 6 | Complete |
 | SEC-05 | Phase 6 | Pending |
-| SEC-06 | Phase 6 | Pending |
+| SEC-06 | Phase 6 | Complete |
 | SEC-07 | Phase 7 | Pending |
 | SEC-08 | Phase 7 | Pending |
 | SEC-09 | Phase 8 | Pending |
