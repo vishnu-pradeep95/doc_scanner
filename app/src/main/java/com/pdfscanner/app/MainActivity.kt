@@ -21,6 +21,7 @@ package com.pdfscanner.app
 
 // Android core imports
 import android.os.Bundle  // Bundle is like a dictionary/map for passing data
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity  // Base class for Activities
 import androidx.appcompat.app.AppCompatDelegate  // For theme switching
 import androidx.core.view.WindowCompat  // For edge-to-edge display
@@ -69,7 +70,16 @@ class MainActivity : AppCompatActivity() {
         
         // Apply dark/light mode preference
         AppCompatDelegate.setDefaultNightMode(prefs.getThemeMode())
-        
+
+        // SEC-01: Prevent screenshots and Recents thumbnails in release builds
+        // Conditional on BuildConfig.DEBUG to preserve screenshot test capability (locked decision)
+        if (!BuildConfig.DEBUG) {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
+            )
+        }
+
         // ALWAYS call super first - this runs the parent class's onCreate
         // Failing to do this will crash your app!
         super.onCreate(savedInstanceState)

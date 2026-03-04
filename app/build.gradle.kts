@@ -155,6 +155,7 @@ android {
         // View Binding generates a binding class for each XML layout
         // Provides type-safe access to views (no more findViewById)
         viewBinding = true
+        buildConfig = true  // SEC-01: Required for BuildConfig.DEBUG (AGP 8.x default is false)
     }
 
     // ===== LINT CONFIGURATION (RELEASE-02) =====
