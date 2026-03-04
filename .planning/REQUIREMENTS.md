@@ -18,7 +18,7 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 ### Input Hardening
 
 - [ ] **SEC-07**: Navigation args containing file paths validated against app-private storage boundaries; imported URIs validated for expected MIME types
-- [ ] **SEC-08**: Document history SharedPreferences encrypted at rest using Tink AEAD with Android Keystore-backed keys
+- [x] **SEC-08**: Document history SharedPreferences encrypted at rest using Tink AEAD with Android Keystore-backed keys
 
 ### App Lock
 
@@ -67,7 +67,7 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 | SEC-05 | Phase 6 | Complete |
 | SEC-06 | Phase 6 | Complete |
 | SEC-07 | Phase 7 | Pending |
-| SEC-08 | Phase 7 | Pending |
+| SEC-08 | Phase 7 | Complete |
 | SEC-09 | Phase 8 | Pending |
 | SEC-10 | Phase 8 | Pending |
 | SEC-11 | Phase 10 | Pending |
