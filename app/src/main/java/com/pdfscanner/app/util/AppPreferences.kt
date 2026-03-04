@@ -15,16 +15,12 @@ import androidx.appcompat.app.AppCompatDelegate
  */
 class AppPreferences(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(
-        PREFS_NAME,
-        Context.MODE_PRIVATE
-    )
+    private val prefs: SharedPreferences = SecurePreferences.getInstance(context)
 
     companion object {
-        private const val PREFS_NAME = "pdf_scanner_prefs"
-        private const val KEY_THEME_MODE = "theme_mode"
-        private const val KEY_APP_STYLE = "app_style"
-        private const val KEY_DEFAULT_FILTER = "default_filter"
+        private const val KEY_THEME_MODE = "${SecurePreferences.APP_PREFIX}theme_mode"
+        private const val KEY_APP_STYLE = "${SecurePreferences.APP_PREFIX}app_style"
+        private const val KEY_DEFAULT_FILTER = "${SecurePreferences.APP_PREFIX}default_filter"
         
         // App Style Constants
         const val STYLE_GHIBLI = 0      // Original Ghibli-inspired style

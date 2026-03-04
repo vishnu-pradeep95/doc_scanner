@@ -7,11 +7,16 @@
         <exclude domain="file" path="pdfs/" />
         <!-- cacheDir is automatically excluded by Android per AOSP backup documentation.
              No explicit rule is needed for cache/ — Android handles it. -->
+        <!-- Encrypted prefs: KeyStore keys don't survive backup/restore (SEC-08) -->
+        <exclude domain="sharedpref" path="secure_prefs.xml" />
+        <exclude domain="sharedpref" path="secure_prefs_fallback.xml" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="scans/" />
         <exclude domain="file" path="processed/" />
         <exclude domain="file" path="pdfs/" />
         <!-- cacheDir is automatically excluded by Android — no explicit rule needed. -->
+        <exclude domain="sharedpref" path="secure_prefs.xml" />
+        <exclude domain="sharedpref" path="secure_prefs_fallback.xml" />
     </device-transfer>
 </data-extraction-rules>

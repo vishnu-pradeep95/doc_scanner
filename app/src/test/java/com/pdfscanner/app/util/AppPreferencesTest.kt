@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.test.core.app.ApplicationProvider
 import com.pdfscanner.app.util.AppPreferences
 import com.pdfscanner.app.util.ImageProcessor
+import com.pdfscanner.app.util.SecurePreferences
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -24,8 +25,10 @@ class AppPreferencesTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        // Clear shared preferences before each test for isolation
-        context.getSharedPreferences("pdf_scanner_prefs", Context.MODE_PRIVATE)
+        // Reset SecurePreferences singleton so each test gets a fresh instance
+        SecurePreferences.resetForTesting()
+        // Clear the fallback prefs (Robolectric has no real KeyStore, so fallback is used)
+        context.getSharedPreferences("secure_prefs_fallback", Context.MODE_PRIVATE)
             .edit().clear().commit()
         // Construct fresh instance — not a singleton, safe to create per test
         appPreferences = AppPreferences(context)

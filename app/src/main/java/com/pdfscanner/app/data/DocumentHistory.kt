@@ -20,6 +20,7 @@ package com.pdfscanner.app.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import com.pdfscanner.app.util.SecurePreferences
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -107,10 +108,7 @@ class DocumentHistoryRepository(context: Context) {
      * 
      * MODE_PRIVATE = Only this app can access
      */
-    private val prefs: SharedPreferences = context.getSharedPreferences(
-        PREFS_NAME, 
-        Context.MODE_PRIVATE
-    )
+    private val prefs: SharedPreferences = SecurePreferences.getInstance(context)
     
     /**
      * Get all documents from history, most recent first
@@ -221,8 +219,7 @@ class DocumentHistoryRepository(context: Context) {
     }
     
     companion object {
-        private const val PREFS_NAME = "document_history"
-        private const val KEY_DOCUMENTS = "documents"
+        private const val KEY_DOCUMENTS = "${SecurePreferences.HISTORY_PREFIX}documents"
         private const val MAX_HISTORY_SIZE = 50  // Keep last 50 documents
         
         // Singleton instance

@@ -5,4 +5,7 @@
     <exclude domain="file" path="pdfs/" />
     <!-- cacheDir (domain="external-cache") is automatically excluded by Android
          per AOSP backup documentation. No explicit rule is needed for cache/. -->
+    <!-- Encrypted prefs: KeyStore keys don't survive backup/restore (SEC-08) -->
+    <exclude domain="sharedpref" path="secure_prefs.xml" />
+    <exclude domain="sharedpref" path="secure_prefs_fallback.xml" />
 </full-backup-content>

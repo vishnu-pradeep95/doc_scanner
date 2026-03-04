@@ -3,6 +3,7 @@ package com.pdfscanner.app.data
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.pdfscanner.app.util.SecurePreferences
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -26,8 +27,10 @@ class DocumentHistoryRepositoryTest {
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
-        // Clear SharedPreferences between tests to ensure isolation
-        context.getSharedPreferences("document_history", Context.MODE_PRIVATE)
+        // Reset SecurePreferences singleton so each test gets a fresh instance
+        SecurePreferences.resetForTesting()
+        // Clear the fallback prefs (Robolectric has no real KeyStore, so fallback is used)
+        context.getSharedPreferences("secure_prefs_fallback", Context.MODE_PRIVATE)
             .edit().clear().commit()
         // Construct directly — do not use getInstance() singleton (it caches old context)
         repository = DocumentHistoryRepository(context)
