@@ -60,26 +60,26 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | TBD | Pending |
-| SEC-02 | TBD | Pending |
-| SEC-03 | TBD | Pending |
-| SEC-04 | TBD | Pending |
-| SEC-05 | TBD | Pending |
-| SEC-06 | TBD | Pending |
-| SEC-07 | TBD | Pending |
-| SEC-08 | TBD | Pending |
-| SEC-09 | TBD | Pending |
-| SEC-10 | TBD | Pending |
-| SEC-11 | TBD | Pending |
-| SEC-12 | TBD | Pending |
-| SEC-13 | TBD | Pending |
-| SEC-14 | TBD | Pending |
+| SEC-01 | Phase 6 | Pending |
+| SEC-02 | Phase 9 | Pending |
+| SEC-03 | Phase 6 | Pending |
+| SEC-04 | Phase 6 | Pending |
+| SEC-05 | Phase 6 | Pending |
+| SEC-06 | Phase 6 | Pending |
+| SEC-07 | Phase 7 | Pending |
+| SEC-08 | Phase 7 | Pending |
+| SEC-09 | Phase 8 | Pending |
+| SEC-10 | Phase 8 | Pending |
+| SEC-11 | Phase 10 | Pending |
+| SEC-12 | Phase 10 | Pending |
+| SEC-13 | Phase 9 | Pending |
+| SEC-14 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-03*
-*Last updated: 2026-03-03 after initial definition*
+*Last updated: 2026-03-03 after roadmap creation*
