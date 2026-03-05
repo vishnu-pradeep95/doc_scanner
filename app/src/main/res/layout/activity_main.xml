@@ -17,4 +17,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph" />
 
+    <!-- SEC-02: Lock overlay hides content while BiometricPrompt is pending -->
+    <View
+        android:id="@+id/lockOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?colorSurface"
+        android:elevation="100dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
