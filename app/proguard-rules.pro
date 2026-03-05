@@ -46,3 +46,11 @@
 # Tink references error-prone annotations at compile time but they are not
 # runtime dependencies. R8 full mode (AGP 8.0+) flags these as missing.
 -dontwarn com.google.errorprone.annotations.**
+
+# ===== SEC-09: Tink 1.20.0 StreamingAead — file encryption at rest =====
+# Tink loads key managers and primitive wrappers via reflection.
+# R8 full mode strips these without explicit keeps.
+-keep class com.google.crypto.tink.** { *; }
+-dontwarn com.google.crypto.tink.**
+# Tink depends on protobuf-lite at runtime for keyset serialization
+-dontwarn com.google.protobuf.**

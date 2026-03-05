@@ -10,6 +10,8 @@
         <!-- Encrypted prefs: KeyStore keys don't survive backup/restore (SEC-08) -->
         <exclude domain="sharedpref" path="secure_prefs.xml" />
         <exclude domain="sharedpref" path="secure_prefs_fallback.xml" />
+        <!-- File encryption keyset: KeyStore-wrapped key doesn't survive backup/restore (SEC-09) -->
+        <exclude domain="sharedpref" path="file_encryption_keyset.xml" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="scans/" />
@@ -18,5 +20,7 @@
         <!-- cacheDir is automatically excluded by Android — no explicit rule needed. -->
         <exclude domain="sharedpref" path="secure_prefs.xml" />
         <exclude domain="sharedpref" path="secure_prefs_fallback.xml" />
+        <!-- File encryption keyset: KeyStore-wrapped key doesn't survive backup/restore (SEC-09) -->
+        <exclude domain="sharedpref" path="file_encryption_keyset.xml" />
     </device-transfer>
 </data-extraction-rules>

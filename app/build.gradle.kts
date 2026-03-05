@@ -378,6 +378,10 @@ dependencies {
     // Deprecated but stable — provides SharedPreferences-compatible API
     implementation("androidx.security:security-crypto:1.1.0")
 
+    // Tink StreamingAead for file-level encryption (SEC-09)
+    // Upgrades transitive tink 1.7.0 from security-crypto to 1.20.0
+    implementation("com.google.crypto.tink:tink-android:1.20.0")
+
     // ===========================================
     // UI COMPONENTS
     // ===========================================
