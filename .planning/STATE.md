@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-03 after v1.2 milestone started)
 ## Current Position
 
 Phase: 8 of 10 (File Encryption at Rest)
-Plan: 2 of 4 complete
-Status: Phase 8 in progress -- SecureFileManager core + utility/editor integration complete, UI fragment/adapter and migration pending
-Last activity: 2026-03-05 — Completed 08-02 (utility/editor file I/O through SecureFileManager)
+Plan: 3 of 4 complete
+Status: Phase 8 in progress -- SecureFileManager core + utility/editor + UI fragment/adapter integration complete, migration pending
+Last activity: 2026-03-05 — Completed 08-03 (UI fragment/adapter file I/O through SecureFileManager, secure delete in DocumentHistory)
 
-Progress: [█████░░░░░] 50% (2/4 plans in phase 8)
+Progress: [███████░░░] 75% (3/4 plans in phase 8)
 
 ## Performance Metrics
 
@@ -45,7 +45,7 @@ Progress: [█████░░░░░] 50% (2/4 plans in phase 8)
 |-------|-------|-------|----------|
 | 6. Security Foundation | 2 | 3min | 1.5min |
 | 7. Input & Encrypted Storage | 2/2 | 15min | 7.5min |
-| 8. File Encryption | 2/4 | 8min | 4min |
+| 8. File Encryption | 3/4 | 13min | 4.3min |
 | 9. Biometric App Lock | - | - | - |
 | 10. Hardening Polish | - | - | - |
 
@@ -55,6 +55,7 @@ Progress: [█████░░░░░] 50% (2/4 plans in phase 8)
 | Phase 07 P01 | 10min | 2 tasks | 6 files |
 | Phase 07 P02 | 5min | 2 tasks | 10 files |
 | Phase 08 P01 | 4min | 2 tasks | 5 files |
+| Phase 08 P03 | 5min | 2 tasks | 8 files |
 | Phase 08 P02 | 4min | 2 tasks | 9 files |
 
 ## Accumulated Context
@@ -77,6 +78,9 @@ Critical decisions carrying forward:
 - Security error messages are intentionally neutral ("Document not available") to prevent info leakage
 - SecureFileManager uses KeyTemplates.get() API (not PredefinedStreamingAeadParameters) for AndroidKeysetManager compatibility
 - File encryption keyset stored in SharedPreferences excluded from Android backup
+- HistoryAdapter renders PDF thumbnails via decrypt-to-temp + PdfRenderer (Coil cannot render PDFs or encrypted files)
+- Adapter decrypt pattern: findViewTreeLifecycleOwner()?.lifecycleScope for async decrypt in RecyclerView bind()
+- Encrypt-in-place after CameraX capture is fire-and-forget (ms-fast, app-private storage)
 - SecureFileManager.encryptBitmapToFile uses configurable CompressFormat param (default JPEG, PNG for signatures)
 - PdfAnnotationRenderer decrypt-to-temp only for file:// URIs; content:// URIs use contentResolver directly
 
@@ -90,6 +94,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-05T00:22:17Z
-Stopped at: Completed 08-02-PLAN.md
-Resume file: .planning/phases/08-file-encryption-at-rest/08-02-SUMMARY.md
+Last session: 2026-03-05T00:23:56Z
+Stopped at: Completed 08-03-PLAN.md
+Resume file: .planning/phases/08-file-encryption-at-rest/08-03-SUMMARY.md
