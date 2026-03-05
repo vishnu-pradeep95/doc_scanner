@@ -29,12 +29,12 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 
 - [x] **SEC-09**: All document images and PDFs encrypted at rest using Tink StreamingAead; existing files migrated on first launch
 - [x] **SEC-10**: File deletion overwrites content with random bytes before removing filesystem reference
-- [ ] **SEC-11**: Clipboard content marked as sensitive via ClipDescription.EXTRA_IS_SENSITIVE flag
-- [ ] **SEC-12**: Sensitive views (document names, paths) protected from untrusted accessibility services via accessibilityDataSensitive attribute
+- [x] **SEC-11**: Clipboard content marked as sensitive via ClipDescription.EXTRA_IS_SENSITIVE flag
+- [x] **SEC-12**: Sensitive views (document names, paths) protected from untrusted accessibility services via accessibilityDataSensitive attribute
 
 ### Detection
 
-- [ ] **SEC-14**: App detects rooted/debuggable device and shows one-time warning dialog (not blocking)
+- [x] **SEC-14**: App detects rooted/debuggable device and shows one-time warning dialog (not blocking)
 
 ## Future Requirements
 
@@ -70,10 +70,10 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 | SEC-08 | Phase 7 | Complete |
 | SEC-09 | Phase 8 | Complete |
 | SEC-10 | Phase 8 | Complete |
-| SEC-11 | Phase 10 | Pending |
-| SEC-12 | Phase 10 | Pending |
+| SEC-11 | Phase 10 | Complete |
+| SEC-12 | Phase 10 | Complete |
 | SEC-13 | Phase 9 | Complete |
-| SEC-14 | Phase 10 | Pending |
+| SEC-14 | Phase 10 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 14 total

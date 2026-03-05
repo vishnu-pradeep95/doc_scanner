@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Security Hardening
-status: completed
-stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-03-05T01:48:59.967Z"
-last_activity: 2026-03-05 — Completed 09-02 (MainActivity BiometricPrompt enforcement)
+status: in-progress
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-03-05T04:12:00Z"
+last_activity: 2026-03-05 — Completed 10-01 (Security hardening - clipboard, accessibility, root detection)
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
-  percent: 100
+  total_plans: 12
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-03 after v1.2 milestone started)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** Phase 9 complete -- biometric app lock; Phase 10 next (Hardening Polish)
+**Current focus:** Phase 10 in progress -- Hardening Polish & Audit (plan 1 of 2 done)
 
 ## Current Position
 
-Phase: 9 of 10 (Biometric App Lock) -- COMPLETE
-Plan: 2 of 2 complete
-Status: Phase 9 done; Phase 10 next (Hardening Polish)
-Last activity: 2026-03-05 — Completed 09-02 (MainActivity BiometricPrompt enforcement)
+Phase: 10 of 10 (Hardening Polish & Audit)
+Plan: 1 of 2 complete
+Status: 10-01 done (clipboard, accessibility, root detection); 10-02 next (cross-cutting audit)
+Last activity: 2026-03-05 — Completed 10-01 (Security hardening - clipboard, accessibility, root detection)
 
-Progress: [██████████] 100% (2/2 plans in phase 9)
+Progress: [█████████░] 92% (1/2 plans in phase 10)
 
 ## Performance Metrics
 
@@ -47,7 +47,7 @@ Progress: [██████████] 100% (2/2 plans in phase 9)
 | 7. Input & Encrypted Storage | 2/2 | 15min | 7.5min |
 | 8. File Encryption | 4/4 | 14min | 3.5min |
 | 9. Biometric App Lock | 2/2 | 5min | 2.5min |
-| 10. Hardening Polish | - | - | - |
+| 10. Hardening Polish | 1/2 | 2min | 2min |
 
 *Updated after each plan completion*
 | Phase 06 P01 | 2min | 2 tasks | 5 files |
@@ -60,6 +60,7 @@ Progress: [██████████] 100% (2/2 plans in phase 9)
 | Phase 08 P04 | 1min | 2 tasks | 3 files |
 | Phase 09 P01 | 3min | 2 tasks | 7 files |
 | Phase 09 P02 | 2min | 2 tasks | 2 files |
+| Phase 10 P01 | 2min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,9 @@ Critical decisions carrying forward:
 - ProcessLifecycleOwner ON_STOP shows overlay before background to prevent task-switcher content glimpse
 - finishAffinity() on BiometricPrompt cancel prevents authentication bypass
 - isAuthenticating guard prevents onResume re-trigger loop when prompt is showing
+- EXTRA_IS_SENSITIVE: no API guard needed -- compile-time constant, no-op on older APIs
+- accessibilityDataSensitive with tools:ignore="UnusedAttribute" for minSdk 24 compat
+- RootDetector is warn-only; root warning guarded by !BuildConfig.DEBUG (same FLAG_SECURE pattern)
 
 ### Blockers/Concerns
 
@@ -105,6 +109,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-05T01:43:53Z
-Stopped at: Completed 09-02-PLAN.md
-Resume file: .planning/phases/09-biometric-app-lock/09-02-SUMMARY.md
+Last session: 2026-03-05T04:09:20Z
+Stopped at: Completed 10-01-PLAN.md
+Resume file: .planning/phases/10-hardening-polish-audit/10-01-SUMMARY.md

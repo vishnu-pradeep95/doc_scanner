@@ -138,4 +138,4 @@ Plans:
 | 7. Input Hardening & Encrypted Storage | v1.2 | 0/2 | Planned | - |
 | 8. File Encryption at Rest | v1.2 | 0/4 | Planned | - |
 | 9. Biometric App Lock | v1.2 | 2/2 | Complete | 2026-03-05 |
-| 10. Hardening Polish & Audit | v1.2 | 0/2 | Not started | - |
+| 10. Hardening Polish & Audit | 1/2 | In Progress|  | - |
