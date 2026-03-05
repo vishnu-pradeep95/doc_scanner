@@ -331,6 +331,24 @@
     <!-- PDF generation progress (determinate indicator) -->
     <string name="pdf_progress">Page %1$d of %2$d\u2026</string>
 
+    <!-- Security Settings (SEC-02, SEC-13) -->
+    <string name="security">Security</string>
+    <string name="app_lock">App Lock</string>
+    <string name="app_lock_description">Require biometric or PIN to open app</string>
+    <string name="auto_lock_timeout">Auto-lock Timeout</string>
+    <string name="auto_lock_timeout_description">Re-lock after being in background</string>
+    <string name="timeout_immediate">Immediately</string>
+    <string name="timeout_30_seconds">After 30 seconds</string>
+    <string name="timeout_1_minute">After 1 minute</string>
+    <string name="timeout_5_minutes">After 5 minutes</string>
+    <string name="app_lock_title">Unlock PDF Scanner</string>
+    <string name="app_lock_subtitle">Verify your identity to continue</string>
+    <string name="device_security_required">Device security required</string>
+    <string name="device_security_required_message">Please set up a PIN, pattern, or biometric in your device settings to use App Lock.</string>
+    <string name="app_lock_disabled_no_security">App Lock disabled — no device security set up</string>
+    <string name="content_desc_lock">Lock icon</string>
+    <string name="content_desc_timer">Timer icon</string>
+
     <!-- SEC-09: File migration dialog -->
     <string name="migration_title">Securing your documents</string>
     <string name="migration_status_encrypting">Encrypting %1$d of %2$d files\u2026</string>

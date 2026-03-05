@@ -144,6 +144,123 @@
             android:layout_marginTop="@dimen/spacing_xs"
             android:background="@color/gray_light" />
 
+        <!-- Security Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="@string/security"
+            android:textColor="@color/cartoon_primary"
+            android:textAppearance="@style/TextAppearance.Cartoon.TitleSmall" />
+
+        <!-- App Lock Toggle -->
+        <LinearLayout
+            android:id="@+id/settingAppLock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="@dimen/spacing_md">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_lock"
+                app:tint="?android:textColorPrimary"
+                android:contentDescription="@string/content_desc_lock" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_lock"
+                    android:textColor="?android:textColorPrimary"
+                    android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/app_lock_description"
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodySmall" />
+
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchAppLock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <!-- Auto-lock Timeout -->
+        <LinearLayout
+            android:id="@+id/settingLockTimeout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="@dimen/spacing_md"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_timer"
+                app:tint="?android:textColorPrimary"
+                android:contentDescription="@string/content_desc_timer" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto_lock_timeout"
+                    android:textColor="?android:textColorPrimary"
+                    android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium" />
+
+                <TextView
+                    android:id="@+id/textCurrentTimeout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="@style/TextAppearance.Cartoon.BodySmall"
+                    tools:text="Immediately" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_arrow_right"
+                app:tint="@color/gray_medium"
+                android:contentDescription="@string/content_desc_arrow_right" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:background="@color/gray_light" />
+
         <!-- About Section -->
         <TextView
             android:layout_width="wrap_content"
