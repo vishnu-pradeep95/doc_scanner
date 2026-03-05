@@ -66,10 +66,12 @@
                 android:id="@+id/textDocName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:accessibilityDataSensitive="yes"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="?attr/colorOnSurface"
                 android:textAppearance="@style/TextAppearance.Cartoon.TitleSmall"
+                tools:ignore="UnusedAttribute"
                 tools:text="Scan_20241227" />
 
             <TextView

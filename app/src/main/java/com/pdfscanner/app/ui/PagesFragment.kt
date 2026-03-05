@@ -347,6 +347,12 @@ class PagesFragment : Fragment() {
     private fun copyToClipboard(text: String) {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clip = android.content.ClipData.newPlainText("OCR Text", text)
+        // SEC-11: Mark clipboard content as sensitive so it is hidden from
+        // clipboard preview on API 33+. On older APIs the extras are set but
+        // the system ignores them (correct no-op behavior).
+        clip.description.extras = android.os.PersistableBundle().apply {
+            putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true)
+        }
         clipboard.setPrimaryClip(clip)
         showSnackbar(R.string.text_copied)
     }

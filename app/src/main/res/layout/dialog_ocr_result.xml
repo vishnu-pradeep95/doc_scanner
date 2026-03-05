@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -43,10 +44,12 @@
                 android:id="@+id/textOcrResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:accessibilityDataSensitive="yes"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOnSurface"
                 android:textIsSelectable="true"
-                android:lineSpacingMultiplier="1.4" />
+                android:lineSpacingMultiplier="1.4"
+                tools:ignore="UnusedAttribute" />
 
         </ScrollView>
 

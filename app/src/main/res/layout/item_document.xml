@@ -40,11 +40,13 @@
                 android:id="@+id/textDocumentName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:accessibilityDataSensitive="yes"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:fontFamily="@font/nunito_bold"
                 android:textColor="?attr/colorOnSurface"
                 android:textAppearance="@style/TextAppearance.Cartoon.TitleMedium"
+                tools:ignore="UnusedAttribute"
                 tools:text="Business Contract.pdf" />
 
             <!-- Document details (pages, size, date) -->
