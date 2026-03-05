@@ -8,7 +8,6 @@ package com.pdfscanner.app.editor
 
 import android.app.Dialog
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pdfscanner.app.R
 import com.pdfscanner.app.databinding.DialogSignatureBinding
+import com.pdfscanner.app.util.SecureFileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -181,9 +181,9 @@ class SavedSignaturesAdapter(
         private val btnDelete: ImageButton = itemView.findViewById(R.id.btnDelete)
         
         fun bind(signature: PdfEditorViewModel.SavedSignature) {
-            // Load signature bitmap in background
+            // Load signature bitmap in background (decrypts if encrypted)
             itemView.post {
-                val bitmap = BitmapFactory.decodeFile(signature.filePath)
+                val bitmap = SecureFileManager.decryptToBitmap(java.io.File(signature.filePath))
                 ivSignature.setImageBitmap(bitmap)
             }
             

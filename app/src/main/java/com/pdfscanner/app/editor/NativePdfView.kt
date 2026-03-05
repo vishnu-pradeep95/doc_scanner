@@ -28,6 +28,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import com.pdfscanner.app.util.SecureFileManager
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
@@ -53,6 +54,7 @@ class NativePdfView @JvmOverloads constructor(
     private var currentPage: PdfRenderer.Page? = null
     private var pageBitmap: Bitmap? = null
     private var tempFile: File? = null
+    private var tempDecryptedFile: File? = null
     
     // View state
     private var currentPageIndex = 0
@@ -85,25 +87,28 @@ class NativePdfView @JvmOverloads constructor(
     fun loadPdf(file: File) {
         try {
             Log.d(TAG, "Loading PDF from file: ${file.absolutePath}")
-            
+
             close() // Close any existing PDF
-            
+
             if (!file.exists()) {
                 onErrorListener?.invoke(Exception("File does not exist: ${file.absolutePath}"))
                 return
             }
-            
-            fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+
+            // Decrypt to temp file for PdfRenderer (requires seekable FileDescriptor)
+            val decrypted = SecureFileManager.decryptToTempFile(context, file)
+            tempDecryptedFile = decrypted
+            fileDescriptor = ParcelFileDescriptor.open(decrypted, ParcelFileDescriptor.MODE_READ_ONLY)
             pdfRenderer = PdfRenderer(fileDescriptor!!)
             totalPages = pdfRenderer!!.pageCount
-            
+
             Log.d(TAG, "PDF loaded successfully, total pages: $totalPages")
-            
+
             // Load first page
             showPage(0)
-            
+
             onLoadCompleteListener?.invoke(totalPages)
-            
+
         } catch (e: Exception) {
             Log.e(TAG, "Error loading PDF", e)
             onErrorListener?.invoke(e)
@@ -384,6 +389,9 @@ class NativePdfView @JvmOverloads constructor(
 
         pageBitmap?.recycle()
         pageBitmap = null
+
+        tempDecryptedFile?.delete()
+        tempDecryptedFile = null
 
         tempFile?.delete()
         tempFile = null

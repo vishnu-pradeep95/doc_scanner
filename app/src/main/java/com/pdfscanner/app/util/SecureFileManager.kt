@@ -106,16 +106,26 @@ object SecureFileManager {
     }
 
     /**
-     * Encrypt a Bitmap to a JPEG file.
-     * If encryption is unavailable, writes plaintext JPEG.
+     * Encrypt a Bitmap to a file.
+     * If encryption is unavailable, writes plaintext.
+     *
+     * @param bitmap The bitmap to write
+     * @param file Target file
+     * @param quality Compression quality (0-100)
+     * @param format Compress format (default JPEG; use PNG for signatures)
      */
-    fun encryptBitmapToFile(bitmap: Bitmap, file: File, quality: Int = 90) {
+    fun encryptBitmapToFile(
+        bitmap: Bitmap,
+        file: File,
+        quality: Int = 90,
+        format: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG
+    ) {
         val aead = streamingAead
         if (aead != null) {
             try {
                 FileOutputStream(file).use { fos ->
                     aead.newEncryptingStream(fos, ASSOCIATED_DATA).use { encStream ->
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, encStream)
+                        bitmap.compress(format, quality, encStream)
                     }
                 }
                 return
@@ -123,9 +133,9 @@ object SecureFileManager {
                 Log.w(TAG, "Bitmap encryption failed for ${file.name}, writing plaintext", e)
             }
         }
-        // Fallback: write plaintext JPEG
+        // Fallback: write plaintext
         FileOutputStream(file).use { fos ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fos)
+            bitmap.compress(format, quality, fos)
         }
     }
 

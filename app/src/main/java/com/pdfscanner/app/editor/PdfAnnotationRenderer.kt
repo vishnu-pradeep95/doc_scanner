@@ -13,8 +13,8 @@ import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import com.pdfscanner.app.util.SecureFileManager
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,10 +38,18 @@ class PdfAnnotationRenderer(private val context: Context) {
         inputUri: Uri,
         pageAnnotations: Map<Int, List<AnnotationCanvasView.AnnotationItem>>
     ): File? {
+        var tempDecryptedFile: File? = null
         return try {
-            // Open the input PDF
-            val inputPfd = context.contentResolver.openFileDescriptor(inputUri, "r")
-                ?: return null
+            // Open the input PDF -- decrypt to temp if file:// URI in app storage
+            val inputPfd: ParcelFileDescriptor
+            if (inputUri.scheme == "file") {
+                val sourceFile = File(inputUri.path!!)
+                tempDecryptedFile = SecureFileManager.decryptToTempFile(context, sourceFile)
+                inputPfd = ParcelFileDescriptor.open(tempDecryptedFile, ParcelFileDescriptor.MODE_READ_ONLY)
+            } else {
+                inputPfd = context.contentResolver.openFileDescriptor(inputUri, "r")
+                    ?: return null
+            }
 
             // Create output document
             val outputDoc = PdfDocument()
@@ -90,10 +98,8 @@ class PdfAnnotationRenderer(private val context: Context) {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val outputFile = File(pdfsDir, "Edited_$timestamp.pdf")
 
-            // Write output document
-            FileOutputStream(outputFile).use { out ->
-                outputDoc.writeTo(out)
-            }
+            // Write encrypted output document
+            SecureFileManager.encryptPdfToFile(outputDoc, outputFile)
 
             outputDoc.close()
 
@@ -101,6 +107,8 @@ class PdfAnnotationRenderer(private val context: Context) {
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        } finally {
+            tempDecryptedFile?.delete()
         }
     }
     

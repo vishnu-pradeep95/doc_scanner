@@ -8,17 +8,16 @@ package com.pdfscanner.app.editor
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.pdfscanner.app.util.SecureFileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -144,10 +143,10 @@ class PdfEditorViewModel(application: Application) : AndroidViewModel(applicatio
             try {
                 val id = "sig_${System.currentTimeMillis()}"
                 val file = File(signaturesDir, "$id.png")
-                
-                FileOutputStream(file).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                }
+
+                SecureFileManager.encryptBitmapToFile(
+                    bitmap, file, 100, Bitmap.CompressFormat.PNG
+                )
                 
                 // Save metadata
                 val savedSignature = SavedSignature(
@@ -171,7 +170,7 @@ class PdfEditorViewModel(application: Application) : AndroidViewModel(applicatio
     fun deleteSignature(signature: SavedSignature) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                File(signature.filePath).delete()
+                SecureFileManager.secureDelete(File(signature.filePath))
                 removeSignatureMetadata(signature.id)
                 loadSavedSignatures()
             } catch (e: Exception) {
@@ -186,7 +185,7 @@ class PdfEditorViewModel(application: Application) : AndroidViewModel(applicatio
     suspend fun loadSignatureBitmap(signature: SavedSignature): Bitmap? {
         return withContext(Dispatchers.IO) {
             try {
-                BitmapFactory.decodeFile(signature.filePath)
+                SecureFileManager.decryptToBitmap(File(signature.filePath))
             } catch (e: Exception) {
                 null
             }
