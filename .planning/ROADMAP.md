@@ -100,11 +100,12 @@ Plans:
   2. When app lock is enabled, BiometricPrompt with DEVICE_CREDENTIAL fallback gates app access on cold start and resume from background
   3. App re-requires authentication after configurable timeout when backgrounded (immediate/30s/1min/5min selectable in Settings)
   4. Biometric authentication works correctly across API tiers: API 24-27, API 28-29, and API 30+ (three distinct behavioral paths)
-**Plans**: TBD
-**Research**: Needs phase research — API 28-29 edge cases, KeyguardManager PIN fallback on API 24-27, OEM device behavior
+**Plans**: 2 plans
+**Research**: Complete — biometric:1.1.0, ProcessLifecycleOwner, API-tiered authenticator selection
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md — AppLockManager utility + biometric dependency + Settings UI with lock toggle and timeout selector (SEC-02, SEC-13)
+- [ ] 09-02-PLAN.md — BiometricPrompt enforcement in MainActivity + ProcessLifecycleOwner + lock overlay (SEC-02, SEC-13)
 
 ### Phase 10: Hardening Polish & Audit
 **Goal**: Remaining security features are added and a cross-cutting audit verifies no plaintext leaks survive across all prior phases
@@ -135,5 +136,5 @@ Plans:
 | 6. Security Foundation & Quick Wins | v1.2 | 0/2 | Planned | - |
 | 7. Input Hardening & Encrypted Storage | v1.2 | 0/2 | Planned | - |
 | 8. File Encryption at Rest | v1.2 | 0/4 | Planned | - |
-| 9. Biometric App Lock | v1.2 | 0/? | Not started | - |
+| 9. Biometric App Lock | v1.2 | 0/2 | Planned | - |
 | 10. Hardening Polish & Audit | v1.2 | 0/? | Not started | - |
