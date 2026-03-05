@@ -32,6 +32,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.fragment.NavHostFragment  // Handles Fragment navigation
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 
@@ -40,6 +41,8 @@ import java.io.File
 import com.pdfscanner.app.databinding.ActivityMainBinding
 import com.pdfscanner.app.util.AppLockManager
 import com.pdfscanner.app.util.AppPreferences
+import com.pdfscanner.app.util.RootDetector
+import com.pdfscanner.app.util.SecurePreferences
 
 /**
  * MainActivity extends AppCompatActivity
@@ -142,6 +145,11 @@ class MainActivity : AppCompatActivity() {
 
         // Clean up stale temp files from previous sessions
         cleanupStaleTempFiles()
+
+        // SEC-14: Root/debuggable detection -- release builds only
+        if (!BuildConfig.DEBUG) {
+            checkRootedDevice()
+        }
 
         /**
          * Navigation Setup
@@ -265,6 +273,30 @@ class MainActivity : AppCompatActivity() {
             // Cleanup is best-effort, don't crash the app
             android.util.Log.w("MainActivity", "Temp cleanup failed", e)
         }
+    }
+
+    /**
+     * SEC-14: Show a one-time dismissible warning dialog if the device is
+     * rooted or running a debuggable system image. Warn-only -- never
+     * blocks functionality or calls finish().
+     *
+     * Persists dismissal in SecurePreferences so the dialog appears at most once.
+     */
+    private fun checkRootedDevice() {
+        if (!RootDetector.isDeviceCompromised(this)) return
+
+        val securePrefs = SecurePreferences.getInstance(this)
+        val dismissedKey = "${SecurePreferences.APP_PREFIX}root_warning_dismissed"
+        if (securePrefs.getBoolean(dismissedKey, false)) return
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.security_warning_title)
+            .setMessage(R.string.security_warning_rooted_message)
+            .setPositiveButton(R.string.i_understand) { _, _ ->
+                securePrefs.edit().putBoolean(dismissedKey, true).apply()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     /**

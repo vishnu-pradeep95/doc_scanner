@@ -349,6 +349,11 @@
     <string name="content_desc_lock">Lock icon</string>
     <string name="content_desc_timer">Timer icon</string>
 
+    <!-- SEC-14: Root/debuggable device warning -->
+    <string name="security_warning_title">Security Notice</string>
+    <string name="security_warning_rooted_message">This device appears to be rooted or running a modified system. Your scanned documents may be at higher risk of unauthorized access.\n\nFor maximum security, consider using an unmodified device.</string>
+    <string name="i_understand">I Understand</string>
+
     <!-- SEC-09: File migration dialog -->
     <string name="migration_title">Securing your documents</string>
     <string name="migration_status_encrypting">Encrypting %1$d of %2$d files\u2026</string>
