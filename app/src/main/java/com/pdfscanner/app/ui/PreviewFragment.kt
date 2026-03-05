@@ -58,6 +58,7 @@ import com.pdfscanner.app.R
 import com.pdfscanner.app.databinding.FragmentPreviewBinding
 import com.pdfscanner.app.util.ImageProcessor
 import com.pdfscanner.app.util.InputValidator
+import com.pdfscanner.app.util.SecureFileManager
 import com.pdfscanner.app.viewmodel.ScannerViewModel
 
 // Coroutines
@@ -178,14 +179,24 @@ class PreviewFragment : Fragment() {
         if (result.isSuccessful) {
             // Get the URI of the cropped image
             result.uriContent?.let { croppedUri ->
+                // CanHub wrote plaintext cropped file; encrypt in-place (SEC-09)
+                croppedUri.path?.let { path ->
+                    val croppedFile = File(path)
+                    if (croppedFile.exists()) {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            SecureFileManager.encryptFileInPlace(croppedFile)
+                        }
+                    }
+                }
+
                 // Update our current image reference
                 currentImageUri = croppedUri
                 originalImageUri = croppedUri  // Cropped image becomes new "original"
-                
+
                 // Reset filter to Original when image changes
                 currentFilterType = ImageProcessor.FilterType.ORIGINAL
                 binding.filterToggleGroup.check(R.id.btnFilterOriginal)
-                
+
                 // Display the cropped image
                 loadImage(croppedUri)
             }
@@ -305,10 +316,10 @@ class PreviewFragment : Fragment() {
             // New capture - show retake button
             binding.btnRetake.visibility = View.VISIBLE
             binding.btnRetake.setOnClickListener {
-                // Delete the captured file to free storage
+                // Securely delete the captured file (SEC-10)
                 // We don't want to keep images the user doesn't want
                 currentImageUri?.path?.let { path ->
-                    File(path).delete()
+                    SecureFileManager.secureDelete(File(path))
                 }
                 
                 // Navigate back to camera
@@ -454,6 +465,9 @@ class PreviewFragment : Fragment() {
     /**
      * Decode a bitmap from URI, capping dimensions to maxWidth x maxHeight
      * using BitmapFactory inSampleSize to avoid OOM on high-resolution cameras.
+     *
+     * For file:// URIs (app-private encrypted files), uses SecureFileManager
+     * to decrypt before decoding. For content:// URIs, uses contentResolver.
      */
     private fun decodeCappedBitmap(
         ctx: Context,
@@ -463,7 +477,7 @@ class PreviewFragment : Fragment() {
     ): Bitmap? {
         // First pass: decode bounds only (no pixel allocation)
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        ctx.contentResolver.openInputStream(uri)?.use { stream ->
+        openInputStreamForUri(ctx, uri)?.use { stream ->
             BitmapFactory.decodeStream(stream, null, options)
         }
 
@@ -474,8 +488,22 @@ class PreviewFragment : Fragment() {
         options.inJustDecodeBounds = false
 
         // Second pass: decode with downsampling applied
-        return ctx.contentResolver.openInputStream(uri)?.use { stream ->
+        return openInputStreamForUri(ctx, uri)?.use { stream ->
             BitmapFactory.decodeStream(stream, null, options)
+        }
+    }
+
+    /**
+     * Open an InputStream for a URI, decrypting if it is a file:// URI
+     * pointing to app-private storage (encrypted files).
+     * For content:// URIs, delegates to contentResolver.
+     */
+    private fun openInputStreamForUri(ctx: Context, uri: Uri): java.io.InputStream? {
+        return if (uri.scheme == "file") {
+            val file = File(uri.path!!)
+            if (file.exists()) SecureFileManager.decryptFromFile(file) else null
+        } else {
+            ctx.contentResolver.openInputStream(uri)
         }
     }
 
@@ -599,17 +627,20 @@ class PreviewFragment : Fragment() {
      */
     private fun loadImage(uri: Uri) {
         try {
+            val ctx = requireContext()
             /**
              * Step 1: Get image dimensions without loading pixels
-             * 
+             *
              * inJustDecodeBounds = true means:
              * - Only read image metadata (width, height)
              * - Don't allocate memory for pixels
              * - Much faster than full decode
+             *
+             * Uses openInputStreamForUri to decrypt file:// URIs (encrypted files)
              */
             var imageWidth = 0
             var imageHeight = 0
-            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+            openInputStreamForUri(ctx, uri)?.use { inputStream ->
                 val options = BitmapFactory.Options().apply {
                     inJustDecodeBounds = true  // Don't load pixels yet
                 }
@@ -620,22 +651,22 @@ class PreviewFragment : Fragment() {
 
             /**
              * Step 2: Load image with sampling
-             * 
+             *
              * inSampleSize = 2 means load 1/4 of pixels (1/2 width × 1/2 height)
              * inSampleSize = 4 means load 1/16 of pixels
-             * 
+             *
              * This dramatically reduces memory usage for display
              */
-            requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
+            openInputStreamForUri(ctx, uri)?.use { inputStream ->
                 val options = BitmapFactory.Options().apply {
                     // Calculate appropriate sample size based on target dimensions
                     inSampleSize = calculateInSampleSize(imageWidth, imageHeight, 1080, 1920)
                 }
                 val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
-                
+
                 // Cache the preview bitmap for filter application
                 previewBitmap = bitmap
-                
+
                 // Set the decoded bitmap as the ImageView source
                 binding.imagePreview.setImageBitmap(bitmap)
             }

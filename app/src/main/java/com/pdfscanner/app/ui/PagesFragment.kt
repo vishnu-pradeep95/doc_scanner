@@ -57,6 +57,7 @@ import com.pdfscanner.app.adapter.PagesAdapter
 import com.pdfscanner.app.data.DocumentHistoryRepository
 import com.pdfscanner.app.databinding.FragmentPagesBinding
 import com.pdfscanner.app.ocr.OcrProcessor
+import com.pdfscanner.app.util.SecureFileManager
 import com.pdfscanner.app.viewmodel.ScannerViewModel
 
 // Coroutine imports
@@ -774,8 +775,13 @@ class PagesFragment : Fragment() {
      */
     private fun rotateImage(ctx: android.content.Context, uri: Uri): Uri? {
         return try {
-            // Load the bitmap
-            val inputStream = ctx.contentResolver.openInputStream(uri) ?: return null
+            // Load the bitmap -- decrypt if file:// URI (encrypted files)
+            val inputStream = if (uri.scheme == "file") {
+                val file = File(uri.path!!)
+                if (file.exists()) SecureFileManager.decryptFromFile(file) else return null
+            } else {
+                ctx.contentResolver.openInputStream(uri) ?: return null
+            }
             val bitmap = BitmapFactory.decodeStream(inputStream)
             inputStream.close()
 
@@ -790,7 +796,7 @@ class PagesFragment : Fragment() {
                 matrix, true
             )
 
-            // Save to a new file
+            // Save encrypted rotated image (SEC-09)
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(java.util.Date())
             val rotatedFile = File(
                 ctx.filesDir,
@@ -798,9 +804,7 @@ class PagesFragment : Fragment() {
             )
             rotatedFile.parentFile?.mkdirs()
 
-            FileOutputStream(rotatedFile).use { outputStream ->
-                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-            }
+            SecureFileManager.encryptBitmapToFile(rotatedBitmap, rotatedFile, 90)
 
             // Clean up
             bitmap.recycle()
@@ -1029,14 +1033,12 @@ class PagesFragment : Fragment() {
         val pdfFile = File(pdfsDir, pdfFileName)
 
         /**
-         * Write PDF to file
-         * 
-         * .use {} is Kotlin's try-with-resources equivalent
-         * Automatically closes the stream when done (even if exception occurs)
+         * Write encrypted PDF to file (SEC-09)
+         *
+         * Uses SecureFileManager to encrypt the PDF output.
+         * Falls back to plaintext if encryption is unavailable.
          */
-        FileOutputStream(pdfFile).use { outputStream ->
-            pdfDocument.writeTo(outputStream)
-        }
+        SecureFileManager.encryptPdfToFile(pdfDocument, pdfFile)
 
         // Release PDF document resources
         pdfDocument.close()
@@ -1060,6 +1062,20 @@ class PagesFragment : Fragment() {
      * @param reqHeight Target height
      * @return Decoded bitmap, or null if failed
      */
+    /**
+     * Open an InputStream for a URI, decrypting if it is a file:// URI
+     * pointing to app-private storage (encrypted files).
+     * For content:// URIs, delegates to contentResolver.
+     */
+    private fun openInputStreamForUri(ctx: android.content.Context, uri: Uri): java.io.InputStream? {
+        return if (uri.scheme == "file") {
+            val file = File(uri.path!!)
+            if (file.exists()) SecureFileManager.decryptFromFile(file) else null
+        } else {
+            ctx.contentResolver.openInputStream(uri)
+        }
+    }
+
     private fun decodeSampledBitmap(ctx: android.content.Context, uri: Uri, reqWidth: Int, reqHeight: Int): Bitmap? {
         return try {
             // Step 1: Get dimensions without loading pixels
@@ -1067,7 +1083,7 @@ class PagesFragment : Fragment() {
                 inJustDecodeBounds = true
             }
 
-            ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
+            openInputStreamForUri(ctx, uri)?.use { inputStream ->
                 BitmapFactory.decodeStream(inputStream, null, options)
             }
 
@@ -1083,7 +1099,7 @@ class PagesFragment : Fragment() {
             options.inJustDecodeBounds = false  // Actually load pixels this time
 
             // Step 3: Decode with calculated sample size
-            ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
+            openInputStreamForUri(ctx, uri)?.use { inputStream ->
                 BitmapFactory.decodeStream(inputStream, null, options)
             }
         } catch (e: Exception) {

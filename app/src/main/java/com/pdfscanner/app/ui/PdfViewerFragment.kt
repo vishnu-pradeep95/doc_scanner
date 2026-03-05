@@ -18,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.pdfscanner.app.ui.showSnackbar
 import com.pdfscanner.app.util.InputValidator
+import com.pdfscanner.app.util.SecureFileManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -44,6 +45,7 @@ class PdfViewerFragment : Fragment() {
     
     private var pdfRenderer: PdfRenderer? = null
     private var fileDescriptor: ParcelFileDescriptor? = null
+    private var tempDecryptedFile: File? = null
     private var currentPage = 0
     private var pageCount = 0
 
@@ -134,7 +136,7 @@ class PdfViewerFragment : Fragment() {
     
     private fun loadPdf() {
         binding.progressBar.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
             try {
                 val file = File(args.pdfPath)
@@ -142,10 +144,14 @@ class PdfViewerFragment : Fragment() {
                     showError(getString(R.string.file_not_found))
                     return@launch
                 }
-                
+
+                val ctx = context ?: return@launch
                 withContext(Dispatchers.IO) {
+                    // Decrypt encrypted PDF to temp file for PdfRenderer (SEC-09)
+                    val tempFile = SecureFileManager.decryptToTempFile(ctx, file)
+                    tempDecryptedFile = tempFile
                     fileDescriptor = ParcelFileDescriptor.open(
-                        file,
+                        tempFile,
                         ParcelFileDescriptor.MODE_READ_ONLY
                     )
                     pdfRenderer = PdfRenderer(fileDescriptor!!)
@@ -273,6 +279,11 @@ class PdfViewerFragment : Fragment() {
         pdfRenderer = null
         try { fileDescriptor?.close() } catch (e: Exception) { android.util.Log.e("PdfViewerFragment", "Error closing fd", e) }
         fileDescriptor = null
+
+        // Clean up decrypted temp file (SEC-09)
+        tempDecryptedFile?.delete()
+        tempDecryptedFile = null
+
         _binding = null
     }
 }

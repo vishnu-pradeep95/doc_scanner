@@ -67,7 +67,13 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.pdfscanner.app.R  // Generated resource references (R.id.xxx, R.string.xxx)
 import com.pdfscanner.app.databinding.FragmentCameraBinding  // View Binding for fragment_camera.xml
 import com.pdfscanner.app.util.DocumentScanner
+import com.pdfscanner.app.util.SecureFileManager
 import com.pdfscanner.app.viewmodel.ScannerViewModel
+
+// Coroutines
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // Java utilities
 import java.io.File
@@ -681,6 +687,13 @@ class CameraFragment : Fragment() {
                  * Called when image is saved successfully
                  */
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    // CameraX wrote plaintext; encrypt in-place immediately (SEC-09)
+                    // Fire-and-forget: encryption is fast (milliseconds for a JPEG)
+                    // and the file is in app-private storage
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        SecureFileManager.encryptFileInPlace(photoFile)
+                    }
+
                     // Guard against fragment detachment during async save
                     val b = _binding ?: return
                     // Hide loading, re-enable button
