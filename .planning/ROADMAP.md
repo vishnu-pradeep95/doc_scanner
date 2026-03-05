@@ -136,5 +136,5 @@ Plans:
 | 6. Security Foundation & Quick Wins | v1.2 | 0/2 | Planned | - |
 | 7. Input Hardening & Encrypted Storage | v1.2 | 0/2 | Planned | - |
 | 8. File Encryption at Rest | v1.2 | 0/4 | Planned | - |
-| 9. Biometric App Lock | v1.2 | 0/2 | Planned | - |
+| 9. Biometric App Lock | v1.2 | 2/2 | Complete | 2026-03-05 |
 | 10. Hardening Polish & Audit | v1.2 | 0/? | Not started | - |
