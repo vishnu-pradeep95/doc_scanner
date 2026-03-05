@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Security Hardening
-status: completed
-stopped_at: Completed 08-04-PLAN.md
-last_updated: "2026-03-05T00:36:03.511Z"
-last_activity: 2026-03-05 — Completed 08-04 (existing-file migration flow with progress UI)
+status: in-progress
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-05T01:39:31Z"
+last_activity: 2026-03-05 — Completed 09-01 (AppLockManager utility + Settings Security UI)
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_plans: 10
+  completed_plans: 9
+  percent: 90
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-03 after v1.2 milestone started)
 
 **Core value:** Every feature that exists must work flawlessly, feel delightful, and be verified — no rough edges, no untested flows.
-**Current focus:** Phase 8 complete -- ready for Phase 9
+**Current focus:** Phase 9 in progress -- biometric app lock
 
 ## Current Position
 
-Phase: 8 of 10 (File Encryption at Rest)
-Plan: 4 of 4 complete
-Status: Phase 8 COMPLETE -- all file encryption at rest plans done (core, utility/editor, UI, migration)
-Last activity: 2026-03-05 — Completed 08-04 (existing-file migration flow with progress UI)
+Phase: 9 of 10 (Biometric App Lock)
+Plan: 1 of 2 complete
+Status: Plan 09-01 done (AppLockManager + Settings UI); Plan 09-02 next (MainActivity enforcement)
+Last activity: 2026-03-05 — Completed 09-01 (AppLockManager utility + Settings Security UI)
 
-Progress: [██████████] 100% (4/4 plans in phase 8)
+Progress: [█████-----] 50% (1/2 plans in phase 9)
 
 ## Performance Metrics
 
@@ -46,7 +46,7 @@ Progress: [██████████] 100% (4/4 plans in phase 8)
 | 6. Security Foundation | 2 | 3min | 1.5min |
 | 7. Input & Encrypted Storage | 2/2 | 15min | 7.5min |
 | 8. File Encryption | 4/4 | 14min | 3.5min |
-| 9. Biometric App Lock | - | - | - |
+| 9. Biometric App Lock | 1/2 | 3min | 3min |
 | 10. Hardening Polish | - | - | - |
 
 *Updated after each plan completion*
@@ -58,6 +58,7 @@ Progress: [██████████] 100% (4/4 plans in phase 8)
 | Phase 08 P03 | 5min | 2 tasks | 8 files |
 | Phase 08 P02 | 4min | 2 tasks | 9 files |
 | Phase 08 P04 | 1min | 2 tasks | 3 files |
+| Phase 09 P01 | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,8 @@ Critical decisions carrying forward:
 - PdfAnnotationRenderer decrypt-to-temp only for file:// URIs; content:// URIs use contentResolver directly
 - HomeFragment migration: quick sentinel check avoids dialog flash; zero-file case sets sentinel without showing dialog
 - Migration progress dialog uses theme-agnostic ?attr/textAppearance* for cross-theme compatibility
+- AppLockManager uses API-level split for authenticators: BIOMETRIC_WEAK|DEVICE_CREDENTIAL on <30, BIOMETRIC_STRONG|DEVICE_CREDENTIAL on 30+
+- Lock toggle hidden entirely on devices with no authentication hardware; enrollment guidance dialog shown when no PIN/biometric enrolled
 
 ### Blockers/Concerns
 
@@ -97,6 +100,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-05T00:29:00Z
-Stopped at: Completed 08-04-PLAN.md
-Resume file: .planning/phases/08-file-encryption-at-rest/08-04-SUMMARY.md
+Last session: 2026-03-05T01:36:07Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: .planning/phases/09-biometric-app-lock/09-01-SUMMARY.md

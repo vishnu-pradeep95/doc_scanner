@@ -22,8 +22,8 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 
 ### App Lock
 
-- [ ] **SEC-02**: User can enable biometric/PIN app lock via Settings; BiometricPrompt with DEVICE_CREDENTIAL fallback
-- [ ] **SEC-13**: App re-requires authentication after configurable timeout when backgrounded (immediate/30s/1min/5min)
+- [x] **SEC-02**: User can enable biometric/PIN app lock via Settings; BiometricPrompt with DEVICE_CREDENTIAL fallback
+- [x] **SEC-13**: App re-requires authentication after configurable timeout when backgrounded (immediate/30s/1min/5min)
 
 ### Data Protection
 
@@ -61,7 +61,7 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SEC-01 | Phase 6 | Complete |
-| SEC-02 | Phase 9 | Pending |
+| SEC-02 | Phase 9 | Complete |
 | SEC-03 | Phase 6 | Complete |
 | SEC-04 | Phase 6 | Complete |
 | SEC-05 | Phase 6 | Complete |
@@ -72,7 +72,7 @@ Requirements for security hardening milestone. Each maps to roadmap phases.
 | SEC-10 | Phase 8 | Complete |
 | SEC-11 | Phase 10 | Pending |
 | SEC-12 | Phase 10 | Pending |
-| SEC-13 | Phase 9 | Pending |
+| SEC-13 | Phase 9 | Complete |
 | SEC-14 | Phase 10 | Pending |
 
 **Coverage:**
