@@ -21,16 +21,24 @@ package com.pdfscanner.app
 
 // Android core imports
 import android.os.Bundle  // Bundle is like a dictionary/map for passing data
+import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity  // Base class for Activities
 import androidx.appcompat.app.AppCompatDelegate  // For theme switching
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat  // For edge-to-edge display
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.fragment.NavHostFragment  // Handles Fragment navigation
+import com.google.android.material.snackbar.Snackbar
 import java.io.File
 
 // View Binding - auto-generated class from activity_main.xml
 // Naming convention: ActivityMainBinding comes from activity_main.xml
 import com.pdfscanner.app.databinding.ActivityMainBinding
+import com.pdfscanner.app.util.AppLockManager
 import com.pdfscanner.app.util.AppPreferences
 
 /**
@@ -43,14 +51,18 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * View Binding variable
-     * 
+     *
      * 'lateinit' means "I promise to initialize this before using it"
      * This is Kotlin's way of handling non-null variables that can't be
      * initialized in the declaration.
-     * 
+     *
      * Similar to declaring a pointer in C++ and initializing it later.
      */
     private lateinit var binding: ActivityMainBinding
+
+    // SEC-02: Biometric app lock state
+    private var isAuthenticating = false
+    private var isAuthenticated = false
 
     /**
      * onCreate() - Called when Activity is first created
@@ -109,6 +121,25 @@ class MainActivity : AppCompatActivity() {
          */
         setContentView(binding.root)
 
+        // SEC-13: Track app background transitions for auto-lock timeout
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
+                // App went to background -- record timestamp for timeout check
+                AppLockManager.recordBackgroundTime(applicationContext)
+                // Reset authenticated state so onResume will re-check
+                isAuthenticated = false
+                // Show overlay immediately to prevent content glimpse on task switcher
+                if (AppLockManager.isLockEnabled(applicationContext)) {
+                    binding.lockOverlay.visibility = View.VISIBLE
+                }
+            }
+        })
+
+        // SEC-02: Show overlay on cold start if lock is enabled
+        if (AppLockManager.shouldRequireAuth(this)) {
+            binding.lockOverlay.visibility = View.VISIBLE
+        }
+
         // Clean up stale temp files from previous sessions
         cleanupStaleTempFiles()
 
@@ -138,7 +169,71 @@ class MainActivity : AppCompatActivity() {
         // NavController is available but not used here since Fragments navigate themselves
         // You could add: setupActionBarWithNavController(navController) for toolbar integration
     }
-    
+
+    override fun onResume() {
+        super.onResume()
+        // SEC-02: Check if biometric auth is needed
+        if (AppLockManager.isLockEnabled(this)) {
+            // Graceful degradation: if user removed device security between sessions, auto-disable lock
+            if (!AppLockManager.canAuthenticate(this)) {
+                AppLockManager.setLockEnabled(this, false)
+                AppLockManager.clearAuthState(this)
+                binding.lockOverlay.visibility = View.GONE
+                Snackbar.make(binding.root, R.string.app_lock_disabled_no_security, Snackbar.LENGTH_LONG).show()
+                return
+            }
+            if (AppLockManager.shouldRequireAuth(this) && !isAuthenticated && !isAuthenticating) {
+                showBiometricPrompt()
+            } else if (isAuthenticated) {
+                binding.lockOverlay.visibility = View.GONE
+            }
+        } else {
+            binding.lockOverlay.visibility = View.GONE
+        }
+    }
+
+    /**
+     * SEC-02: Show BiometricPrompt with API-tiered authenticator flags.
+     * Uses AppLockManager.getAllowedAuthenticators() which returns:
+     *   API 30+: BIOMETRIC_STRONG | DEVICE_CREDENTIAL
+     *   API < 30: BIOMETRIC_WEAK | DEVICE_CREDENTIAL
+     *
+     * IMPORTANT: Do NOT call setNegativeButtonText when DEVICE_CREDENTIAL is included
+     * (BiometricPrompt throws IllegalArgumentException).
+     */
+    private fun showBiometricPrompt() {
+        isAuthenticating = true
+        val executor = ContextCompat.getMainExecutor(this)
+        val prompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    isAuthenticated = true
+                    isAuthenticating = false
+                    binding.lockOverlay.visibility = View.GONE
+                }
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    isAuthenticating = false
+                    if (errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
+                        errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                        // User refused authentication -- close app to prevent bypass
+                        finishAffinity()
+                    }
+                    // Other errors (e.g., ERROR_LOCKOUT): prompt dismissed, overlay stays,
+                    // next onResume will re-trigger prompt
+                }
+                override fun onAuthenticationFailed() {
+                    // Biometric not recognized -- prompt stays open, user can retry
+                    // No action needed; BiometricPrompt handles retry UI internally
+                }
+            })
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.app_lock_title))
+            .setSubtitle(getString(R.string.app_lock_subtitle))
+            .setAllowedAuthenticators(AppLockManager.getAllowedAuthenticators())
+            .build()
+        prompt.authenticate(promptInfo)
+    }
+
     /**
      * Clean up stale temp files created by PDF viewing and editing operations.
      * SEC-05: Deletes ALL matching temp files on startup regardless of age,
