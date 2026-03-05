@@ -116,11 +116,12 @@ Plans:
   2. Sensitive views (document names, file paths) are protected from untrusted accessibility services via accessibilityDataSensitive attribute on API 34+
   3. App detects rooted/debuggable device environment and shows a one-time warning dialog (non-blocking, dismissible)
   4. Release APK passes full security audit: no plaintext document data on disk, no log leaks, all encrypted operations verified on physical device
-**Plans**: TBD
-**Research**: Skip — verification and low-complexity additions
+**Plans**: 2 plans
+**Research**: Complete — platform APIs, no external dependencies
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md — Sensitive clipboard (SEC-11) + accessibility data protection (SEC-12) + root/debuggable detection with warning dialog (SEC-14)
+- [ ] 10-02-PLAN.md — Release APK build + cross-cutting security audit verification (all SEC requirements)
 
 ## Progress
 
@@ -137,4 +138,4 @@ Plans:
 | 7. Input Hardening & Encrypted Storage | v1.2 | 0/2 | Planned | - |
 | 8. File Encryption at Rest | v1.2 | 0/4 | Planned | - |
 | 9. Biometric App Lock | v1.2 | 2/2 | Complete | 2026-03-05 |
-| 10. Hardening Polish & Audit | v1.2 | 0/? | Not started | - |
+| 10. Hardening Polish & Audit | v1.2 | 0/2 | Not started | - |
