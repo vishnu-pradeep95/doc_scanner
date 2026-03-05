@@ -46,10 +46,13 @@ import com.pdfscanner.app.util.DocumentScanner
 import com.pdfscanner.app.util.InputValidator
 import com.pdfscanner.app.util.PdfPageExtractor
 import com.pdfscanner.app.util.PdfUtils
+import com.pdfscanner.app.util.SecureFileManager
+import com.pdfscanner.app.util.SecurePreferences
 import com.pdfscanner.app.viewmodel.ScannerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 // PDF operation modes
 private enum class PdfOperation {
@@ -165,6 +168,9 @@ class HomeFragment : Fragment() {
             v.updatePadding(bottom = insets.bottom)
             windowInsets
         }
+
+        // SEC-09: Migrate existing unencrypted files on first launch after update
+        checkAndRunMigration()
     }
 
     override fun onResume() {
@@ -752,6 +758,60 @@ class HomeFragment : Fragment() {
             } else {
                 showSnackbar(result.message)
             }
+        }
+    }
+
+    /**
+     * SEC-09: Check if unencrypted files need migration and run with progress dialog.
+     *
+     * Quick sentinel check avoids dialog flash on subsequent launches.
+     * Zero-file case sets sentinel immediately without showing dialog.
+     * Non-cancelable dialog prevents user from interrupting encryption mid-file.
+     * Crash-safe: SecureFileManager.migrateExistingFiles is idempotent.
+     */
+    private fun checkAndRunMigration() {
+        val ctx = context ?: return
+
+        // Quick sentinel check to avoid dialog flash on subsequent launches
+        val prefs = SecurePreferences.getInstance(ctx)
+        if (prefs.getBoolean("_file_migration_complete", false)) return
+
+        // Check if there are any files to migrate
+        val dirs = listOf("scans", "processed", "pdfs")
+        val fileCount = dirs.sumOf { dir ->
+            File(ctx.filesDir, dir).listFiles()?.count { it.isFile } ?: 0
+        }
+        if (fileCount == 0) {
+            // No files to migrate -- set sentinel and return
+            prefs.edit().putBoolean("_file_migration_complete", true).apply()
+            return
+        }
+
+        // Show non-cancelable progress dialog
+        val progressView = layoutInflater.inflate(R.layout.dialog_migration_progress, null)
+        val progressBar = progressView.findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.progressMigration)
+        val statusText = progressView.findViewById<android.widget.TextView>(R.id.textMigrationStatus)
+        val countText = progressView.findViewById<android.widget.TextView>(R.id.textMigrationCount)
+
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(ctx)
+            .setTitle(R.string.migration_title)
+            .setView(progressView)
+            .setCancelable(false)
+            .create()
+        dialog.show()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val success = withContext(Dispatchers.IO) {
+                SecureFileManager.migrateExistingFiles(ctx.applicationContext) { current, total ->
+                    launch(Dispatchers.Main) {
+                        progressBar.max = total
+                        progressBar.progress = current
+                        statusText.text = getString(R.string.migration_status_encrypting, current, total)
+                        countText.text = "$current / $total"
+                    }
+                }
+            }
+            dialog.dismiss()
         }
     }
 
