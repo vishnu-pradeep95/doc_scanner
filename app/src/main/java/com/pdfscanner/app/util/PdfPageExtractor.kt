@@ -24,7 +24,6 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -154,11 +153,9 @@ object PdfPageExtractor {
                 PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
             )
             
-            // Save as JPEG
+            // Save as encrypted JPEG
             val outputFile = File(outputDir, "PDF_${timestamp}_page${pageIndex + 1}.jpg")
-            FileOutputStream(outputFile).use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-            }
+            SecureFileManager.encryptBitmapToFile(bitmap, outputFile, 90)
             
             // Recycle bitmap to free memory
             bitmap.recycle()

@@ -142,11 +142,9 @@ object PdfUtils {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             val outputFile = File(getPdfsDir(context), "${outputName}_$timestamp.pdf")
             
-            FileOutputStream(outputFile).use { fos ->
-                pdfDocument.writeTo(fos)
-            }
+            SecureFileManager.encryptPdfToFile(pdfDocument, outputFile)
             pdfDocument.close()
-            
+
             Log.d(TAG, "Merged ${pdfUris.size} PDFs into ${outputFile.name}")
             
             PdfOperationResult(
@@ -224,9 +222,7 @@ object PdfUtils {
 
                             // Save
                             val outputFile = File(getPdfsDir(context), "${baseName}_${i + 1}_$timestamp.pdf")
-                            FileOutputStream(outputFile).use { fos ->
-                                singlePagePdf.writeTo(fos)
-                            }
+                            SecureFileManager.encryptPdfToFile(singlePagePdf, outputFile)
                             singlePagePdf.close()
                             bitmap.recycle()
 
@@ -320,9 +316,7 @@ object PdfUtils {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             val outputFile = File(getPdfsDir(context), "${outputName}_$timestamp.pdf")
 
-            FileOutputStream(outputFile).use { fos ->
-                pdfDocument.writeTo(fos)
-            }
+            SecureFileManager.encryptPdfToFile(pdfDocument, outputFile)
             pdfDocument.close()
 
             PdfOperationResult(
@@ -440,11 +434,9 @@ object PdfUtils {
             val baseName = outputName ?: "Compressed"
             val outputFile = File(getPdfsDir(context), "${baseName}_$timestamp.pdf")
 
-            FileOutputStream(outputFile).use { fos ->
-                pdfDocument.writeTo(fos)
-            }
+            SecureFileManager.encryptPdfToFile(pdfDocument, outputFile)
             pdfDocument.close()
-            
+
             val newSize = outputFile.length()
             val savingsPercent = if (originalSize > 0) {
                 ((originalSize - newSize) * 100 / originalSize).toInt()

@@ -579,9 +579,7 @@ object ImageProcessor {
         quality: Int = 90
     ): Boolean {
         return try {
-            java.io.FileOutputStream(outputFile).use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
+            SecureFileManager.encryptBitmapToFile(bitmap, outputFile, quality)
             true
         } catch (e: Exception) {
             false

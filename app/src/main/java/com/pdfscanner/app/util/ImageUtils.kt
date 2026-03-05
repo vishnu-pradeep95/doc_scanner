@@ -8,7 +8,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
-import java.io.FileOutputStream
 
 /**
  * Image utility functions for the scanner app.
@@ -91,9 +90,7 @@ object ImageUtils {
             if (!scansDir.exists()) scansDir.mkdirs()
             val outputFile = File(scansDir, "IMPORT_${System.currentTimeMillis()}.jpg")
 
-            FileOutputStream(outputFile).use { out ->
-                corrected.compress(Bitmap.CompressFormat.JPEG, 90, out)
-            }
+            SecureFileManager.encryptBitmapToFile(corrected, outputFile, 90)
             corrected.recycle()
 
             Log.d(TAG, "EXIF corrected image saved: ${outputFile.absolutePath}")
