@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dialog_migration_progress.xml - Non-cancelable migration progress dialog -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg"
+    android:gravity="center_horizontal">
+
+    <!-- Status message -->
+    <TextView
+        android:id="@+id/textMigrationStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:gravity="center"
+        tools:text="Securing your documents..." />
+
+    <!-- Determinate progress bar -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressMigration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:indeterminate="false"
+        app:trackThickness="6dp" />
+
+    <!-- File count -->
+    <TextView
+        android:id="@+id/textMigrationCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:gravity="center"
+        tools:text="0 of 0 files" />
+
+</LinearLayout>
