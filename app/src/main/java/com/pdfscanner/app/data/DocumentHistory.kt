@@ -20,6 +20,7 @@ package com.pdfscanner.app.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import com.pdfscanner.app.util.SecureFileManager
 import com.pdfscanner.app.util.SecurePreferences
 import org.json.JSONArray
 import org.json.JSONObject
@@ -178,10 +179,10 @@ class DocumentHistoryRepository(context: Context) {
     fun removeDocument(id: String, deleteFile: Boolean = false) {
         val documents = getAllDocuments().toMutableList()
         val toRemove = documents.find { it.id == id }
-        
+
         if (toRemove != null) {
             if (deleteFile) {
-                File(toRemove.filePath).delete()
+                SecureFileManager.secureDelete(File(toRemove.filePath)) // SEC-10
             }
             documents.remove(toRemove)
             saveDocuments(documents)
@@ -194,7 +195,7 @@ class DocumentHistoryRepository(context: Context) {
     fun clearHistory(deleteFiles: Boolean = false) {
         if (deleteFiles) {
             getAllDocuments().forEach { doc ->
-                File(doc.filePath).delete()
+                SecureFileManager.secureDelete(File(doc.filePath)) // SEC-10
             }
         }
         prefs.edit().remove(KEY_DOCUMENTS).apply()

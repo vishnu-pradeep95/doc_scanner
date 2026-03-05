@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pdfscanner.app.R
 import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.databinding.ItemRecentDocumentBinding
+import com.pdfscanner.app.util.SecureFileManager
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -102,26 +103,35 @@ class RecentDocumentsAdapter(
 
         private fun loadPdfThumbnail(document: DocumentEntry) {
             CoroutineScope(Dispatchers.IO).launch {
+                var tempFile: File? = null
                 try {
                     val file = File(document.filePath)
                     if (!file.exists()) return@launch
 
+                    // Decrypt encrypted PDF to temp file for PdfRenderer (SEC-09)
+                    tempFile = File.createTempFile("recent_thumb_", ".tmp", file.parentFile)
+                    SecureFileManager.decryptFromFile(file).use { input ->
+                        tempFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+
                     val fileDescriptor = ParcelFileDescriptor.open(
-                        file,
+                        tempFile,
                         ParcelFileDescriptor.MODE_READ_ONLY
                     )
                     val pdfRenderer = PdfRenderer(fileDescriptor)
-                    
+
                     if (pdfRenderer.pageCount > 0) {
                         val page = pdfRenderer.openPage(0)
-                        
+
                         // Create bitmap for thumbnail
                         val bitmap = Bitmap.createBitmap(
                             page.width,
                             page.height,
                             Bitmap.Config.ARGB_8888
                         )
-                        
+
                         // Render page to bitmap
                         page.render(
                             bitmap,
@@ -129,7 +139,7 @@ class RecentDocumentsAdapter(
                             null,
                             PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
                         )
-                        
+
                         page.close()
                         pdfRenderer.close()
                         fileDescriptor.close()
@@ -144,6 +154,8 @@ class RecentDocumentsAdapter(
                     }
                 } catch (e: Exception) {
                     // Silently fail - will show default icon
+                } finally {
+                    tempFile?.delete()
                 }
             }
         }

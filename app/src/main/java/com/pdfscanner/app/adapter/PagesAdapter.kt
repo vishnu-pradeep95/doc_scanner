@@ -16,14 +16,22 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 import com.pdfscanner.app.R
 import com.pdfscanner.app.databinding.ItemPageBinding
+import com.pdfscanner.app.util.SecureFileManager
+
+import java.io.File
 
 /**
  * PagesAdapter - Displays page thumbnails with multi-selection & drag-to-reorder
@@ -229,11 +237,35 @@ class PagesAdapter(
                 binding.dragHandle.visibility = View.VISIBLE
             }
 
-            // Coil handles caching, lifecycle, and placeholder automatically
-            binding.imageThumbnail.load(uri) {
-                crossfade(true)
-                placeholder(R.drawable.ic_cartoon_document)
-                error(R.drawable.ic_cartoon_document)
+            // Decrypt encrypted scan images before loading into Coil (SEC-09)
+            if (uri.scheme == "file") {
+                val file = File(uri.path ?: "")
+                if (file.exists()) {
+                    binding.root.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) {
+                        val bitmap = SecureFileManager.decryptToBitmap(file)
+                        withContext(Dispatchers.Main) {
+                            binding.imageThumbnail.load(bitmap ?: uri) {
+                                crossfade(true)
+                                placeholder(R.drawable.ic_cartoon_document)
+                                error(R.drawable.ic_cartoon_document)
+                            }
+                        }
+                    } ?: run {
+                        // Fallback if no lifecycle owner available
+                        binding.imageThumbnail.load(uri) {
+                            crossfade(true)
+                            placeholder(R.drawable.ic_cartoon_document)
+                            error(R.drawable.ic_cartoon_document)
+                        }
+                    }
+                }
+            } else {
+                // content:// URIs -- Coil handles directly
+                binding.imageThumbnail.load(uri) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_cartoon_document)
+                    error(R.drawable.ic_cartoon_document)
+                }
             }
 
             // Click handlers

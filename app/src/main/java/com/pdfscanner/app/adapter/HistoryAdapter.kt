@@ -10,10 +10,15 @@
 
 package com.pdfscanner.app.adapter
 
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +26,10 @@ import coil.load
 import com.pdfscanner.app.R
 import com.pdfscanner.app.data.DocumentEntry
 import com.pdfscanner.app.databinding.ItemDocumentBinding
+import com.pdfscanner.app.util.SecureFileManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -81,13 +90,23 @@ class HistoryAdapter(
             }
             binding.textDocumentName.text = displayName
 
-            // Load document thumbnail via Coil
+            // Load document thumbnail -- decrypt encrypted PDF to render first page (SEC-09)
             val file = File(document.filePath)
             if (file.exists()) {
-                binding.imageDocumentThumbnail.load(Uri.fromFile(file)) {
-                    crossfade(true)
-                    placeholder(R.drawable.ic_cartoon_document)
-                    error(R.drawable.ic_cartoon_document)
+                binding.root.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) {
+                    val bitmap = renderPdfThumbnail(file)
+                    withContext(Dispatchers.Main) {
+                        if (bitmap != null) {
+                            binding.imageDocumentThumbnail.load(bitmap) {
+                                crossfade(true)
+                                placeholder(R.drawable.ic_cartoon_document)
+                            }
+                        } else {
+                            binding.imageDocumentThumbnail.setImageResource(R.drawable.ic_cartoon_document)
+                        }
+                    }
+                } ?: run {
+                    binding.imageDocumentThumbnail.setImageResource(R.drawable.ic_cartoon_document)
                 }
             } else {
                 binding.imageDocumentThumbnail.setImageResource(R.drawable.ic_cartoon_document)
@@ -211,6 +230,44 @@ class HistoryAdapter(
         onSelectionChanged?.invoke(selectedItems.size, true)
     }
     
+    /**
+     * Render first page of an encrypted PDF as a thumbnail bitmap.
+     * Decrypts to temp, opens with PdfRenderer, renders page 0, cleans up.
+     * Must be called from Dispatchers.IO.
+     */
+    private fun renderPdfThumbnail(file: File): Bitmap? {
+        var tempFile: File? = null
+        return try {
+            // Decrypt to temp file for PdfRenderer (no Context needed)
+            tempFile = File.createTempFile("hist_thumb_", ".tmp", file.parentFile)
+            SecureFileManager.decryptFromFile(file).use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            val pfd = ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_READ_ONLY)
+            val renderer = PdfRenderer(pfd)
+            if (renderer.pageCount > 0) {
+                val page = renderer.openPage(0)
+                val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+                bitmap.eraseColor(android.graphics.Color.WHITE)
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                page.close()
+                renderer.close()
+                pfd.close()
+                bitmap
+            } else {
+                renderer.close()
+                pfd.close()
+                null
+            }
+        } catch (e: Exception) {
+            null
+        } finally {
+            tempFile?.delete()
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DocumentViewHolder {
         val binding = ItemDocumentBinding.inflate(
             LayoutInflater.from(parent.context),
