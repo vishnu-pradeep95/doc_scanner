@@ -383,6 +383,17 @@ dependencies {
     implementation("com.google.crypto.tink:tink-android:1.20.0")
 
     // ===========================================
+    // BIOMETRIC APP LOCK (SEC-02)
+    // ===========================================
+
+    // BiometricPrompt + BiometricManager — unified biometric/PIN auth API
+    // biometric:1.1.0 bundles its own consumer ProGuard rules — no explicit keep rules needed
+    implementation("androidx.biometric:biometric:1.1.0")
+
+    // ProcessLifecycleOwner — app foreground/background detection for lock timeout
+    implementation("androidx.lifecycle:lifecycle-process:2.6.2")
+
+    // ===========================================
     // UI COMPONENTS
     // ===========================================
 
